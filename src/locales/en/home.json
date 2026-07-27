@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "cta": "PLACEHOLDER",
+    "watchSimulation": "Watch Simulation",
+    "compare": {
+      "fireSide": "FIRE SIDE",
+      "protectionSide": "PROTECTION SIDE",
+      "dragHint": "DRAG TO COMPARE",
+      "beforePlaceholder": "Unprotected building image",
+      "afterPlaceholder": "Protected building image",
+      "unprotected": {
+        "badge": "UNPROTECTED",
+        "sub": "Without Firestop",
+        "description": "Fire & Smoke Spread"
+      },
+      "protected": {
+        "badge": "PROTECTED",
+        "sub": "With Firestop",
+        "description": "Fire & Smoke Contained"
+      }
+    },
+    "stats": {
+      "experience": { "label": "PLACEHOLDER" },
+      "completedProjects": { "label": "PLACEHOLDER" },
+      "serviceCoverage": { "label": "PLACEHOLDER" }
+    }
+  },
+  "building3d": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "loading": "Loading...",
+    "hint": "Click a red marker to explore the system",
+    "panel": {
+      "selectedLabel": "Selected Area",
+      "systemType": "System Type",
+      "serviceType": "Service Type",
+      "applicationArea": "Application Area",
+      "fireRating": "Fire Rating",
+      "certification": "Certification",
+      "detailsCta": "Learn More",
+      "close": "Close"
+    },
+    "hotspots": {
+      "cableTray": {
+        "name": "Cable Tray Penetration",
+        "description": "The opening where cables pass through floors and walls. Left unsealed, it lets fire and smoke spread from one compartment to another.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "metalPipe": {
+        "name": "Metal Pipe Penetration",
+        "description": "The point where metal pipework passes through structural elements. Its thermal conductivity calls for extra attention.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "pvcPipe": {
+        "name": "PVC Pipe Penetration",
+        "description": "The penetration point for PVC pipework. It can melt under high heat and create an opening, which calls for a dedicated seal.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "hvacDuct": {
+        "name": "HVAC Duct Penetration",
+        "description": "The penetration point for HVAC ductwork. It must be protected to stop fire and smoke spreading through the air ducts.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "floorWallJoint": {
+        "name": "Floor-Wall Joint",
+        "description": "The structural joint line where floor meets wall. This gap can open under building movement and must be fire-sealed.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "curtainWall": {
+        "name": "Curtain Wall Penetration",
+        "description": "The gap between the curtain wall system and the floor slab. A critical point for stopping fire spread between floors.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "structuralJoint": {
+        "name": "Structural Joint",
+        "description": "The joint line that allows for the building's structural movement. It needs a flexible fire seal that keeps its integrity through expansion and contraction.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "landscape": {
+        "name": "Landscape Design",
+        "description": "Functional and aesthetic yard layout around the building — green spaces, walking paths, and open-area planning.",
+        "systemType": "Landscape Architecture",
+        "applicationArea": "Open area, yard, green zone",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      },
+      "exteriorDesign": {
+        "name": "Facade & Exterior Design",
+        "description": "Modern cladding systems, facade materials, and architectural solutions for the building's exterior appearance.",
+        "systemType": "Exterior Engineering",
+        "applicationArea": "Facade, cladding, exterior envelope",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      }
+    }
+  },
+  "whyFirestop": {
+    "titlePrefix": "Why",
+    "titleHighlight": "Firestop?",
+    "reasons": {
+      "delaySpread": "Slows the spread of fire and reduces its spread rate.",
+      "reduceSmoke": "Reduces the spread of smoke and toxic gases inside the building.",
+      "evacuationTime": "Buys extra time for evacuation, protecting human life.",
+      "protectStructure": "Protects the building structure and minimizes damage."
+    }
+  },
+  "materials": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "comingSoon": "PLACEHOLDER",
+    "imagePlaceholder": "Image coming soon",
+    "items": {
+      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "hvacDuct": { "name": "PLACEHOLDER" },
+      "pvcPipe": { "name": "PLACEHOLDER" }
+    }
+  },
+  "process": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "steps": {
+      "step1": { "title": "PLACEHOLDER" },
+      "step2": { "title": "PLACEHOLDER" },
+      "step3": { "title": "PLACEHOLDER" },
+      "step4": { "title": "PLACEHOLDER" }
+    }
+  },
+  "services": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "viewAll": "All Services",
+    "readMore": "Learn More",
+    "imagePlaceholder": "Image coming soon",
+    "items": {
+      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    }
+  },
+  "processTeaser": {
+    "heading": "This is how Fire Stop protects.",
+    "description": "PLACEHOLDER",
+    "cta": "Discover the Process"
+  },
+  "projects": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "imagePlaceholder": "Image coming soon",
+    "viewAll": "All Projects",
+    "filters": {
+      "all": "All",
+      "completed": "Completed",
+      "ongoing": "Ongoing"
+    },
+    "status": {
+      "completed": "Completed",
+      "ongoing": "Ongoing"
+    }
+  },
+  "partnersMarquee": {
+    "partnersTitle": "Our Partners",
+    "customersTitle": "Our Customers"
+  },
+  "cta": {
+    "title": "PLACEHOLDER",
+    "button": "PLACEHOLDER"
+  }
+}

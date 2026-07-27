@@ -1,0 +1,14 @@
+{
+  "description": "PLACEHOLDER",
+  "quickLinksHeading": "Быстрые ссылки",
+  "links": {
+    "home": "Главная",
+    "about": "О компании",
+    "services": "Услуги",
+    "projects": "Проекты",
+    "contact": "Контакты"
+  },
+  "contactHeading": "Контакты",
+  "socialHeading": "Социальные сети",
+  "copyright": "© {year} AR Group Construction Services. Все права защищены."
+}

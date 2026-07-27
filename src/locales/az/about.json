@@ -1,0 +1,33 @@
+{
+  "pageTitle": "Haqqımızda",
+  "subtitle": "Tikinti həllərində peşəkar xidmət göstəririk.",
+  "intro": "AR Group Construction Services — tikinti sənayesində peşəkar həllər təqdim edən şirkətdir. Passiv yanğın qorunması, mühəndislik dizaynı və tikinti xidmətləri sahəsində Azərbaycanın aparıcı layihələrinə tərəfdaşlıq edirik.",
+  "values": {
+    "heading": "Dəyərlərimiz",
+    "items": {
+      "quality": {
+        "title": "Keyfiyyət",
+        "description": "Xidmət və materiallarda keyfiyyət bizim əsas prioritetimizdir."
+      },
+      "professionalism": {
+        "title": "Peşəkarlıq",
+        "description": "Tapşırılan işləri sistemli, səmərəli və etibarlı şəkildə icra edirik."
+      },
+      "personnel": {
+        "title": "Kadr Siyasəti",
+        "description": "Layihələrdə lazımi insan resurslarının formalaşdırılmasını və komandanın effektiv işləməsini təmin edirik."
+      },
+      "privacy": {
+        "title": "Məxfilik",
+        "description": "Müştərilərimizin layihə, müqavilə və iş metodları ilə bağlı məlumatlarının məxfiliyini qoruyuruq."
+      }
+    }
+  },
+  "stats": {
+    "experience": "İllik təcrübə",
+    "completedProjects": "Tamamlanmış layihə",
+    "certifications": "Sertifikatlar",
+    "employeeCount": "Əməkdaş sayı"
+  },
+  "teamHeading": "Komandamız"
+}

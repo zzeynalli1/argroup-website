@@ -1,0 +1,13 @@
+{
+  "pageTitle": "İletişim",
+  "subtitle": "Bizimle iletişime geçin, projenizi birlikte değerlendirelim.",
+  "info": {
+    "addressLabel": "Adres",
+    "phoneLabel": "Telefon",
+    "emailLabel": "E-posta",
+    "hoursLabel": "Çalışma Saatleri"
+  },
+  "map": {
+    "title": "Harita"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "description": "PLACEHOLDER",
+  "quickLinksHeading": "Sürətli keçidlər",
+  "links": {
+    "home": "Ana səhifə",
+    "about": "Haqqımızda",
+    "services": "Xidmətlər",
+    "projects": "Layihələr",
+    "contact": "Əlaqə"
+  },
+  "contactHeading": "Əlaqə",
+  "socialHeading": "Sosial media",
+  "copyright": "© {year} AR Group Construction Services. Bütün hüquqlar qorunur."
+}

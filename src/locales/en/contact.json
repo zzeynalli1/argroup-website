@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Contact",
+  "subtitle": "Get in touch — let's discuss your project together.",
+  "info": {
+    "addressLabel": "Address",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "hoursLabel": "Business Hours"
+  },
+  "map": {
+    "title": "Map"
+  }
+}

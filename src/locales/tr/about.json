@@ -1,0 +1,33 @@
+{
+  "pageTitle": "Hakkımızda",
+  "subtitle": "İnşaat çözümlerinde profesyonel hizmet sunuyoruz.",
+  "intro": "AR Group Construction Services, inşaat sektörüne profesyonel çözümler sunan bir şirkettir. Pasif yangından korunma, mühendislik tasarımı ve inşaat hizmetleri alanında Azerbaycan'ın önde gelen projelerine ortaklık ediyoruz.",
+  "values": {
+    "heading": "Değerlerimiz",
+    "items": {
+      "quality": {
+        "title": "Kalite",
+        "description": "Hizmet ve malzemede kalite, en önemli önceliğimizdir."
+      },
+      "professionalism": {
+        "title": "Profesyonellik",
+        "description": "Verilen işleri sistemli, verimli ve güvenilir şekilde yürütüyoruz."
+      },
+      "personnel": {
+        "title": "Personel Politikası",
+        "description": "Projelerde gerekli insan kaynağının oluşturulmasını ve ekibin etkin çalışmasını sağlıyoruz."
+      },
+      "privacy": {
+        "title": "Gizlilik",
+        "description": "Müşterilerimizin proje, sözleşme ve çalışma yöntemlerine ilişkin bilgilerinin gizliliğini koruyoruz."
+      }
+    }
+  },
+  "stats": {
+    "experience": "Yıllık Deneyim",
+    "completedProjects": "Tamamlanan Proje",
+    "certifications": "Sertifikalar",
+    "employeeCount": "Çalışan Sayısı"
+  },
+  "teamHeading": "Ekibimiz"
+}

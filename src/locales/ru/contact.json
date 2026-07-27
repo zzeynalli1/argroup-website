@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Контакты",
+  "subtitle": "Свяжитесь с нами — обсудим ваш проект вместе.",
+  "info": {
+    "addressLabel": "Адрес",
+    "phoneLabel": "Телефон",
+    "emailLabel": "Эл. почта",
+    "hoursLabel": "Часы работы"
+  },
+  "map": {
+    "title": "Карта"
+  }
+}

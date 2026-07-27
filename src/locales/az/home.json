@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "title": "Yanğın yayıla bilər. Biz onu dayandırırıq.",
+    "subtitle": "Qabaqcıl firestop sistemləri açılışları bağlayır, yanğını məhdudlaşdırır və ən vacib olanı qoruyur.",
+    "cta": "Həllərimizi kəşf et",
+    "watchSimulation": "Simulyasiyaya bax",
+    "compare": {
+      "fireSide": "FIRE SIDE",
+      "protectionSide": "PROTECTION SIDE",
+      "dragHint": "SÜRÜŞDÜRÜB MÜQAYİSƏ ET",
+      "beforePlaceholder": "Qorunmasız bina şəkli",
+      "afterPlaceholder": "Qorunan bina şəkli",
+      "unprotected": {
+        "badge": "QORUNMASIZ",
+        "sub": "Fire Stop olmadan",
+        "description": "Yanğın və tüstü yayılır"
+      },
+      "protected": {
+        "badge": "QORUNAN",
+        "sub": "Fire Stop ilə",
+        "description": "Yanğın və tüstü məhdudlaşdırılır"
+      }
+    },
+    "stats": {
+      "experience": { "label": "İllik təcrübə" },
+      "completedProjects": { "label": "Tamamlanmış layihə" },
+      "serviceCoverage": { "label": "Xidmət coğrafiyası" }
+    }
+  },
+  "building3d": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "loading": "Yüklənir...",
+    "hint": "Sistemi araşdırmaq üçün qırmızı nöqtəyə klikləyin",
+    "panel": {
+      "selectedLabel": "Seçilmiş sahə",
+      "systemType": "Sistem növü",
+      "serviceType": "Xidmət növü",
+      "applicationArea": "İstifadə sahəsi",
+      "fireRating": "Yanğın davamlılığı",
+      "certification": "Sertifikasiya",
+      "detailsCta": "Ətraflı bax",
+      "close": "Bağla"
+    },
+    "hotspots": {
+      "cableTray": {
+        "name": "Kabel Keçidi",
+        "description": "Kabellərin döşəmə və divarlardan keçdiyi açıqlıq. Bağlanmadıqda yanğın və tüstünün bir bölmədən digərinə yayılmasına yol açır.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "metalPipe": {
+        "name": "Metal Boru Keçidi",
+        "description": "Metal boru kəmərlərinin struktur elementlərdən keçdiyi nöqtə. İstilik ötürücülüyü səbəbindən əlavə diqqət tələb edir.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "pvcPipe": {
+        "name": "Plastik Boru Keçidi",
+        "description": "Plastik (PVC) boru kəmərlərinin keçid nöqtəsi. Yüksək temperaturda əriyərək açıqlıq yarada bilər, bu da xüsusi bağlama tələb edir.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "hvacDuct": {
+        "name": "HVAC Kanal Keçidi",
+        "description": "Ventilyasiya (HVAC) kanallarının keçid nöqtəsi. Tüstü və alovun hava kanalları vasitəsilə yayılmasının qarşısını almaq üçün qorunmalıdır.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "floorWallJoint": {
+        "name": "Döşəmə-Divar Birləşməsi",
+        "description": "Döşəmə ilə divarın birləşdiyi struktur tikiş xətti. Bina hərəkəti zamanı açıla bilən bu boşluq yanğına qarşı bağlanmalıdır.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "curtainWall": {
+        "name": "Fasad (Curtain Wall) Keçidi",
+        "description": "Fasad (curtain wall) sistemi ilə döşəmə arasındakı boşluq. Mərtəbələr arası yanğın yayılmasının qarşısını almaq üçün kritik nöqtədir.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "structuralJoint": {
+        "name": "Konstruktiv Tikiş",
+        "description": "Binanın struktur hərəkətinə imkan verən tikiş xətti. Genişlənmə/daralma zamanı bütövlüyünü qoruyan elastik yanğın bağlaması tələb edir.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "landscape": {
+        "name": "Landşaft Dizaynı",
+        "description": "Bina ətrafında funksional və estetik həyət düzənləməsi — yaşıl sahələr, gəzinti yolları və açıq məkan planlaması.",
+        "systemType": "Landşaft Arxitekturası",
+        "applicationArea": "Açıq sahə, həyət, yaşıl zona",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      },
+      "exteriorDesign": {
+        "name": "Fasad və Eksteryer Dizaynı",
+        "description": "Binanın xarici görünüşü üçün müasir cladding sistemləri, fasad materialları və arxitektural həllər.",
+        "systemType": "Eksteryer Mühəndisliyi",
+        "applicationArea": "Fasad, cladding, xarici örtük",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      }
+    }
+  },
+  "whyFirestop": {
+    "titlePrefix": "Niyə",
+    "titleHighlight": "Firestop?",
+    "reasons": {
+      "delaySpread": "Yanğının yayılmasını ləngidir və yayılma sürətini azaldır.",
+      "reduceSmoke": "Tüstü və zəhərli qazların bina daxilində yayılmasını azaldır.",
+      "evacuationTime": "Təxliyə üçün əlavə vaxt yaradaraq insan həyatını qoruyur.",
+      "protectStructure": "Bina strukturunu qoruyur və maddi zərərləri minimuma endirir."
+    }
+  },
+  "materials": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "comingSoon": "PLACEHOLDER",
+    "imagePlaceholder": "Şəkil əlavə olunacaq",
+    "items": {
+      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "hvacDuct": { "name": "PLACEHOLDER" },
+      "pvcPipe": { "name": "PLACEHOLDER" }
+    }
+  },
+  "process": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "steps": {
+      "step1": { "title": "PLACEHOLDER" },
+      "step2": { "title": "PLACEHOLDER" },
+      "step3": { "title": "PLACEHOLDER" },
+      "step4": { "title": "PLACEHOLDER" }
+    }
+  },
+  "services": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "viewAll": "Bütün xidmətlər",
+    "readMore": "Ətraflı",
+    "imagePlaceholder": "Şəkil əlavə olunacaq",
+    "items": {
+      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    }
+  },
+  "processTeaser": {
+    "heading": "Fire Stop bu şəkildə qoruyur.",
+    "description": "PLACEHOLDER",
+    "cta": "Prosesi kəşf et"
+  },
+  "projects": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "imagePlaceholder": "Şəkil əlavə olunacaq",
+    "viewAll": "Bütün layihələr",
+    "filters": {
+      "all": "Hamısı",
+      "completed": "Tamamlanmış",
+      "ongoing": "Davam edir"
+    },
+    "status": {
+      "completed": "Tamamlanmış",
+      "ongoing": "Davam edir"
+    }
+  },
+  "partnersMarquee": {
+    "partnersTitle": "Tərəfdaşlarımız",
+    "customersTitle": "Müştərilərimiz"
+  },
+  "cta": {
+    "title": "PLACEHOLDER",
+    "button": "PLACEHOLDER"
+  }
+}

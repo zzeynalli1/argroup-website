@@ -10,7 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+build
 *.local
+
+# Environment variables (never commit real secrets/API keys)
+.env
+.env.local
+.env.*.local
 
 # Editor directories and files
 .vscode/*

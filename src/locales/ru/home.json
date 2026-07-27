@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "cta": "PLACEHOLDER",
+    "watchSimulation": "Смотреть симуляцию",
+    "compare": {
+      "fireSide": "ОГОНЬ",
+      "protectionSide": "ЗАЩИТА",
+      "dragHint": "ПЕРЕТАЩИТЕ ДЛЯ СРАВНЕНИЯ",
+      "beforePlaceholder": "Изображение незащищённого здания",
+      "afterPlaceholder": "Изображение защищённого здания",
+      "unprotected": {
+        "badge": "БЕЗ ЗАЩИТЫ",
+        "sub": "Без Firestop",
+        "description": "Огонь и дым распространяются"
+      },
+      "protected": {
+        "badge": "ЗАЩИЩЕНО",
+        "sub": "С Firestop",
+        "description": "Огонь и дым локализованы"
+      }
+    },
+    "stats": {
+      "experience": { "label": "PLACEHOLDER" },
+      "completedProjects": { "label": "PLACEHOLDER" },
+      "serviceCoverage": { "label": "PLACEHOLDER" }
+    }
+  },
+  "building3d": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "loading": "Загрузка...",
+    "hint": "Нажмите на красную точку, чтобы изучить систему",
+    "panel": {
+      "selectedLabel": "Выбранная зона",
+      "systemType": "Тип системы",
+      "serviceType": "Тип услуги",
+      "applicationArea": "Область применения",
+      "fireRating": "Огнестойкость",
+      "certification": "Сертификация",
+      "detailsCta": "Подробнее",
+      "close": "Закрыть"
+    },
+    "hotspots": {
+      "cableTray": {
+        "name": "Кабельный лоток",
+        "description": "Проём для прохода кабелей через перекрытия и стены. Без герметизации через него огонь и дым распространяются из одного отсека в другой.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "metalPipe": {
+        "name": "Металлическая труба",
+        "description": "Точка прохода металлических труб через конструктивные элементы. Из-за теплопроводности требует особого внимания.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "pvcPipe": {
+        "name": "ПВХ труба",
+        "description": "Точка прохода труб ПВХ. При высокой температуре труба может расплавиться и образовать проём, поэтому требуется специальная герметизация.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "hvacDuct": {
+        "name": "Вентиляционный канал (HVAC)",
+        "description": "Точка прохода вентиляционных (HVAC) каналов. Должна быть защищена, чтобы предотвратить распространение огня и дыма через воздуховоды.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "floorWallJoint": {
+        "name": "Стык пол-стена",
+        "description": "Конструктивный шов в месте соединения пола и стены. Этот зазор может раскрываться при движении здания и должен быть огнестойко герметизирован.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "curtainWall": {
+        "name": "Навесной фасад (Curtain Wall)",
+        "description": "Зазор между навесным фасадом (curtain wall) и перекрытием. Критическая точка для предотвращения распространения огня между этажами.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "structuralJoint": {
+        "name": "Конструктивный шов",
+        "description": "Шов, обеспечивающий конструктивное движение здания. Требует эластичной огнестойкой герметизации, сохраняющей целостность при расширении и сжатии.",
+        "systemType": "Пассивная противопожарная защита",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "landscape": {
+        "name": "Ландшафтный дизайн",
+        "description": "Функциональное и эстетичное благоустройство территории вокруг здания — зелёные зоны, пешеходные дорожки и планировка открытого пространства.",
+        "systemType": "Ландшафтная архитектура",
+        "applicationArea": "Открытая территория, двор, зелёная зона",
+        "fireRating": "Не применимо",
+        "certification": "—"
+      },
+      "exteriorDesign": {
+        "name": "Фасад и экстерьерный дизайн",
+        "description": "Современные системы облицовки, фасадные материалы и архитектурные решения для внешнего вида здания.",
+        "systemType": "Экстерьерная инженерия",
+        "applicationArea": "Фасад, облицовка, внешняя оболочка",
+        "fireRating": "Не применимо",
+        "certification": "—"
+      }
+    }
+  },
+  "whyFirestop": {
+    "titlePrefix": "Почему",
+    "titleHighlight": "Firestop?",
+    "reasons": {
+      "delaySpread": "Замедляет распространение огня и снижает скорость его распространения.",
+      "reduceSmoke": "Снижает распространение дыма и токсичных газов внутри здания.",
+      "evacuationTime": "Даёт дополнительное время для эвакуации, защищая жизнь людей.",
+      "protectStructure": "Защищает конструкцию здания и минимизирует ущерб."
+    }
+  },
+  "materials": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "comingSoon": "PLACEHOLDER",
+    "imagePlaceholder": "Изображение появится позже",
+    "items": {
+      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "hvacDuct": { "name": "PLACEHOLDER" },
+      "pvcPipe": { "name": "PLACEHOLDER" }
+    }
+  },
+  "process": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "steps": {
+      "step1": { "title": "PLACEHOLDER" },
+      "step2": { "title": "PLACEHOLDER" },
+      "step3": { "title": "PLACEHOLDER" },
+      "step4": { "title": "PLACEHOLDER" }
+    }
+  },
+  "services": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "viewAll": "Все услуги",
+    "readMore": "Подробнее",
+    "imagePlaceholder": "Изображение появится позже",
+    "items": {
+      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    }
+  },
+  "processTeaser": {
+    "heading": "Вот как работает противопожарная защита.",
+    "description": "PLACEHOLDER",
+    "cta": "Узнать процесс"
+  },
+  "projects": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "imagePlaceholder": "Изображение появится позже",
+    "viewAll": "Все проекты",
+    "filters": {
+      "all": "Все",
+      "completed": "Завершено",
+      "ongoing": "В процессе"
+    },
+    "status": {
+      "completed": "Завершено",
+      "ongoing": "В процессе"
+    }
+  },
+  "partnersMarquee": {
+    "partnersTitle": "Наши партнёры",
+    "customersTitle": "Наши клиенты"
+  },
+  "cta": {
+    "title": "PLACEHOLDER",
+    "button": "PLACEHOLDER"
+  }
+}

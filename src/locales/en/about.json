@@ -1,0 +1,33 @@
+{
+  "pageTitle": "About Us",
+  "subtitle": "We deliver professional service in construction solutions.",
+  "intro": "AR Group Construction Services is a company delivering professional solutions for the construction industry. We partner on Azerbaijan's leading projects in passive fire protection, engineering design, and construction services.",
+  "values": {
+    "heading": "Our Values",
+    "items": {
+      "quality": {
+        "title": "Quality",
+        "description": "Quality in service and materials is our top priority."
+      },
+      "professionalism": {
+        "title": "Professionalism",
+        "description": "We carry out assigned work systematically, efficiently, and reliably."
+      },
+      "personnel": {
+        "title": "Personnel Policy",
+        "description": "We ensure the right human resources are in place on every project and that our teams work effectively."
+      },
+      "privacy": {
+        "title": "Confidentiality",
+        "description": "We safeguard the confidentiality of our clients' project, contract, and working-method information."
+      }
+    }
+  },
+  "stats": {
+    "experience": "Years of Experience",
+    "completedProjects": "Completed Projects",
+    "certifications": "Certifications",
+    "employeeCount": "Number of Employees"
+  },
+  "teamHeading": "Our Team"
+}

@@ -1,0 +1,195 @@
+{
+  "hero": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "cta": "PLACEHOLDER",
+    "watchSimulation": "Simülasyonu izle",
+    "compare": {
+      "fireSide": "YANGIN TARAFI",
+      "protectionSide": "KORUMA TARAFI",
+      "dragHint": "KARŞILAŞTIRMAK İÇİN SÜRÜKLEYİN",
+      "beforePlaceholder": "Korumasız bina görseli",
+      "afterPlaceholder": "Korumalı bina görseli",
+      "unprotected": {
+        "badge": "KORUMASIZ",
+        "sub": "Fire Stop olmadan",
+        "description": "Yangın ve duman yayılır"
+      },
+      "protected": {
+        "badge": "KORUMALI",
+        "sub": "Fire Stop ile",
+        "description": "Yangın ve duman kontrol altında"
+      }
+    },
+    "stats": {
+      "experience": { "label": "PLACEHOLDER" },
+      "completedProjects": { "label": "PLACEHOLDER" },
+      "serviceCoverage": { "label": "PLACEHOLDER" }
+    }
+  },
+  "building3d": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "loading": "Yükleniyor...",
+    "hint": "Sistemi incelemek için kırmızı noktaya tıklayın",
+    "panel": {
+      "selectedLabel": "Seçili Alan",
+      "systemType": "Sistem Türü",
+      "serviceType": "Hizmet Türü",
+      "applicationArea": "Uygulama Alanı",
+      "fireRating": "Yangın Dayanımı",
+      "certification": "Sertifikasyon",
+      "detailsCta": "Daha Fazla",
+      "close": "Kapat"
+    },
+    "hotspots": {
+      "cableTray": {
+        "name": "Kablo Kanalı Geçişi",
+        "description": "Kabloların döşeme ve duvarlardan geçtiği boşluk. Kapatılmazsa yangın ve dumanın bir bölmeden diğerine yayılmasına yol açar.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "metalPipe": {
+        "name": "Metal Boru Geçişi",
+        "description": "Metal boru hatlarının yapısal elemanlardan geçtiği nokta. Isı iletkenliği nedeniyle ekstra dikkat gerektirir.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "pvcPipe": {
+        "name": "Plastik Boru Geçişi",
+        "description": "Plastik (PVC) boru hatlarının geçiş noktası. Yüksek sıcaklıkta eriyerek boşluk oluşturabilir, bu da özel bir sızdırmazlık gerektirir.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "hvacDuct": {
+        "name": "HVAC Kanal Geçişi",
+        "description": "HVAC kanallarının geçiş noktası. Yangın ve dumanın hava kanalları yoluyla yayılmasını önlemek için korunmalıdır.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "floorWallJoint": {
+        "name": "Döşeme-Duvar Birleşimi",
+        "description": "Döşeme ile duvarın birleştiği yapısal derz hattı. Bina hareketi sırasında açılabilen bu boşluk yangına karşı kapatılmalıdır.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "curtainWall": {
+        "name": "Cephe (Curtain Wall) Geçişi",
+        "description": "Cephe (curtain wall) sistemi ile döşeme arasındaki boşluk. Katlar arası yangın yayılmasını önlemek için kritik bir noktadır.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "structuralJoint": {
+        "name": "Yapısal Derz",
+        "description": "Binanın yapısal hareketine izin veren derz hattı. Genleşme ve büzülme sırasında bütünlüğünü koruyan esnek bir yangın sızdırmazlığı gerektirir.",
+        "systemType": "Pasif Yangın Koruması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "landscape": {
+        "name": "Peyzaj Tasarımı",
+        "description": "Bina çevresinde işlevsel ve estetik bahçe düzenlemesi — yeşil alanlar, yürüyüş yolları ve açık alan planlaması.",
+        "systemType": "Peyzaj Mimarlığı",
+        "applicationArea": "Açık alan, bahçe, yeşil bölge",
+        "fireRating": "Geçerli değil",
+        "certification": "—"
+      },
+      "exteriorDesign": {
+        "name": "Cephe ve Dış Cephe Tasarımı",
+        "description": "Binanın dış görünümü için modern cladding sistemleri, cephe malzemeleri ve mimari çözümler.",
+        "systemType": "Dış Cephe Mühendisliği",
+        "applicationArea": "Cephe, cladding, dış kaplama",
+        "fireRating": "Geçerli değil",
+        "certification": "—"
+      }
+    }
+  },
+  "whyFirestop": {
+    "titlePrefix": "Neden",
+    "titleHighlight": "Firestop?",
+    "reasons": {
+      "delaySpread": "Yangının yayılmasını geciktirir ve yayılma hızını azaltır.",
+      "reduceSmoke": "Duman ve zehirli gazların bina içinde yayılmasını azaltır.",
+      "evacuationTime": "Tahliye için ek zaman kazandırarak insan hayatını korur.",
+      "protectStructure": "Bina yapısını korur ve maddi hasarı en aza indirir."
+    }
+  },
+  "materials": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "comingSoon": "PLACEHOLDER",
+    "imagePlaceholder": "Görsel eklenecek",
+    "items": {
+      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "hvacDuct": { "name": "PLACEHOLDER" },
+      "pvcPipe": { "name": "PLACEHOLDER" }
+    }
+  },
+  "process": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "steps": {
+      "step1": { "title": "PLACEHOLDER" },
+      "step2": { "title": "PLACEHOLDER" },
+      "step3": { "title": "PLACEHOLDER" },
+      "step4": { "title": "PLACEHOLDER" }
+    }
+  },
+  "services": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "viewAll": "Tüm Hizmetler",
+    "readMore": "Detaylar",
+    "imagePlaceholder": "Görsel eklenecek",
+    "items": {
+      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    }
+  },
+  "processTeaser": {
+    "heading": "Fire Stop bu şekilde korur.",
+    "description": "PLACEHOLDER",
+    "cta": "Süreci Keşfet"
+  },
+  "projects": {
+    "title": "PLACEHOLDER",
+    "subtitle": "PLACEHOLDER",
+    "imagePlaceholder": "Görsel eklenecek",
+    "viewAll": "Tüm Projeler",
+    "filters": {
+      "all": "Tümü",
+      "completed": "Tamamlandı",
+      "ongoing": "Devam Ediyor"
+    },
+    "status": {
+      "completed": "Tamamlandı",
+      "ongoing": "Devam Ediyor"
+    }
+  },
+  "partnersMarquee": {
+    "partnersTitle": "İş Ortaklarımız",
+    "customersTitle": "Müşterilerimiz"
+  },
+  "cta": {
+    "title": "PLACEHOLDER",
+    "button": "PLACEHOLDER"
+  }
+}

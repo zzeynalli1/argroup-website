@@ -1,3 +1,10 @@
+<!--
+  SECURITY NOTE (production): Content-Security-Policy, X-Frame-Options and
+  X-Content-Type-Options headers are NOT set here — a static <meta> tag
+  can't fully replace real HTTP headers. Configure these in the hosting
+  provider's settings (Vercel/Netlify headers config, etc.) once deployed.
+  See README.md "Təhlükəsizlik qeydləri" for details.
+-->
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,6 +12,13 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>firestop-site</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>
