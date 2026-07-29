@@ -27,7 +27,12 @@ const SOCIAL_LINKS = [
 ]
 
 function ColumnHeading({ children }) {
-  return <p className="text-sm font-semibold uppercase tracking-wide text-neutral-custom-400">{children}</p>
+  return (
+    <div>
+      <p className="text-sm font-bold uppercase tracking-wide text-industrial-950">{children}</p>
+      <span className="mt-2 block h-0.5 w-9 bg-ember-600" />
+    </div>
+  )
 }
 
 export default function Footer() {
@@ -35,11 +40,11 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="w-full bg-industrial-950 text-base-50 mt-auto">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+    <footer className="relative mt-auto w-full overflow-hidden border-t-2 border-ember-600 bg-base-100 text-industrial-950">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo inverted />
-          <p className="mt-4 text-sm text-neutral-custom-400 max-w-xs">{t('description')}</p>
+          <Logo className="h-16" />
+          <p className="mt-4 max-w-xs text-sm text-neutral-custom-600">{t('description')}</p>
         </div>
 
         <div>
@@ -47,7 +52,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-2">
             {QUICK_LINKS.map((link) => (
               <li key={link.to}>
-                <Link to={link.to} className="text-sm text-base-50 hover:text-ember-600 transition-colors">
+                <Link to={link.to} className="text-sm text-neutral-custom-600 hover:text-ember-600 transition-colors">
                   {t(`links.${link.key}`)}
                 </Link>
               </li>
@@ -57,8 +62,8 @@ export default function Footer() {
 
         <div>
           <ColumnHeading>{t('contactHeading')}</ColumnHeading>
-          <ul className="mt-4 space-y-2 text-sm text-base-50">
-            <li className="text-neutral-custom-400">{ADDRESS}</li>
+          <ul className="mt-4 space-y-2 text-sm text-neutral-custom-600">
+            <li>{ADDRESS}</li>
             <li>
               <a href={PHONE.href} className="hover:text-ember-600 transition-colors">
                 {PHONE.display}
@@ -82,7 +87,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="text-neutral-custom-400 hover:text-ember-600 transition-colors"
+                className="text-ember-600 hover:text-ember-800 transition-colors"
               >
                 <Icon className="w-5 h-5" />
               </a>
@@ -91,8 +96,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-neutral-custom-400/20">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-custom-400">
+      <div className="relative border-t border-neutral-custom-400/20">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-neutral-custom-600 sm:flex-row">
           <p>{t('copyright').replace('{year}', year)}</p>
           {/* Simple current-language indicator — the functional switcher lives in Header. */}
           <span>{locale.toUpperCase()}</span>

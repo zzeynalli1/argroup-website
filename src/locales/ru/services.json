@@ -1,4 +1,47 @@
 {
-  "pageTitle": "Услуги",
-  "subtitle": "Полный спектр услуг в области противопожарной защиты, испытаний и строительства."
+  "fireProcess": {
+    "eyebrow": "Интерактивный процесс",
+    "title": "Fire Protection Systems",
+    "subtitle": "Как мы защищаем?",
+    "nextCta": "Перейти к другим услугам",
+    "steps": {
+      "fireStopSystems": {
+        "title": "Fire Stop Systems",
+        "description": "Герметизация проёмов и проходок"
+      },
+      "fireproofingSystems": {
+        "title": "Fireproofing Systems",
+        "description": "Защита конструктивных элементов от огня"
+      },
+      "cableProtection": {
+        "title": "Защита кабелей",
+        "description": "Безопасность электрических систем"
+      }
+    }
+  },
+  "otherServices": {
+    "title": "Наши другие услуги",
+    "items": {
+      "testing": {
+        "title": "Testing & Measurement Services",
+        "description": "Подтверждаем надёжность систем с помощью pull-out теста и измерений вибрации."
+      },
+      "construction": {
+        "title": "Construction Services",
+        "description": "Резка бетона, акустическая изоляция и анализ нагрузок."
+      },
+      "industrial": {
+        "title": "Industrial",
+        "description": "Специализированные инженерные решения для промышленных объектов."
+      },
+      "marine": {
+        "title": "Marine",
+        "description": "Противопожарная защита и инженерная поддержка для морской отрасли."
+      },
+      "designEngineering": {
+        "title": "Design Engineering Services",
+        "description": "Полная техническая поддержка проектирования начиная со стадии планирования."
+      }
+    }
+  }
 }

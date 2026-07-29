@@ -32,6 +32,8 @@
     "subtitle": "PLACEHOLDER",
     "loading": "Yüklənir...",
     "hint": "Sistemi araşdırmaq üçün qırmızı nöqtəyə klikləyin",
+    "zoomIn": "Yaxınlaşdır",
+    "zoomOut": "Uzaqlaşdır",
     "panel": {
       "selectedLabel": "Seçilmiş sahə",
       "systemType": "Sistem növü",
@@ -121,22 +123,40 @@
     "titlePrefix": "Niyə",
     "titleHighlight": "Firestop?",
     "reasons": {
-      "delaySpread": "Yanğının yayılmasını ləngidir və yayılma sürətini azaldır.",
-      "reduceSmoke": "Tüstü və zəhərli qazların bina daxilində yayılmasını azaldır.",
-      "evacuationTime": "Təxliyə üçün əlavə vaxt yaradaraq insan həyatını qoruyur.",
-      "protectStructure": "Bina strukturunu qoruyur və maddi zərərləri minimuma endirir."
+      "delaySpread": {
+        "title": "Yanğının Yayılmasını Dayandırır",
+        "description": "Alovun digər sahələrə yayılmasının qarşısını alır."
+      },
+      "reduceSmoke": {
+        "title": "Tüstünü Bloklayır",
+        "description": "Tüstü və zəhərli qazların keçidini effektiv şəkildə azaldır."
+      },
+      "evacuationTime": {
+        "title": "Vaxt Qazandırır",
+        "description": "Təxliyə üçün əlavə vaxt yaradır, insan həyatını qoruyur."
+      },
+      "protectStructure": {
+        "title": "Strukturu Qoruyur",
+        "description": "Binanın strukturunu qoruyur və maddi zərərləri minimuma endirir."
+      }
     }
   },
   "materials": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "comingSoon": "PLACEHOLDER",
-    "imagePlaceholder": "Şəkil əlavə olunacaq",
+    "titlePrefix": "Hər açılış",
+    "titleHighlight": "bir risk daşıyır.",
+    "subtitle": "Binanızı qoruyan boşluqları biz bağlayırıq.",
+    "viewSystemsCta": "Sistemlərə bax",
+    "detailsCta": "Ətraflı bax",
+    "checklist": {
+      "sealing": "Yanğına davamlı bağlanma",
+      "certified": "Sertifikatlı sistem",
+      "installation": "Peşəkar quraşdırma"
+    },
     "items": {
-      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "hvacDuct": { "name": "PLACEHOLDER" },
-      "pvcPipe": { "name": "PLACEHOLDER" }
+      "cableTray": { "name": "Kabel Keçidi" },
+      "metalPipe": { "name": "Metal Boru Keçidi" },
+      "hvacDuct": { "name": "HVAC Kanal Keçidi" },
+      "pvcPipe": { "name": "Plastik Boru Keçidi" }
     }
   },
   "process": {
@@ -170,9 +190,8 @@
     "cta": "Prosesi kəşf et"
   },
   "projects": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "imagePlaceholder": "Şəkil əlavə olunacaq",
+    "title": "Etibar Etdiyimiz Layihələr",
+    "subtitle": "Azərbaycanın aparıcı tikinti layihələrində iştirak edirik.",
     "viewAll": "Bütün layihələr",
     "filters": {
       "all": "Hamısı",
@@ -184,12 +203,31 @@
       "ongoing": "Davam edir"
     }
   },
-  "partnersMarquee": {
-    "partnersTitle": "Tərəfdaşlarımız",
-    "customersTitle": "Müştərilərimiz"
+  "brands": {
+    "label": "BRANDS",
+    "title": "Təqdim etdiyimiz brendlər",
+    "subtitle": "Beynəlxalq standartlara uyğun sertifikatlı sistem və materialları sizə təqdim edirik."
+  },
+  "partnersSection": {
+    "label": "PARTNERS",
+    "title": "Tərəfdaşlarımız",
+    "subtitle": "Birlikdə daha güclüyük."
+  },
+  "customersSection": {
+    "label": "CUSTOMERS",
+    "title": "Müştərilərimiz",
+    "subtitle": "Etibar edilən layihələrdə güclü əməkdaşlıq.",
+    "stats": {
+      "partners": "Beynəlxalq Tərəfdaş",
+      "customers": "Nüfuzlu Müştəri",
+      "projects": "Tamamlanmış Layihə"
+    }
   },
   "cta": {
-    "title": "PLACEHOLDER",
-    "button": "PLACEHOLDER"
+    "label": "MÖHKƏM ƏSAS, ETİBARLI GƏLƏCƏK",
+    "titleLine1": "Bağlayın. Qoruyun.",
+    "titleLine2": "Etibar edin.",
+    "subtitle": "Firestop sadəcə məhsul deyil - bu, ürək rahatlığıdır.",
+    "button": "Bizimlə Əlaqə"
   }
 }

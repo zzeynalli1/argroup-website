@@ -32,6 +32,8 @@
     "subtitle": "PLACEHOLDER",
     "loading": "Loading...",
     "hint": "Click a red marker to explore the system",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
     "panel": {
       "selectedLabel": "Selected Area",
       "systemType": "System Type",
@@ -121,22 +123,40 @@
     "titlePrefix": "Why",
     "titleHighlight": "Firestop?",
     "reasons": {
-      "delaySpread": "Slows the spread of fire and reduces its spread rate.",
-      "reduceSmoke": "Reduces the spread of smoke and toxic gases inside the building.",
-      "evacuationTime": "Buys extra time for evacuation, protecting human life.",
-      "protectStructure": "Protects the building structure and minimizes damage."
+      "delaySpread": {
+        "title": "Stops Fire Spread",
+        "description": "Prevents flames from spreading to other areas."
+      },
+      "reduceSmoke": {
+        "title": "Blocks Smoke",
+        "description": "Effectively reduces the passage of smoke and toxic gases."
+      },
+      "evacuationTime": {
+        "title": "Buys Time",
+        "description": "Creates extra time for evacuation, protecting human life."
+      },
+      "protectStructure": {
+        "title": "Protects the Structure",
+        "description": "Protects the building's structure and minimizes material damage."
+      }
     }
   },
   "materials": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "comingSoon": "PLACEHOLDER",
-    "imagePlaceholder": "Image coming soon",
+    "titlePrefix": "Every opening",
+    "titleHighlight": "is a risk.",
+    "subtitle": "We seal the gaps that protect your building.",
+    "viewSystemsCta": "View Systems",
+    "detailsCta": "Learn more",
+    "checklist": {
+      "sealing": "Fire-rated sealing",
+      "certified": "Certified system",
+      "installation": "Professional installation"
+    },
     "items": {
-      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "hvacDuct": { "name": "PLACEHOLDER" },
-      "pvcPipe": { "name": "PLACEHOLDER" }
+      "cableTray": { "name": "Cable Tray Penetration" },
+      "metalPipe": { "name": "Metal Pipe Penetration" },
+      "hvacDuct": { "name": "HVAC Duct Penetration" },
+      "pvcPipe": { "name": "PVC Pipe Penetration" }
     }
   },
   "process": {
@@ -170,9 +190,8 @@
     "cta": "Discover the Process"
   },
   "projects": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "imagePlaceholder": "Image coming soon",
+    "title": "Projects Our Clients Trust Us With",
+    "subtitle": "We take part in Azerbaijan's leading construction projects.",
     "viewAll": "All Projects",
     "filters": {
       "all": "All",
@@ -184,12 +203,31 @@
       "ongoing": "Ongoing"
     }
   },
-  "partnersMarquee": {
-    "partnersTitle": "Our Partners",
-    "customersTitle": "Our Customers"
+  "brands": {
+    "label": "BRANDS",
+    "title": "Brands We Represent",
+    "subtitle": "We bring you certified systems and materials that meet international standards."
+  },
+  "partnersSection": {
+    "label": "PARTNERS",
+    "title": "Our Partners",
+    "subtitle": "Stronger together."
+  },
+  "customersSection": {
+    "label": "CUSTOMERS",
+    "title": "Our Customers",
+    "subtitle": "Strong collaboration on trusted projects.",
+    "stats": {
+      "partners": "International Partners",
+      "customers": "Trusted Customers",
+      "projects": "Completed Projects"
+    }
   },
   "cta": {
-    "title": "PLACEHOLDER",
-    "button": "PLACEHOLDER"
+    "label": "STRONG FOUNDATION, RELIABLE FUTURE",
+    "titleLine1": "Seal it. Protect it.",
+    "titleLine2": "Trust it.",
+    "subtitle": "Firestop isn't just a product - it's peace of mind.",
+    "button": "Contact Us"
   }
 }

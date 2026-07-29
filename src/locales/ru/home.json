@@ -32,6 +32,8 @@
     "subtitle": "PLACEHOLDER",
     "loading": "Загрузка...",
     "hint": "Нажмите на красную точку, чтобы изучить систему",
+    "zoomIn": "Приблизить",
+    "zoomOut": "Отдалить",
     "panel": {
       "selectedLabel": "Выбранная зона",
       "systemType": "Тип системы",
@@ -121,22 +123,40 @@
     "titlePrefix": "Почему",
     "titleHighlight": "Firestop?",
     "reasons": {
-      "delaySpread": "Замедляет распространение огня и снижает скорость его распространения.",
-      "reduceSmoke": "Снижает распространение дыма и токсичных газов внутри здания.",
-      "evacuationTime": "Даёт дополнительное время для эвакуации, защищая жизнь людей.",
-      "protectStructure": "Защищает конструкцию здания и минимизирует ущерб."
+      "delaySpread": {
+        "title": "Останавливает распространение огня",
+        "description": "Предотвращает распространение пламени на другие зоны."
+      },
+      "reduceSmoke": {
+        "title": "Блокирует дым",
+        "description": "Эффективно снижает проникновение дыма и токсичных газов."
+      },
+      "evacuationTime": {
+        "title": "Даёт время",
+        "description": "Создаёт дополнительное время для эвакуации, защищая жизнь людей."
+      },
+      "protectStructure": {
+        "title": "Защищает конструкцию",
+        "description": "Защищает конструкцию здания и минимизирует материальный ущерб."
+      }
     }
   },
   "materials": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "comingSoon": "PLACEHOLDER",
-    "imagePlaceholder": "Изображение появится позже",
+    "titlePrefix": "Каждый проём",
+    "titleHighlight": "— это риск.",
+    "subtitle": "Мы герметизируем проёмы, которые защищают ваше здание.",
+    "viewSystemsCta": "Смотреть системы",
+    "detailsCta": "Подробнее",
+    "checklist": {
+      "sealing": "Огнестойкая герметизация",
+      "certified": "Сертифицированная система",
+      "installation": "Профессиональный монтаж"
+    },
     "items": {
-      "cableTray": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "metalPipe": { "name": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "hvacDuct": { "name": "PLACEHOLDER" },
-      "pvcPipe": { "name": "PLACEHOLDER" }
+      "cableTray": { "name": "Кабельный лоток" },
+      "metalPipe": { "name": "Металлическая труба" },
+      "hvacDuct": { "name": "Вентиляционный канал (HVAC)" },
+      "pvcPipe": { "name": "ПВХ труба" }
     }
   },
   "process": {
@@ -170,9 +190,8 @@
     "cta": "Узнать процесс"
   },
   "projects": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "imagePlaceholder": "Изображение появится позже",
+    "title": "Проекты, которые нам доверяют",
+    "subtitle": "Мы участвуем в ведущих строительных проектах Азербайджана.",
     "viewAll": "Все проекты",
     "filters": {
       "all": "Все",
@@ -184,12 +203,31 @@
       "ongoing": "В процессе"
     }
   },
-  "partnersMarquee": {
-    "partnersTitle": "Наши партнёры",
-    "customersTitle": "Наши клиенты"
+  "brands": {
+    "label": "BRANDS",
+    "title": "Бренды, которые мы представляем",
+    "subtitle": "Мы предлагаем сертифицированные системы и материалы, соответствующие международным стандартам."
+  },
+  "partnersSection": {
+    "label": "PARTNERS",
+    "title": "Наши партнёры",
+    "subtitle": "Вместе мы сильнее."
+  },
+  "customersSection": {
+    "label": "CUSTOMERS",
+    "title": "Наши клиенты",
+    "subtitle": "Крепкое сотрудничество в надёжных проектах.",
+    "stats": {
+      "partners": "Международных партнёров",
+      "customers": "Надёжных клиентов",
+      "projects": "Завершённых проектов"
+    }
   },
   "cta": {
-    "title": "PLACEHOLDER",
-    "button": "PLACEHOLDER"
+    "label": "ПРОЧНАЯ ОСНОВА, НАДЁЖНОЕ БУДУЩЕЕ",
+    "titleLine1": "Закройте. Защитите.",
+    "titleLine2": "Доверьтесь.",
+    "subtitle": "Огнезащита - это не просто продукт, это спокойствие.",
+    "button": "Связаться с нами"
   }
 }

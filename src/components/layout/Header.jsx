@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { to: '/', key: 'home' },
   { to: '/about', key: 'about' },
   { to: '/services', key: 'services' },
-  { to: '/projects', key: 'projects' },
+  { to: '/products', key: 'products' },
   { to: '/contact', key: 'contact' },
 ]
 
@@ -19,9 +19,7 @@ function NavItem({ link, isActive, label }) {
   return (
     <Link
       to={link.to}
-      className={`group relative inline-block py-1 text-sm font-medium transition-colors duration-300 ${
-        isActive ? 'text-base-50' : 'text-neutral-custom-400 hover:text-base-50'
-      }`}
+      className="group relative inline-block py-1 text-sm font-medium text-industrial-950 transition-colors duration-300 hover:text-ember-600"
     >
       {label}
       <span
@@ -41,10 +39,10 @@ export default function Header() {
   return (
     <motion.header
       initial={false}
-      animate={{ backgroundColor: scrolled ? 'rgba(20, 20, 20, 0.95)' : 'rgba(20, 20, 20, 0.2)' }}
+      animate={{ backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)' }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`fixed inset-x-0 top-0 z-40 w-full transition-[backdrop-filter,box-shadow] duration-300 ease-out ${
-        scrolled ? 'shadow-lg shadow-black/20 backdrop-blur-md' : ''
+        scrolled ? 'shadow-lg shadow-black/10 backdrop-blur-md' : ''
       }`}
     >
       <div
@@ -58,7 +56,7 @@ export default function Header() {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             style={{ willChange: 'transform', transformOrigin: 'left center' }}
           >
-            <Logo inverted />
+            <Logo className="h-14" />
           </motion.div>
         </Link>
 

@@ -1,4 +1,47 @@
 {
-  "pageTitle": "Xidmətlər",
-  "subtitle": "Yanğından qorunma, sınaq və tikinti sahəsində tam xidmət spektri."
+  "fireProcess": {
+    "eyebrow": "İnteraktiv Proses",
+    "title": "Fire Protection Systems",
+    "subtitle": "Necə qoruyuruq?",
+    "nextCta": "Digər xidmətlərə keç",
+    "steps": {
+      "fireStopSystems": {
+        "title": "Fire Stop Systems",
+        "description": "Açılış və keçidlərin bağlanması"
+      },
+      "fireproofingSystems": {
+        "title": "Fireproofing Systems",
+        "description": "Struktur elementlərin alovdan qorunması"
+      },
+      "cableProtection": {
+        "title": "Kabel Qorunması",
+        "description": "Elektrik sistemlərinin təhlükəsizliyi"
+      }
+    }
+  },
+  "otherServices": {
+    "title": "Digər Xidmətlərimiz",
+    "items": {
+      "testing": {
+        "title": "Testing & Measurement Services",
+        "description": "Pull-out test və vibrasiya ölçmələri ilə sistemlərin etibarlılığını təsdiqləyirik."
+      },
+      "construction": {
+        "title": "Construction Services",
+        "description": "Beton kəsimi, akustik izolyasiya və yük analizi xidmətləri."
+      },
+      "industrial": {
+        "title": "Industrial",
+        "description": "Sənaye obyektləri üçün ixtisaslaşmış mühəndislik həlləri."
+      },
+      "marine": {
+        "title": "Marine",
+        "description": "Dəniz sənayesi üçün yanğın qorunması və mühəndislik dəstəyi."
+      },
+      "designEngineering": {
+        "title": "Design Engineering Services",
+        "description": "Layihələndirmə mərhələsindən tam texniki dizayn dəstəyi."
+      }
+    }
+  }
 }

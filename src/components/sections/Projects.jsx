@@ -41,10 +41,16 @@ function ProjectCard({ project, t }) {
       whileHover={{ scale: 1.02 }}
       className="group rounded-lg overflow-hidden border border-neutral-custom-400/20"
     >
-      <div className="relative aspect-video bg-neutral-custom-400/15 overflow-hidden">
-        <div className="w-full h-full flex items-center justify-center text-neutral-custom-600 text-sm text-center px-2">
-          {t('projects.imagePlaceholder')}
-        </div>
+      <div className="relative aspect-video overflow-hidden bg-neutral-custom-400/15">
+        <picture>
+          <source srcSet={project.imageWebp} type="image/webp" />
+          <img
+            src={project.imageJpg}
+            alt={project.title}
+            loading="lazy"
+            className="h-full w-full object-cover"
+          />
+        </picture>
         <div className="absolute inset-0 bg-ember-600/0 group-hover:bg-ember-600/10 transition-colors duration-300" />
       </div>
 

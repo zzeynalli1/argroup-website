@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import About from './pages/About'
 import ServicesPage from './pages/ServicesPage'
 import ProjectsPage from './pages/ProjectsPage'
+import Products from './pages/Products'
 import Contact from './pages/Contact'
 
 /**
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>

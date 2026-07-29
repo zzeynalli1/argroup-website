@@ -1,4 +1,47 @@
 {
-  "pageTitle": "Services",
-  "subtitle": "A full range of services in fire protection, testing, and construction."
+  "fireProcess": {
+    "eyebrow": "Interactive Process",
+    "title": "Fire Protection Systems",
+    "subtitle": "How do we protect?",
+    "nextCta": "Go to other services",
+    "steps": {
+      "fireStopSystems": {
+        "title": "Fire Stop Systems",
+        "description": "Sealing openings and penetrations"
+      },
+      "fireproofingSystems": {
+        "title": "Fireproofing Systems",
+        "description": "Protecting structural elements from fire"
+      },
+      "cableProtection": {
+        "title": "Cable Protection",
+        "description": "Safety of electrical systems"
+      }
+    }
+  },
+  "otherServices": {
+    "title": "Our Other Services",
+    "items": {
+      "testing": {
+        "title": "Testing & Measurement Services",
+        "description": "We confirm system reliability with pull-out tests and vibration measurements."
+      },
+      "construction": {
+        "title": "Construction Services",
+        "description": "Concrete cutting, acoustic insulation, and load analysis services."
+      },
+      "industrial": {
+        "title": "Industrial",
+        "description": "Specialized engineering solutions for industrial facilities."
+      },
+      "marine": {
+        "title": "Marine",
+        "description": "Fire protection and engineering support for the marine industry."
+      },
+      "designEngineering": {
+        "title": "Design Engineering Services",
+        "description": "Full technical design support starting from the planning stage."
+      }
+    }
+  }
 }

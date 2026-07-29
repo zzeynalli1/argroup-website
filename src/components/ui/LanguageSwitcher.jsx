@@ -32,7 +32,7 @@ export default function LanguageSwitcher() {
         onClick={() => setOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-1 text-sm font-medium text-neutral-custom-400 hover:text-ember-600 transition-colors"
+        className="flex items-center gap-1 text-sm font-medium text-industrial-950 hover:text-ember-600 transition-colors"
       >
         {LOCALE_LABELS[locale]}
         <ChevronDown size={14} className={`transition-transform ${open ? 'rotate-180' : ''}`} />

@@ -1,0 +1,30 @@
+{
+  "pageTitle": "Products",
+  "subtitle": "Our certified product range, built to international quality standards.",
+  "items": {
+    "passiveFireProtection": {
+      "name": "Passive Fire Protection Products",
+      "description": "Certified sealing systems that stop the spread of fire and smoke."
+    },
+    "pipingSystems": {
+      "name": "Piping and Connection Systems",
+      "description": "High-quality piping and connection solutions for industrial and construction projects."
+    },
+    "vibrationAcoustic": {
+      "name": "Vibration and Acoustic Insulation",
+      "description": "Insulation materials that reduce noise and vibration and extend equipment lifespan."
+    },
+    "thermalInsulation": {
+      "name": "Thermal Insulation",
+      "description": "Effective thermal insulation products for high-temperature environments."
+    },
+    "ventilationSystems": {
+      "name": "Ventilation Systems",
+      "description": "Smoke extraction and air circulation systems for buildings and tunnels."
+    },
+    "marineAnticorrosion": {
+      "name": "Marine and Anti-Corrosion Products",
+      "description": "Protective coating systems for the marine industry and aggressive environments."
+    }
+  }
+}

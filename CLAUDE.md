@@ -37,8 +37,15 @@ Məzmun üçün əsas mənbə: `docs/argroup-knowledge-base.md` (real saytdan
 - Stack: Vite + React + Tailwind CSS v4 + react-three-fiber/drei/
   postprocessing + framer-motion + gsap + Lenis (smooth scroll).
 - Rəng palitrası: yalnız `tailwind.config.js`-də təyin olunmuş tokenlərdən
-  istifadə et (industrial-950/800, base-50/100, ember-600/800, amber-500,
+  istifadə et (industrial-950/900/800, base-50/100, ember-600/800, amber-500,
   neutral-custom-400/600) — ad-hoc marka rəngi əlavə etmə.
+- Tünd/açıq ritm: tam-enli bölmələr ardıcıl olaraq hamısı industrial-950
+  olmamalıdır (monoton "tünd" hiss yaradır). Səhifə boyu növbələşdirin:
+  Hero industrial-950 (ən tünd, əsas fokus) qalır; digər tünd bölmələr üçün
+  industrial-900 (bir az açıq) və ya industrial-800 istifadə et; əksər orta
+  bölmələr base-50/base-100 (açıq fon) olmalıdır; son CTA və Partners/Trust
+  bölmələri yenidən tünd ola bilər (bağlayıcı vurğu üçün). Header/Footer
+  bu qaydadan kənardır — brend konsistensiyası üçün həmişə tünd qalır.
 - i18n: bütün istifadəçiyə görünən mətn `src/locales/<locale>/<namespace>.json`
   fayllarından `useTranslation(namespace)` vasitəsilə gəlməlidir — komponent
   daxilində hardcode mətn qadağandır. `az` real (placeholder) məzmuna

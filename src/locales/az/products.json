@@ -1,0 +1,30 @@
+{
+  "pageTitle": "Məhsullar",
+  "subtitle": "Sertifikatlı, beynəlxalq keyfiyyət standartlarına uyğun məhsul çeşidimiz.",
+  "items": {
+    "passiveFireProtection": {
+      "name": "Passiv Yanğın Məhsulları",
+      "description": "Yanğın və tüstünün yayılmasının qarşısını alan sertifikatlı bağlama sistemləri."
+    },
+    "pipingSystems": {
+      "name": "Borular və Birləşdirici Sistemlər",
+      "description": "Sənaye və tikinti layihələri üçün yüksək keyfiyyətli boru və birləşmə həlləri."
+    },
+    "vibrationAcoustic": {
+      "name": "Vibrasiya və Akustik İzolyasiya",
+      "description": "Səs-küy və vibrasiyanı azaldan, avadanlığın ömrünü uzadan izolyasiya materialları."
+    },
+    "thermalInsulation": {
+      "name": "İstilik İzolyasiyası",
+      "description": "Yüksək temperaturlu mühitlər üçün effektiv termal izolyasiya məhsulları."
+    },
+    "ventilationSystems": {
+      "name": "Ventilyasiya Sistemləri",
+      "description": "Bina və tunellər üçün tüstü çıxarma və hava dövranı sistemləri."
+    },
+    "marineAnticorrosion": {
+      "name": "Dəniz və Antikorroziya Məhsulları",
+      "description": "Dəniz sənayesi və aqressiv mühitlər üçün qoruyucu örtük sistemləri."
+    }
+  }
+}

@@ -28,6 +28,11 @@ import enProjects from '../../locales/en/projects.json'
 import ruProjects from '../../locales/ru/projects.json'
 import trProjects from '../../locales/tr/projects.json'
 
+import azProducts from '../../locales/az/products.json'
+import enProducts from '../../locales/en/products.json'
+import ruProducts from '../../locales/ru/products.json'
+import trProducts from '../../locales/tr/products.json'
+
 import azNav from '../../locales/az/nav.json'
 import enNav from '../../locales/en/nav.json'
 import ruNav from '../../locales/ru/nav.json'
@@ -43,8 +48,8 @@ export const FALLBACK_LOCALE = 'az'
  * new sections/pages get copy.
  */
 export const resources = {
-  az: { home: azHome, contact: azContact, footer: azFooter, about: azAbout, services: azServices, projects: azProjects, nav: azNav },
-  en: { home: enHome, contact: enContact, footer: enFooter, about: enAbout, services: enServices, projects: enProjects, nav: enNav },
-  ru: { home: ruHome, contact: ruContact, footer: ruFooter, about: ruAbout, services: ruServices, projects: ruProjects, nav: ruNav },
-  tr: { home: trHome, contact: trContact, footer: trFooter, about: trAbout, services: trServices, projects: trProjects, nav: trNav },
+  az: { home: azHome, contact: azContact, footer: azFooter, about: azAbout, services: azServices, projects: azProjects, products: azProducts, nav: azNav },
+  en: { home: enHome, contact: enContact, footer: enFooter, about: enAbout, services: enServices, projects: enProjects, products: enProducts, nav: enNav },
+  ru: { home: ruHome, contact: ruContact, footer: ruFooter, about: ruAbout, services: ruServices, projects: ruProjects, products: ruProducts, nav: ruNav },
+  tr: { home: trHome, contact: trContact, footer: trFooter, about: trAbout, services: trServices, projects: trProjects, products: trProducts, nav: trNav },
 }

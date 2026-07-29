@@ -36,20 +36,33 @@ body {
   }
 }
 
-/* PartnersMarquee's scrolling row: track is the item list rendered twice
-   back-to-back, translated by exactly -50% so the second copy lines up
-   where the first started — an infinite loop with no visible seam. */
-@keyframes marquee {
-  from {
-    transform: translateX(0);
+/* Materials section's hover glow — a pulsing "light from within the
+   concrete" feel on the active hover zone, see Materials.jsx. */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
   }
-  to {
-    transform: translateX(-50%);
+  50% {
+    opacity: 1;
   }
 }
 
 @layer utilities {
-  .animate-marquee {
-    animation: marquee 32s linear infinite;
+  .animate-glow-pulse {
+    animation: glow-pulse 1.5s ease-in-out infinite;
+  }
+}
+
+/* Process's horizontal scroller — native scrollbar hidden since the row
+   already has its own visible connector-line/dot affordance. */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

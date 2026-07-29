@@ -1,9 +1,13 @@
 import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Environment, Html, OrbitControls } from '@react-three/drei'
+import { Minus, Plus } from 'lucide-react'
 import * as THREE from 'three'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import { DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_TARGET, hotspots } from '../../data/hotspots3d'
+
+// Camera moves this much closer/farther per zoom-button click (see `zoomBy`).
+const ZOOM_STEP = 0.85
 
 // Hex values mirror tailwind.config.js tokens — three.js materials need raw
 // color values, Tailwind classes don't apply inside the Canvas. `concrete`
@@ -203,6 +207,12 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
     const controls = orbitRef.current
     if (!controls) return undefined
 
+    // OrbitControls unconditionally sets touch-action:none on its domElement
+    // when it connects, which blocks native page scroll on touch devices
+    // entirely (independent of enableZoom/enablePan). Override it so a
+    // one-finger vertical swipe still scrolls the page.
+    controls.domElement.style.touchAction = 'pan-y'
+
     const stopTransition = () => {
       transitioningRef.current = false
     }
@@ -231,12 +241,29 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
 }
 
 const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
+  const { t } = useTranslation('home')
   const orbitRef = useRef(null)
   const desiredPosRef = useRef(new THREE.Vector3(...DEFAULT_CAMERA_POSITION))
   const desiredTargetRef = useRef(new THREE.Vector3(...DEFAULT_CAMERA_TARGET))
   const transitioningRef = useRef(false)
   const [activeKey, setActiveKey] = useState(null)
   const [hoveredKey, setHoveredKey] = useState(null)
+
+  // Zoom now lives here instead of on the mouse wheel (see OrbitControls'
+  // enableZoom={false} below) — this moves the camera along the existing
+  // target->camera direction, clamped to the same min/maxDistance the wheel
+  // used to respect.
+  function zoomBy(factor) {
+    const controls = orbitRef.current
+    if (!controls) return
+
+    const camera = controls.object
+    const offset = camera.position.clone().sub(controls.target)
+    const nextDistance = THREE.MathUtils.clamp(offset.length() * factor, controls.minDistance, controls.maxDistance)
+    offset.setLength(nextDistance)
+    camera.position.copy(controls.target).add(offset)
+    controls.update()
+  }
 
   function selectHotspot(hotspot) {
     setActiveKey(hotspot.key)
@@ -262,67 +289,89 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
   useImperativeHandle(ref, () => ({ resetCamera, selectHotspot: selectHotspotByKey }))
 
   return (
-    <Canvas shadows camera={{ position: DEFAULT_CAMERA_POSITION, fov: 45 }} dpr={[1, 1.5]}>
-      <GradientBackdrop />
-      <fog attach="fog" args={[FOG_COLOR, 8, 25]} />
+    <>
+      <Canvas shadows camera={{ position: DEFAULT_CAMERA_POSITION, fov: 45 }} dpr={[1, 1.5]}>
+        <GradientBackdrop />
+        <fog attach="fog" args={[FOG_COLOR, 8, 25]} />
 
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[6, 10, 5]}
-        intensity={1.2}
-        color={COLORS.base50}
-        castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={-6}
-        shadow-camera-right={6}
-        shadow-camera-top={6}
-        shadow-camera-bottom={-6}
-        shadow-camera-near={0.5}
-        shadow-camera-far={20}
-      />
-      <directionalLight position={[-6, 3, -5]} intensity={0.3} color={COLORS.amber500} />
-      {/* Scoped to its own Suspense so the CDN-fetched HDRI reflections never
-          block the building/hotspots from rendering — without this boundary
-          the whole R3F tree suspends (see useEnvironment -> useLoader) and
-          nothing commits, which is why only the Html markers were visible. */}
-      <Suspense fallback={null}>
-        <Environment preset="warehouse" />
-      </Suspense>
-
-      <Ground />
-      <Building />
-      <ContactShadows position={[0, -0.01, 0]} opacity={0.55} scale={14} blur={2.4} far={4} />
-
-      {hotspots.map((hotspot) => (
-        <Hotspot
-          key={hotspot.id}
-          hotspot={hotspot}
-          isActive={activeKey === hotspot.key}
-          isHovered={hoveredKey === hotspot.key}
-          onHover={setHoveredKey}
-          onSelect={selectHotspot}
+        <ambientLight intensity={0.4} />
+        <directionalLight
+          position={[6, 10, 5]}
+          intensity={1.2}
+          color={COLORS.base50}
+          castShadow
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
+          shadow-camera-left={-6}
+          shadow-camera-right={6}
+          shadow-camera-top={6}
+          shadow-camera-bottom={-6}
+          shadow-camera-near={0.5}
+          shadow-camera-far={20}
         />
-      ))}
+        <directionalLight position={[-6, 3, -5]} intensity={0.3} color={COLORS.amber500} />
+        {/* Scoped to its own Suspense so the CDN-fetched HDRI reflections never
+            block the building/hotspots from rendering — without this boundary
+            the whole R3F tree suspends (see useEnvironment -> useLoader) and
+            nothing commits, which is why only the Html markers were visible. */}
+        <Suspense fallback={null}>
+          <Environment preset="warehouse" />
+        </Suspense>
 
-      <OrbitControls
-        ref={orbitRef}
-        target={DEFAULT_CAMERA_TARGET}
-        enablePan={false}
-        enableDamping
-        dampingFactor={0.05}
-        zoomSpeed={0.4}
-        minDistance={3}
-        maxDistance={13}
-        maxPolarAngle={Math.PI / 2.05}
-      />
-      <CameraRig
-        orbitRef={orbitRef}
-        desiredPosRef={desiredPosRef}
-        desiredTargetRef={desiredTargetRef}
-        transitioningRef={transitioningRef}
-      />
-    </Canvas>
+        <Ground />
+        <Building />
+        <ContactShadows position={[0, -0.01, 0]} opacity={0.55} scale={14} blur={2.4} far={4} />
+
+        {hotspots.map((hotspot) => (
+          <Hotspot
+            key={hotspot.id}
+            hotspot={hotspot}
+            isActive={activeKey === hotspot.key}
+            isHovered={hoveredKey === hotspot.key}
+            onHover={setHoveredKey}
+            onSelect={selectHotspot}
+          />
+        ))}
+
+        <OrbitControls
+          ref={orbitRef}
+          target={DEFAULT_CAMERA_TARGET}
+          enablePan={false}
+          enableZoom={false}
+          enableDamping
+          dampingFactor={0.05}
+          minDistance={3}
+          maxDistance={13}
+          maxPolarAngle={Math.PI / 2.05}
+          touches={{ ONE: undefined, TWO: undefined }}
+        />
+        <CameraRig
+          orbitRef={orbitRef}
+          desiredPosRef={desiredPosRef}
+          desiredTargetRef={desiredTargetRef}
+          transitioningRef={transitioningRef}
+        />
+      </Canvas>
+
+      <div className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => zoomBy(ZOOM_STEP)}
+          aria-label={t('building3d.zoomIn')}
+          className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 backdrop-blur-sm transition-colors hover:border-ember-600 hover:text-ember-600"
+        >
+          <Plus size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => zoomBy(1 / ZOOM_STEP)}
+          aria-label={t('building3d.zoomOut')}
+          className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 backdrop-blur-sm transition-colors hover:border-ember-600 hover:text-ember-600"
+        >
+          <Minus size={16} />
+        </button>
+      </div>
+    </>
   )
 })
 
