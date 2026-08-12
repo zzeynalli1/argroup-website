@@ -1,26 +1,59 @@
 import { forwardRef, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Environment, Html, OrbitControls } from '@react-three/drei'
+import {
+  Bloom,
+  BrightnessContrast,
+  EffectComposer,
+  HueSaturation,
+  N8AO,
+  ToneMapping,
+  Vignette,
+} from '@react-three/postprocessing'
+import { ToneMappingMode } from 'postprocessing'
 import { Minus, Plus } from 'lucide-react'
 import * as THREE from 'three'
 import { useTranslation } from '../../lib/i18n/useTranslation'
-import { DEFAULT_CAMERA_POSITION, DEFAULT_CAMERA_TARGET, hotspots } from '../../data/hotspots3d'
+import {
+  DEFAULT_CAMERA_POSITION,
+  DEFAULT_CAMERA_TARGET,
+  NARROW_CAMERA_POSITION,
+  NARROW_CAMERA_TARGET,
+  hotspots,
+} from '../../data/hotspots3d'
+import { COLORS, groundMaterial } from './buildingMaterials'
+import Building from './Building'
 
 // Camera moves this much closer/farther per zoom-button click (see `zoomBy`).
 const ZOOM_STEP = 0.85
 
-// Hex values mirror tailwind.config.js tokens — three.js materials need raw
-// color values, Tailwind classes don't apply inside the Canvas. `concrete`
-// and `metal` are tonal variants of industrial-800/neutral-custom-400 (not
-// new brand colors) picked to actually read as concrete/steel under PBR
-// lighting instead of the flat dark grey the raw tokens gave.
-const COLORS = {
-  base50: '#FFFFFF',
-  ember600: '#E31E24',
-  amber500: '#E8A33D',
-  neutral600: '#6B7075',
-  concrete: '#8A8D91',
-  metal: '#8B98A3',
+// Coarse, dependency-free "is this a phone/tablet, or a small/touch
+// viewport" check — used only to drop the most expensive post-processing
+// settings (SSAO quality, Bloom, multisampling, shadow-map size) a notch,
+// per the brief's "adaptive settings for mobile" requirement. Deliberately
+// not using GPU-benchmark detection (e.g. drei's `useDetectGPU`, which
+// fetches a benchmark table from a CDN) — that adds a network dependency
+// and latency to a marketing homepage for a call this simple heuristic
+// already answers well enough. Computed once; screen size/pointer type
+// don't change during a session in any way that matters here.
+function detectMobile() {
+  if (typeof window === 'undefined') return false
+  const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false
+  const smallViewport = window.innerWidth < 768
+  return coarsePointer || smallViewport
+}
+
+// Same one-time-at-mount pattern as `detectMobile` above, but answering a
+// different question: is this viewport's own aspect ratio portrait/
+// near-square? This governs which of the two default camera framings from
+// data/hotspots3d.js applies (see the comment there) — a landscape-vs-mobile
+// device check wouldn't be the right signal here, since e.g. a tablet in
+// portrait and a resized narrow desktop browser window need the same
+// (safer, less zoomed) framing a phone does, while a tablet in landscape
+// doesn't.
+function detectPortraitAspect() {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth / window.innerHeight < 1.15
 }
 
 // Vertical gradient, dark blue-grey — a plain <color> would read as flat
@@ -28,10 +61,6 @@ const COLORS = {
 const BACKDROP_TOP = '#20242B'
 const BACKDROP_BOTTOM = '#141414'
 const FOG_COLOR = '#23262C'
-
-const HALF_W = 3
-const HALF_D = 2
-const FLOOR_Y = [0, 1.2, 2.4, 3.6]
 
 function GradientBackdrop() {
   const { scene } = useThree()
@@ -66,86 +95,9 @@ function GradientBackdrop() {
 
 function Ground() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow material={groundMaterial} dispose={null}>
       <planeGeometry args={[24, 24]} />
-      <meshStandardMaterial color={COLORS.concrete} roughness={0.95} metalness={0.02} />
     </mesh>
-  )
-}
-
-function Building() {
-  return (
-    <group>
-      {FLOOR_Y.map((y) => (
-        <mesh key={y} position={[0, y, 0]} castShadow receiveShadow>
-          <boxGeometry args={[HALF_W * 2, 0.15, HALF_D * 2]} />
-          <meshStandardMaterial color={COLORS.concrete} roughness={0.85} metalness={0.05} />
-        </mesh>
-      ))}
-
-      {/* Back wall */}
-      <mesh position={[0, 1.8, -HALF_D]} castShadow receiveShadow>
-        <boxGeometry args={[HALF_W * 2, 3.6, 0.15]} />
-        <meshStandardMaterial color={COLORS.concrete} roughness={0.85} metalness={0.05} />
-      </mesh>
-
-      {/* Left wall */}
-      <mesh position={[-HALF_W, 1.8, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.15, 3.6, HALF_D * 2]} />
-        <meshStandardMaterial color={COLORS.concrete} roughness={0.85} metalness={0.05} />
-      </mesh>
-
-      {/* Right wall, shortened near the front to leave room for the curtain-wall panel */}
-      <mesh position={[HALF_W, 1.8, -0.5]} castShadow receiveShadow>
-        <boxGeometry args={[0.15, 3.6, HALF_D * 2 - 1.4]} />
-        <meshStandardMaterial color={COLORS.concrete} roughness={0.85} metalness={0.05} />
-      </mesh>
-
-      {/* Curtain-wall glazing panel */}
-      <mesh position={[HALF_W, 1.8, 1.65]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[1.4, 3.4]} />
-        <meshStandardMaterial
-          color={COLORS.base50}
-          transparent
-          opacity={0.22}
-          roughness={0.1}
-          metalness={0.1}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-
-      {/* Structural joint seam, back-left corner */}
-      <mesh position={[-HALF_W, 1.8, -HALF_D]} castShadow>
-        <boxGeometry args={[0.06, 3.6, 0.06]} />
-        <meshStandardMaterial color={COLORS.neutral600} metalness={0.3} roughness={0.5} />
-      </mesh>
-
-      {/* Cable tray — parallel cylinder bundle */}
-      {[0, 1, 2].map((i) => (
-        <mesh key={i} position={[-2, 0.95 + i * 0.1, -1.3]} rotation={[0, 0, Math.PI / 2]} castShadow>
-          <cylinderGeometry args={[0.04, 0.04, 1.6, 8]} />
-          <meshStandardMaterial color={COLORS.neutral600} metalness={0.6} roughness={0.4} />
-        </mesh>
-      ))}
-
-      {/* Metal pipe riser */}
-      <mesh position={[0, 1.2, -1]} castShadow>
-        <cylinderGeometry args={[0.1, 0.1, 1.8, 16]} />
-        <meshStandardMaterial color={COLORS.metal} metalness={0.8} roughness={0.3} />
-      </mesh>
-
-      {/* PVC pipe riser */}
-      <mesh position={[1.6, 1.2, -1]} castShadow>
-        <cylinderGeometry args={[0.09, 0.09, 1.8, 16]} />
-        <meshStandardMaterial color={COLORS.amber500} metalness={0.05} roughness={0.6} />
-      </mesh>
-
-      {/* HVAC duct */}
-      <mesh position={[-1.2, 2.4, -1]} castShadow>
-        <boxGeometry args={[1.4, 0.45, 0.45]} />
-        <meshStandardMaterial color={COLORS.neutral600} metalness={0.5} roughness={0.4} />
-      </mesh>
-    </group>
   )
 }
 
@@ -243,8 +195,14 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
 const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
   const { t } = useTranslation('home')
   const orbitRef = useRef(null)
-  const desiredPosRef = useRef(new THREE.Vector3(...DEFAULT_CAMERA_POSITION))
-  const desiredTargetRef = useRef(new THREE.Vector3(...DEFAULT_CAMERA_TARGET))
+  const [isMobile] = useState(detectMobile)
+  const [isPortrait] = useState(detectPortraitAspect)
+  // See data/hotspots3d.js for why there are two presets and how each was
+  // derived/verified — this is the only place that picks between them.
+  const defaultCameraPosition = isPortrait ? NARROW_CAMERA_POSITION : DEFAULT_CAMERA_POSITION
+  const defaultCameraTarget = isPortrait ? NARROW_CAMERA_TARGET : DEFAULT_CAMERA_TARGET
+  const desiredPosRef = useRef(new THREE.Vector3(...defaultCameraPosition))
+  const desiredTargetRef = useRef(new THREE.Vector3(...defaultCameraTarget))
   const transitioningRef = useRef(false)
   const [activeKey, setActiveKey] = useState(null)
   const [hoveredKey, setHoveredKey] = useState(null)
@@ -267,7 +225,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
 
   function selectHotspot(hotspot) {
     setActiveKey(hotspot.key)
-    desiredPosRef.current.set(...hotspot.cameraTarget)
+    desiredPosRef.current.set(...hotspot.cameraPosition)
     desiredTargetRef.current.set(...hotspot.position)
     transitioningRef.current = true
     onHotspotChange?.(hotspot)
@@ -275,8 +233,8 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
 
   function resetCamera() {
     setActiveKey(null)
-    desiredPosRef.current.set(...DEFAULT_CAMERA_POSITION)
-    desiredTargetRef.current.set(...DEFAULT_CAMERA_TARGET)
+    desiredPosRef.current.set(...defaultCameraPosition)
+    desiredTargetRef.current.set(...defaultCameraTarget)
     transitioningRef.current = true
     onHotspotChange?.(null)
   }
@@ -288,39 +246,95 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
 
   useImperativeHandle(ref, () => ({ resetCamera, selectHotspot: selectHotspotByKey }))
 
+  // Groups (components/3d/groups) are what actually highlight/dim — resolved
+  // here from the hotspot's own `group` field rather than passed straight
+  // through as the raw hotspot key, so a future hotspot whose `group`
+  // differs from its `key` still highlights the right thing without any
+  // change to Building.jsx or the group components.
+  const activeGroup = hotspots.find((h) => h.key === activeKey)?.group ?? null
+  const hoveredGroup = hotspots.find((h) => h.key === hoveredKey)?.group ?? null
+
   return (
     <>
-      <Canvas shadows camera={{ position: DEFAULT_CAMERA_POSITION, fov: 45 }} dpr={[1, 1.5]}>
+      <Canvas
+        shadows
+        camera={{ position: defaultCameraPosition, fov: 45 }}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
+        // `antialias` off deliberately: once `<EffectComposer>` is mounted,
+        // the 3D scene is rendered into the composer's own render target,
+        // never the canvas's default (potentially MSAA) framebuffer — the
+        // composer's own `multisampling` prop below is what actually
+        // controls edge antialiasing now, so paying for a second, unused
+        // native AA context would be pure waste.
+        gl={{ antialias: false, outputColorSpace: THREE.SRGBColorSpace }}
+      >
         <GradientBackdrop />
-        <fog attach="fog" args={[FOG_COLOR, 8, 25]} />
+        <fog attach="fog" args={[FOG_COLOR, 16, 30]} />
 
-        <ambientLight intensity={0.4} />
+        {/* Restrained key/fill/rim rig. Ambient kept deliberately low — the
+            `Environment` IBL below and the post-processing SSAO now do the
+            job flat ambient used to do, so a high ambient here would just
+            wash the contrast back out. */}
+        <ambientLight intensity={0.14} />
         <directionalLight
-          position={[6, 10, 5]}
-          intensity={1.2}
+          position={[6, 7, 5.5]}
+          intensity={1.9}
           color={COLORS.base50}
           castShadow
-          shadow-mapSize-width={1024}
-          shadow-mapSize-height={1024}
-          shadow-camera-left={-6}
-          shadow-camera-right={6}
-          shadow-camera-top={6}
-          shadow-camera-bottom={-6}
+          shadow-mapSize-width={isMobile ? 1024 : 2048}
+          shadow-mapSize-height={isMobile ? 1024 : 2048}
+          // Frustum derived from projecting the building's bounding box
+          // (x:-3..3, y:0..4.1 incl. rooftop rail, z:-2..2) onto this light's
+          // own local left/up axes — the projected extent is left/right
+          // ±3.46, top 5.35, bottom -2.83; the values below add a safety
+          // margin on top of that rather than guessing a round symmetric
+          // number, so nothing at the model's real edges (e.g. the rooftop
+          // rail's far corner) clips. near/far left at their original safe
+          // values since they only affect depth precision, not the map's
+          // effective resolution.
+          shadow-camera-left={-3.9}
+          shadow-camera-right={3.9}
+          shadow-camera-top={5.6}
+          shadow-camera-bottom={-3.2}
           shadow-camera-near={0.5}
           shadow-camera-far={20}
+          // Prevents shadow acne now that resolution is effectively higher
+          // (tighter frustum + bigger map) — a small fixed depth bias offsets
+          // the comparison just enough to avoid self-shadowing artifacts on
+          // the concrete's own chamfered faces.
+          shadow-bias={-0.0015}
         />
-        <directionalLight position={[-6, 3, -5]} intensity={0.3} color={COLORS.amber500} />
+        {/* Warm rim/accent from the back-left, opposite the key — separates
+            the building's silhouette from the dark backdrop and gives the
+            concrete a warm/cool split instead of one flat white light. */}
+        <directionalLight position={[-6, 3.2, -5]} intensity={0.45} color={COLORS.amber500} />
+        {/* Cool fill from the opposite side — keeps the shadow side of the
+            cutaway readable instead of crushed to black now that ambient is
+            low. */}
+        <directionalLight position={[-4, 2, 6]} intensity={0.24} color="#8FA3B8" />
         {/* Scoped to its own Suspense so the CDN-fetched HDRI reflections never
             block the building/hotspots from rendering — without this boundary
             the whole R3F tree suspends (see useEnvironment -> useLoader) and
-            nothing commits, which is why only the Html markers were visible. */}
+            nothing commits, which is why only the Html markers were visible.
+            "city" reads as a moody, window-lit night skyline (fits the dark
+            industrial backdrop) and gives metal/glass reflections actual
+            shape/variation instead of "warehouse"'s flat, uniform bright
+            dome. `environmentIntensity` keeps that IBL contribution
+            restrained so reflections read as real without blowing out. */}
         <Suspense fallback={null}>
-          <Environment preset="warehouse" />
+          <Environment preset="city" environmentIntensity={0.7} />
         </Suspense>
 
         <Ground />
-        <Building />
-        <ContactShadows position={[0, -0.01, 0]} opacity={0.55} scale={14} blur={2.4} far={4} />
+        <Building activeGroup={activeGroup} hoveredGroup={hoveredGroup} />
+        <ContactShadows
+          position={[0, -0.01, 0]}
+          opacity={0.6}
+          scale={14}
+          blur={2.2}
+          far={4.2}
+          resolution={isMobile ? 128 : 256}
+        />
 
         {hotspots.map((hotspot) => (
           <Hotspot
@@ -335,7 +349,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
 
         <OrbitControls
           ref={orbitRef}
-          target={DEFAULT_CAMERA_TARGET}
+          target={defaultCameraTarget}
           enablePan={false}
           enableZoom={false}
           enableDamping
@@ -351,6 +365,57 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange }, ref) {
           desiredTargetRef={desiredTargetRef}
           transitioningRef={transitioningRef}
         />
+
+        {/* Post-processing pipeline. Order matters — each effect processes
+            the previous one's output:
+              1. N8AO   — screen-space ambient occlusion. Seats every small
+                          connection (bolts, brackets, base plates, slab/
+                          column junctions) into real contact shadow that the
+                          directional shadow map's resolution can't resolve,
+                          without needing per-mesh geometry changes.
+              2. Bloom  — luminance-gated, tight threshold: only true bright
+                          highlights (sun-hit specular on metal, the emissive
+                          hotspot markers) bloom, never a general glow — the
+                          brief's explicit "no bloom/glow overuse".
+              3. ToneMapping (AGX) — replaces the old renderer-level
+                          ACESFilmic + fixed exposure (mounting this composer
+                          forces `renderer.toneMapping` to `NoToneMapping`
+                          for as long as it's mounted, so tone mapping has to
+                          live here now). AGX (Blender's own default view
+                          transform since 4.0) rolls off bright highlights
+                          much more gracefully than ACES/Reinhard, which is
+                          the direct fix for "washed out" — mid-tone contrast
+                          stays intact instead of everything clipping to white.
+              4. BrightnessContrast / HueSaturation — a very small, restrained
+                          grade (not a stylized LUT): a touch more contrast
+                          and a touch less saturation so it reads as a real
+                          render, not a color-corrected screenshot.
+              5. Vignette — subtle edge falloff only, to hold focus on the
+                          building rather than the frame edges.
+            `multisampling` is this composer's own antialiasing (see the
+            `gl={{antialias:false}}` note above) — reduced, not removed, on
+            mobile; N8AO's quality/resolution and Bloom (skipped entirely on
+            mobile) are the two genuinely expensive settings, so those are
+            what actually adapt for phones/tablets. */}
+        <EffectComposer multisampling={isMobile ? 0 : 4}>
+          <N8AO
+            aoRadius={0.45}
+            distanceFalloff={1}
+            intensity={isMobile ? 2.2 : 3.2}
+            quality={isMobile ? 'performance' : 'medium'}
+            halfRes={isMobile}
+            screenSpaceRadius
+          />
+          {isMobile ? (
+            <></>
+          ) : (
+            <Bloom luminanceThreshold={0.92} luminanceSmoothing={0.25} intensity={0.4} mipmapBlur />
+          )}
+          <ToneMapping mode={ToneMappingMode.AGX} />
+          <BrightnessContrast brightness={-0.02} contrast={0.06} />
+          <HueSaturation hue={0} saturation={-0.05} />
+          <Vignette offset={0.32} darkness={0.45} />
+        </EffectComposer>
       </Canvas>
 
       <div className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col gap-2">

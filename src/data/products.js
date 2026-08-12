@@ -2,7 +2,8 @@
 // src/locales/<locale>/products.json via products.items.<key> so they stay
 // translatable. `brands` are literal brand/product-line names (not
 // sentences), so — like partners.js — they're kept here directly rather
-// than routed through i18n.
+// than routed through i18n. `icon` is a lucide icon name (SolutionFinder);
+// each `key` also maps to a components/ui/ProductIllustration variant.
 export const products = [
   { id: 1, key: 'passiveFireProtection', icon: 'Flame', brands: ['Fire Stop', 'Hensotherm', 'Hensomastik'] },
   { id: 2, key: 'pipingSystems', icon: 'Pipette', brands: ['Pam Global'] },

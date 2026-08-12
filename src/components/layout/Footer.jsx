@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Logo from '../ui/Logo'
-import { FacebookIcon, InstagramIcon, LinkedinIcon, WhatsappIcon } from '../ui/SocialIcons'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import { socialLinks } from '../../data/socialLinks'
 
 const QUICK_LINKS = [
   { to: '/', key: 'home' },
@@ -16,15 +16,6 @@ const QUICK_LINKS = [
 const ADDRESS = 'İzzət Orucova 18, Xətai, Bakı, Azərbaycan'
 const PHONE = { display: '+994 55 490 74 24', href: 'tel:+994554907424' }
 const EMAIL = 'office@argroup.az'
-
-// Placeholder hrefs — real profile links to be added later. Reuses the same
-// custom brand-mark SVGs as ContactInfo.jsx (lucide-react ships no brand logos).
-const SOCIAL_LINKS = [
-  { Icon: FacebookIcon, href: '#', label: 'Facebook' },
-  { Icon: InstagramIcon, href: '#', label: 'Instagram' },
-  { Icon: LinkedinIcon, href: '#', label: 'LinkedIn' },
-  { Icon: WhatsappIcon, href: '#', label: 'WhatsApp' },
-]
 
 function ColumnHeading({ children }) {
   return (
@@ -80,7 +71,7 @@ export default function Footer() {
         <div>
           <ColumnHeading>{t('socialHeading')}</ColumnHeading>
           <div className="mt-4 flex items-center gap-4">
-            {SOCIAL_LINKS.map(({ Icon, href, label }) => (
+            {socialLinks.map(({ Icon, href, label }) => (
               <a
                 key={label}
                 href={href}

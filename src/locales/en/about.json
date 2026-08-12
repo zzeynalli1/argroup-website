@@ -1,7 +1,19 @@
 {
   "pageTitle": "About Us",
   "subtitle": "We deliver professional service in construction solutions.",
+  "hero": {
+    "eyebrow": "ABOUT — AR GROUP",
+    "headline": {
+      "prefix": "We deliver ",
+      "emphasis": "professional",
+      "suffix": " service in construction solutions."
+    }
+  },
   "intro": "AR Group Construction Services is a company delivering professional solutions for the construction industry. We partner on Azerbaijan's leading projects in passive fire protection, engineering design, and construction services.",
+  "story": {
+    "eyebrow": "OUR VALUES",
+    "visualLabel": "FIRE STOP APPLICATION"
+  },
   "values": {
     "heading": "Our Values",
     "items": {
@@ -25,9 +37,84 @@
   },
   "stats": {
     "experience": "Years of Experience",
-    "completedProjects": "Completed Projects",
-    "certifications": "Certifications",
-    "employeeCount": "Number of Employees"
+    "foundedLabel": "Founded",
+    "sinceCaption": "Since 2018, we have been installing Fire Stop passive fire protection systems across Azerbaijan."
   },
-  "teamHeading": "Our Team"
+  "leadership": {
+    "heading": "Our Team",
+    "items": {
+      "ceo": { "title": "Chief Executive Officer" },
+      "purchasingSales": { "title": "Head of Purchasing and Sales Department" },
+      "engineer": { "title": "Main Engineer" },
+      "siteTeam": { "title": "Technical / Site Team" },
+      "installation": { "title": "Installation & Operations" }
+    }
+  },
+  "capabilities": {
+    "eyebrow": "OUR CAPABILITIES",
+    "title": "Engineering Capabilities",
+    "primary": {
+      "label": "CORE SPECIALTY",
+      "title": "Passive Fire Protection",
+      "description": "We stop the spread of fire and smoke with Fire Stop and fireproofing systems — our core specialty in Azerbaijan since 2018."
+    },
+    "items": {
+      "cableProtection": {
+        "title": "Cable Protection",
+        "description": "Fire protection for electrical and data cables, extending their service life."
+      },
+      "acousticInsulation": {
+        "title": "Acoustic Insulation",
+        "description": "Controlling airborne and structure-borne sound at the source, the path, and the receiver."
+      },
+      "chemicalAnchoring": {
+        "title": "Chemical Anchoring",
+        "description": "Chemical anchoring solutions for structural fixings."
+      },
+      "concreteCutting": {
+        "title": "Concrete Cutting & Demolition",
+        "description": "Precise diamond-tooled cutting, coring, and demolition work."
+      },
+      "loadAnalysis": {
+        "title": "Load Analysis & Support Design",
+        "description": "Static/dynamic load calculations and 3D modeling for MEP support systems."
+      },
+      "vibrationTesting": {
+        "title": "Vibration Analysis & Testing",
+        "description": "Confirming system reliability through pull-out tests and vibration measurements."
+      },
+      "waterproofInjection": {
+        "title": "Waterproof Injection",
+        "description": "Stopping moisture ingress at wall-floor joints."
+      }
+    }
+  },
+  "compartmentation": {
+    "eyebrow": "OUR APPROACH",
+    "title": "From idea\nto outcome.",
+    "description": "We analyze the project, plan the right solution, execute it precisely, and follow through with technical support.",
+    "steps": {
+      "step1": {
+        "title": "Analysis",
+        "description": "We analyze the project's requirements, technical conditions, and application areas."
+      },
+      "step2": {
+        "title": "Plan",
+        "description": "We define the right solution, materials, and execution approach."
+      },
+      "step3": {
+        "title": "Execution",
+        "description": "We carry out the work precisely, in line with the approved technical solution."
+      },
+      "step4": {
+        "title": "Support",
+        "description": "We provide technical support after execution, and further solutions when needed."
+      }
+    }
+  },
+  "closing": {
+    "title": "Get engineering support for your project.",
+    "subtitle": "Our team will get in touch to help define the right solution for your needs.",
+    "button": "Contact Us"
+  }
 }

@@ -1,4 +1,7 @@
 {
   "pageTitle": "Projeler",
-  "subtitle": "Bakü ve Azerbaycan genelindeki tamamlanan ve devam eden projelerimiz."
+  "subtitle": "Bakü ve Azerbaycan genelindeki tamamlanan ve devam eden projelerimiz.",
+  "hero": {
+    "eyebrow": "PROJELERİMİZ"
+  }
 }

@@ -1,13 +1,48 @@
 {
   "pageTitle": "Контакты",
   "subtitle": "Свяжитесь с нами — обсудим ваш проект вместе.",
+  "hero": {
+    "eyebrow": "СВЯЖИТЕСЬ С НАМИ",
+    "headingLine1": "Свяжитесь",
+    "headingLine2": "с нами."
+  },
   "info": {
     "addressLabel": "Адрес",
     "phoneLabel": "Телефон",
     "emailLabel": "Эл. почта",
-    "hoursLabel": "Часы работы"
+    "hoursLabel": "Часы работы",
+    "hoursValue": "08:00 - 18:00, Понедельник - Суббота"
+  },
+  "form": {
+    "heading": "Отправить сообщение",
+    "nameLabel": "Имя и фамилия",
+    "namePlaceholder": "Ваше имя и фамилия",
+    "emailLabel": "Эл. почта",
+    "emailPlaceholder": "Ваш адрес эл. почты",
+    "phoneLabel": "Телефон",
+    "phonePlaceholder": "Ваш номер телефона",
+    "serviceLabel": "Услуга",
+    "servicePlaceholder": "Выберите услугу",
+    "messageLabel": "Сообщение",
+    "messagePlaceholder": "Ваше сообщение",
+    "submit": "Отправить",
+    "privacyNote": "Ваши данные защищены и не передаются третьим лицам.",
+    "successMessage": "Спасибо! Ваше сообщение получено.",
+    "errors": {
+      "nameRequired": "Введите имя.",
+      "nameTooLong": "Имя не может быть длиннее {max} символов.",
+      "emailRequired": "Введите эл. почту.",
+      "emailTooLong": "Эл. почта не может быть длиннее {max} символов.",
+      "emailInvalid": "Неверный формат эл. почты.",
+      "messageRequired": "Введите сообщение.",
+      "messageTooLong": "Сообщение не может быть длиннее {max} символов."
+    }
   },
   "map": {
     "title": "Карта"
+  },
+  "closing": {
+    "eyebrow": "Быстрая связь",
+    "title": "Есть вопрос? Свяжитесь с нами напрямую."
   }
 }

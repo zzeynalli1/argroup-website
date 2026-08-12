@@ -1,0 +1,10 @@
+Texture sources — all CC0 1.0 (public domain), no attribution required.
+Downloaded from ambientCG.com, re-exported at reduced resolution/quality for
+this project's real-time web use (see src/components/3d/buildingMaterials.js
+for how each set is applied).
+
+- concrete/       ambientCG "Concrete034"  https://ambientcg.com/a/Concrete034
+- steel-painted/  ambientCG "Metal029"     https://ambientcg.com/a/Metal029
+- galvanized/     ambientCG "Metal009"     https://ambientcg.com/a/Metal009
+
+ambientCG license: CC0 1.0 Universal — https://ambientcg.com/list?license=CC0

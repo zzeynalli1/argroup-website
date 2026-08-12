@@ -19,8 +19,8 @@ body {
 
 /* Space Grotesk for headings, Inter for body text — see tailwind.config.js
    fontFamily.heading/body. Applied globally here so individual components
-   don't each need a font-heading/font-body utility class; Hero.jsx and
-   PageHeader.jsx still add font-heading explicitly on their h1 for clarity. */
+   don't each need a font-heading/font-body utility class; page hero
+   components still add font-heading explicitly on their h1 for clarity. */
 @layer base {
   body {
     @apply font-body;

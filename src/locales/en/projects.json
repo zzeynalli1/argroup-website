@@ -1,4 +1,7 @@
 {
   "pageTitle": "Projects",
-  "subtitle": "Our completed and ongoing projects across Baku and Azerbaijan."
+  "subtitle": "Our completed and ongoing projects across Baku and Azerbaijan.",
+  "hero": {
+    "eyebrow": "OUR PROJECTS"
+  }
 }

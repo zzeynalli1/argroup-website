@@ -1,47 +1,49 @@
 {
-  "fireProcess": {
-    "eyebrow": "İnteraktiv Proses",
-    "title": "Fire Protection Systems",
-    "subtitle": "Necə qoruyuruq?",
-    "nextCta": "Digər xidmətlərə keç",
-    "steps": {
+  "hero": {
+    "eyebrow": "XİDMƏTLƏRİMİZ",
+    "title": "Xidmətlərimiz",
+    "subtitle": "Yanğın Bağlamadan Dizayn Mühəndisliyinə qədər — hər layihədə etibarlı mühəndislik dəstəyi."
+  },
+  "grid": {
+    "title": "Təqdim Etdiyimiz Xidmətlər",
+    "items": {
       "fireStopSystems": {
-        "title": "Fire Stop Systems",
+        "title": "Yanğın Bağlama Sistemləri",
         "description": "Açılış və keçidlərin bağlanması"
       },
       "fireproofingSystems": {
-        "title": "Fireproofing Systems",
+        "title": "Yanğından Qoruma Sistemləri",
         "description": "Struktur elementlərin alovdan qorunması"
       },
       "cableProtection": {
         "title": "Kabel Qorunması",
         "description": "Elektrik sistemlərinin təhlükəsizliyi"
-      }
-    }
-  },
-  "otherServices": {
-    "title": "Digər Xidmətlərimiz",
-    "items": {
+      },
       "testing": {
-        "title": "Testing & Measurement Services",
+        "title": "Test və Ölçmə Xidmətləri",
         "description": "Pull-out test və vibrasiya ölçmələri ilə sistemlərin etibarlılığını təsdiqləyirik."
       },
       "construction": {
-        "title": "Construction Services",
+        "title": "Tikinti Xidmətləri",
         "description": "Beton kəsimi, akustik izolyasiya və yük analizi xidmətləri."
       },
       "industrial": {
-        "title": "Industrial",
+        "title": "Sənaye",
         "description": "Sənaye obyektləri üçün ixtisaslaşmış mühəndislik həlləri."
       },
       "marine": {
-        "title": "Marine",
+        "title": "Dəniz Sənayesi",
         "description": "Dəniz sənayesi üçün yanğın qorunması və mühəndislik dəstəyi."
       },
       "designEngineering": {
-        "title": "Design Engineering Services",
+        "title": "Dizayn Mühəndisliyi Xidmətləri",
         "description": "Layihələndirmə mərhələsindən tam texniki dizayn dəstəyi."
       }
     }
+  },
+  "cta": {
+    "title": "Layihəniz üçün mütəxəssis dəstəyi alın",
+    "subtitle": "Komandamız ehtiyaclarınıza uyğun həlli birlikdə müəyyən etmək üçün sizinlə əlaqə saxlayacaq.",
+    "button": "Bizimlə Əlaqə"
   }
 }

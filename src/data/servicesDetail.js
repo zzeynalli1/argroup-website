@@ -1,23 +1,14 @@
 /**
- * Fire Protection Systems' 3 real sub-services, grounded in
- * docs/argroup-knowledge-base.md (Fire Stop Systems, Fireproofing Systems,
- * Protecting Cables). `imagePosition` is an `object-position` value picking
- * a focal point on public/images/materials/wall-penetrations.jpg (see
- * src/data/materials.js for the same photo's hotspot zones) so each step
- * gets a thematically-matching crop without needing a separate image asset.
+ * All 8 real AR Group service categories from docs/argroup-knowledge-base.md
+ * "Services" section — the 3 Fire Protection Systems sub-services plus the 5
+ * other top-level categories, flattened into one grid. Each card's visual is
+ * a unique technical line illustration (see components/ui/ServiceIllustration)
+ * keyed by `key`, rather than photography that doesn't exist yet.
  */
-export const fireProcessSteps = [
-  { key: 'fireStopSystems', imagePosition: '80% 50%' },
-  { key: 'fireproofingSystems', imagePosition: '65% 50%' },
-  { key: 'cableProtection', imagePosition: '50% 50%' },
-]
-
-/**
- * The remaining 5 service categories from the KB "Services" section,
- * rendered as plain cards (not a process) since only Fire Protection has a
- * documented step-by-step flow.
- */
-export const otherServices = [
+export const services = [
+  { key: 'fireStopSystems', icon: 'ShieldCheck' },
+  { key: 'fireproofingSystems', icon: 'Flame' },
+  { key: 'cableProtection', icon: 'Cable' },
   { key: 'testing', icon: 'Ruler' },
   { key: 'construction', icon: 'HardHat' },
   { key: 'industrial', icon: 'Factory' },

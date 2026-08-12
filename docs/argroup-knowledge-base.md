@@ -19,7 +19,6 @@ projects/products/statistics/certifications/history.
 ## Leadership
 - Ramin Mustafayev — Chief Executive Officer
 - Cavid Allahverdiyev — Head of Purchasing and Sales Department
-- Pərviz Məmmədli — Main Engineer
 
 ## Self-Reported Stats (as displayed on site, unverified/round numbers)
 100 completed projects, 100 satisfied customers, 100 partners, 100 awards.
@@ -89,6 +88,11 @@ projects/products/statistics/certifications/history.
   engine groups). Engineers measure vibration-prone platforms, simulate via
   analysis software, aim for complete/partial elimination — protects comfort
   and extends equipment life via reduced maintenance frequency.
+- **Waterproof Injection**: confirmed as a real AR Group service by the
+  project owner (2026-07-29) — not present in the original site extraction,
+  no further scope/spec detail captured yet. Ask before adding technical
+  specifics beyond the general "injection at wall/floor joints stops
+  moisture ingress" description already used on the Home page 3D hotspot.
 
 ### 4. Industrial
 Listed as a category (nav + service/4). **No description text exists on the

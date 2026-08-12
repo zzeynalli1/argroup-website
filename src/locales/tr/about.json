@@ -1,7 +1,19 @@
 {
   "pageTitle": "Hakkımızda",
   "subtitle": "İnşaat çözümlerinde profesyonel hizmet sunuyoruz.",
+  "hero": {
+    "eyebrow": "HAKKINDA — AR GROUP",
+    "headline": {
+      "prefix": "İnşaat çözümlerinde ",
+      "emphasis": "profesyonel",
+      "suffix": " hizmet sunuyoruz."
+    }
+  },
   "intro": "AR Group Construction Services, inşaat sektörüne profesyonel çözümler sunan bir şirkettir. Pasif yangından korunma, mühendislik tasarımı ve inşaat hizmetleri alanında Azerbaycan'ın önde gelen projelerine ortaklık ediyoruz.",
+  "story": {
+    "eyebrow": "DEĞERLERİMİZ",
+    "visualLabel": "FIRE STOP UYGULAMASI"
+  },
   "values": {
     "heading": "Değerlerimiz",
     "items": {
@@ -25,9 +37,84 @@
   },
   "stats": {
     "experience": "Yıllık Deneyim",
-    "completedProjects": "Tamamlanan Proje",
-    "certifications": "Sertifikalar",
-    "employeeCount": "Çalışan Sayısı"
+    "foundedLabel": "Kuruluş Yılı",
+    "sinceCaption": "2018'den bu yana Azerbaycan genelinde Fire Stop pasif yangın koruma sistemleri kuruyoruz."
   },
-  "teamHeading": "Ekibimiz"
+  "leadership": {
+    "heading": "Ekibimiz",
+    "items": {
+      "ceo": { "title": "İcra Direktörü" },
+      "purchasingSales": { "title": "Satınalma ve Satış Departmanı Müdürü" },
+      "engineer": { "title": "Baş Mühendis" },
+      "siteTeam": { "title": "Teknik / Saha Ekibi" },
+      "installation": { "title": "Montaj ve Operasyonlar" }
+    }
+  },
+  "capabilities": {
+    "eyebrow": "YETKİNLİKLERİMİZ",
+    "title": "Mühendislik Yetkinlikleri",
+    "primary": {
+      "label": "TEMEL UZMANLIK",
+      "title": "Pasif Yangın Koruması",
+      "description": "Fire Stop ve fireproofing sistemleriyle yangın ve dumanın yayılmasını durduruyoruz — 2018'den bu yana Azerbaycan'daki temel uzmanlığımız."
+    },
+    "items": {
+      "cableProtection": {
+        "title": "Kablo Koruması",
+        "description": "Elektrik ve veri kablolarının yangından korunması, kullanım ömrünün uzatılması."
+      },
+      "acousticInsulation": {
+        "title": "Akustik Yalıtım",
+        "description": "Hava ve yapı yoluyla yayılan sesin kaynakta, yolda ve alıcıda kontrolü."
+      },
+      "chemicalAnchoring": {
+        "title": "Kimyasal Ankraj",
+        "description": "Yapısal sabitlemeler için kimyasal ankraj çözümleri."
+      },
+      "concreteCutting": {
+        "title": "Beton Kesimi ve Yıkım",
+        "description": "Elmas uçlu ekipmanla hassas kesim, delme ve yıkım işleri."
+      },
+      "loadAnalysis": {
+        "title": "Yük Analizi ve Destek Tasarımı",
+        "description": "MEP destek sistemleri için statik/dinamik yük hesaplamaları ve 3D modelleme."
+      },
+      "vibrationTesting": {
+        "title": "Titreşim Analizi ve Testler",
+        "description": "Çekme testleri ve titreşim ölçümleriyle sistem güvenilirliğinin doğrulanması."
+      },
+      "waterproofInjection": {
+        "title": "Su Yalıtımı Enjeksiyonu",
+        "description": "Duvar-döşeme birleşimlerinde nem geçişinin önlenmesi."
+      }
+    }
+  },
+  "compartmentation": {
+    "eyebrow": "YAKLAŞIMIMIZ",
+    "title": "Fikirden\nsonuca.",
+    "description": "Projeyi analiz eder, doğru çözümü planlar, hassasiyetle uygular ve teknik destekle tamamlarız.",
+    "steps": {
+      "step1": {
+        "title": "Analiz",
+        "description": "Projenin gereksinimlerini, teknik şartlarını ve uygulama alanlarını analiz ederiz."
+      },
+      "step2": {
+        "title": "Plan",
+        "description": "Uygun çözümü, malzemeyi ve uygulama yaklaşımını belirleriz."
+      },
+      "step3": {
+        "title": "Uygulama",
+        "description": "İşleri onaylanmış teknik çözüme uygun şekilde hassasiyetle gerçekleştiririz."
+      },
+      "step4": {
+        "title": "Destek",
+        "description": "Uygulama sonrası teknik destek ve gerektiğinde ek çözümler sunarız."
+      }
+    }
+  },
+  "closing": {
+    "title": "Projeniz için mühendislik desteği alın.",
+    "subtitle": "Ekibimiz ihtiyaçlarınıza uygun çözümü birlikte belirlemek için sizinle iletişime geçecek.",
+    "button": "Bizimle İletişime Geçin"
+  }
 }

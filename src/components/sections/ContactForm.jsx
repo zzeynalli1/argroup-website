@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import Button from '../ui/Button'
+import { ChevronDown, Lock, Mail, MessageSquare, Phone, User } from 'lucide-react'
+import { useTranslation } from '../../lib/i18n/useTranslation'
+import { services } from '../../data/servicesDetail'
 
 /**
  * Contact form — structure + client-side validation only.
@@ -20,43 +22,49 @@ import Button from '../ui/Button'
 const LIMITS = {
   name: 100,
   email: 254,
+  phone: 30,
   message: 2000,
 }
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const initialFormState = { name: '', email: '', message: '' }
+const initialFormState = { name: '', email: '', phone: '', service: '', message: '' }
 
-function validate(values) {
-  const errors = {}
-
-  if (!values.name.trim()) {
-    errors.name = 'Ad daxil edilməlidir.'
-  } else if (values.name.length > LIMITS.name) {
-    errors.name = `Ad ${LIMITS.name} simvoldan uzun ola bilməz.`
-  }
-
-  if (!values.email.trim()) {
-    errors.email = 'E-poçt daxil edilməlidir.'
-  } else if (values.email.length > LIMITS.email) {
-    errors.email = `E-poçt ${LIMITS.email} simvoldan uzun ola bilməz.`
-  } else if (!EMAIL_REGEX.test(values.email)) {
-    errors.email = 'E-poçt formatı düzgün deyil.'
-  }
-
-  if (!values.message.trim()) {
-    errors.message = 'Mesaj daxil edilməlidir.'
-  } else if (values.message.length > LIMITS.message) {
-    errors.message = `Mesaj ${LIMITS.message} simvoldan uzun ola bilməz.`
-  }
-
-  return errors
-}
+const FIELD_CLASSES =
+  'w-full rounded-sm border border-base-50/15 bg-industrial-950/50 py-3.5 pl-4 pr-11 text-sm text-base-50 placeholder:text-neutral-custom-400 outline-none transition-colors focus:border-ember-600'
 
 export default function ContactForm() {
+  const { t } = useTranslation('contact')
+  const { t: tServices } = useTranslation('services')
   const [values, setValues] = useState(initialFormState)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+
+  function validate(v) {
+    const errs = {}
+
+    if (!v.name.trim()) {
+      errs.name = t('form.errors.nameRequired')
+    } else if (v.name.length > LIMITS.name) {
+      errs.name = t('form.errors.nameTooLong').replace('{max}', LIMITS.name)
+    }
+
+    if (!v.email.trim()) {
+      errs.email = t('form.errors.emailRequired')
+    } else if (v.email.length > LIMITS.email) {
+      errs.email = t('form.errors.emailTooLong').replace('{max}', LIMITS.email)
+    } else if (!EMAIL_REGEX.test(v.email)) {
+      errs.email = t('form.errors.emailInvalid')
+    }
+
+    if (!v.message.trim()) {
+      errs.message = t('form.errors.messageRequired')
+    } else if (v.message.length > LIMITS.message) {
+      errs.message = t('form.errors.messageTooLong').replace('{max}', LIMITS.message)
+    }
+
+    return errs
+  }
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -83,63 +91,133 @@ export default function ContactForm() {
   }
 
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit} noValidate className="w-full max-w-md space-y-4">
+    <div className="relative w-full overflow-hidden rounded-sm border border-base-50/10 bg-industrial-950/90 p-6 shadow-[0_30px_60px_-25px_rgba(0,0,0,0.55)] sm:p-8 md:p-10">
+      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-ember-600" />
+
+      <h2 className="font-heading text-2xl font-bold text-base-50 md:text-3xl">{t('form.heading')}</h2>
+      <span aria-hidden="true" className="mt-4 block h-px w-12 bg-ember-600" />
+
+      <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-industrial-800">
-            Ad
+          <label htmlFor="name" className="sr-only">
+            {t('form.nameLabel')}
           </label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            value={values.name}
-            onChange={handleChange}
-            maxLength={LIMITS.name}
-            className="mt-1 w-full rounded-md border border-neutral-custom-400/40 px-3 py-2"
-          />
-          {errors.name && <p className="mt-1 text-sm text-ember-600">{errors.name}</p>}
+          <div className="relative">
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={values.name}
+              onChange={handleChange}
+              maxLength={LIMITS.name}
+              placeholder={t('form.namePlaceholder')}
+              className={FIELD_CLASSES}
+            />
+            <User size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-custom-400" />
+          </div>
+          {errors.name && <p className="mt-1.5 text-sm text-ember-600">{errors.name}</p>}
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-industrial-800">
-            E-poçt
+          <label htmlFor="email" className="sr-only">
+            {t('form.emailLabel')}
           </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={values.email}
-            onChange={handleChange}
-            maxLength={LIMITS.email}
-            className="mt-1 w-full rounded-md border border-neutral-custom-400/40 px-3 py-2"
-          />
-          {errors.email && <p className="mt-1 text-sm text-ember-600">{errors.email}</p>}
+          <div className="relative">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={values.email}
+              onChange={handleChange}
+              maxLength={LIMITS.email}
+              placeholder={t('form.emailPlaceholder')}
+              className={FIELD_CLASSES}
+            />
+            <Mail size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-custom-400" />
+          </div>
+          {errors.email && <p className="mt-1.5 text-sm text-ember-600">{errors.email}</p>}
         </div>
 
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-industrial-800">
-            Mesaj
+          <label htmlFor="phone" className="sr-only">
+            {t('form.phoneLabel')}
           </label>
-          <textarea
-            id="message"
-            name="message"
-            rows={5}
-            value={values.message}
-            onChange={handleChange}
-            maxLength={LIMITS.message}
-            className="mt-1 w-full rounded-md border border-neutral-custom-400/40 px-3 py-2"
-          />
-          {errors.message && <p className="mt-1 text-sm text-ember-600">{errors.message}</p>}
+          <div className="relative">
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              value={values.phone}
+              onChange={handleChange}
+              maxLength={LIMITS.phone}
+              placeholder={t('form.phonePlaceholder')}
+              className={FIELD_CLASSES}
+            />
+            <Phone size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-custom-400" />
+          </div>
         </div>
 
-        <Button type="submit">Göndər</Button>
+        <div>
+          <label htmlFor="service" className="sr-only">
+            {t('form.serviceLabel')}
+          </label>
+          <div className="relative">
+            <select
+              id="service"
+              name="service"
+              value={values.service}
+              onChange={handleChange}
+              className={`${FIELD_CLASSES} appearance-none ${values.service ? 'text-base-50' : 'text-neutral-custom-400'}`}
+            >
+              <option value="" className="text-neutral-custom-600">
+                {t('form.servicePlaceholder')}
+              </option>
+              {services.map((service) => (
+                <option key={service.key} value={service.key} className="text-industrial-950">
+                  {tServices(`grid.items.${service.key}.title`)}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-custom-400" />
+          </div>
+        </div>
 
-        {submitted && (
-          <p className="text-sm text-industrial-800">
-            Təşəkkürlər! (Placeholder — hələ heç bir yerə göndərilmir.)
-          </p>
-        )}
+        <div>
+          <label htmlFor="message" className="sr-only">
+            {t('form.messageLabel')}
+          </label>
+          <div className="relative">
+            <textarea
+              id="message"
+              name="message"
+              rows={5}
+              value={values.message}
+              onChange={handleChange}
+              maxLength={LIMITS.message}
+              placeholder={t('form.messagePlaceholder')}
+              className={`${FIELD_CLASSES} min-h-[140px] resize-none`}
+            />
+            <MessageSquare size={16} className="pointer-events-none absolute right-4 top-4 text-neutral-custom-400" />
+          </div>
+          {errors.message && <p className="mt-1.5 text-sm text-ember-600">{errors.message}</p>}
+        </div>
+
+        <button
+          type="submit"
+          className="group flex w-full items-center justify-center gap-2 rounded-sm bg-ember-600 py-4 text-sm font-semibold uppercase tracking-wide text-base-50 transition-colors hover:bg-ember-800"
+        >
+          {t('form.submit')}
+          <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+            →
+          </span>
+        </button>
+
+        <p className="flex items-center gap-2 text-xs text-neutral-custom-400">
+          <Lock size={12} />
+          {t('form.privacyNote')}
+        </p>
+
+        {submitted && <p className="text-sm text-success-500">{t('form.successMessage')}</p>}
       </form>
     </div>
   )

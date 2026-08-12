@@ -1,6 +1,24 @@
 {
   "pageTitle": "Ürünler",
   "subtitle": "Uluslararası kalite standartlarına uygun, sertifikalı ürün yelpazemiz.",
+  "hero": {
+    "eyebrow": "ÜRÜNLERİMİZ",
+    "meta": "MALZEME KATEGORİSİ"
+  },
+  "solutionFinder": {
+    "eyebrow": "UYGULAMA ALANLARI",
+    "title": "Uygulama Alanına Göre Çözümler"
+  },
+  "tabs": {
+    "all": "Tümü"
+  },
+  "categoryFilter": {
+    "label": "KATEGORİ"
+  },
+  "brandFilter": {
+    "label": "MARKA"
+  },
+  "noResults": "Bu filtreye uygun ürün bulunamadı.",
   "items": {
     "passiveFireProtection": {
       "name": "Pasif Yangın Ürünleri",
@@ -26,5 +44,33 @@
       "name": "Deniz ve Korozyon Önleyici Ürünler",
       "description": "Deniz endüstrisi ve agresif ortamlar için koruyucu kaplama sistemleri."
     }
+  },
+  "learnMore": "Daha Fazla",
+  "whyChoose": {
+    "title": "Ürünlerimizin Avantajları",
+    "items": {
+      "certifications": {
+        "title": "Uluslararası Sertifikalar",
+        "description": "Uluslararası kalite standartlarına uygun sertifikalı ürünler sunuyoruz."
+      },
+      "fireTested": {
+        "title": "Yangına Karşı Test Edilmiş",
+        "description": "Ürünlerimiz yangın güvenliği gereksinimlerini karşılamak için test edilir."
+      },
+      "premiumQuality": {
+        "title": "Premium Kalite",
+        "description": "Tanınmış uluslararası markaların yüksek kaliteli ürünlerini sunuyoruz."
+      },
+      "technicalSupport": {
+        "title": "Teknik Destek",
+        "description": "Uzman ekibimiz projenizin her aşamasında yanınızda."
+      }
+    }
+  },
+  "cta": {
+    "title": "Doğru Yangın Koruma Çözümünü Seçmenize Yardımcı Oluyoruz",
+    "subtitle": "Uzman ekibimiz ihtiyaçlarınıza uygun ürünleri belirlemenize yardımcı olmak için burada.",
+    "contactButton": "Bizimle İletişime Geçin",
+    "consultationButton": "Danışmanlık Talep Edin"
   }
 }

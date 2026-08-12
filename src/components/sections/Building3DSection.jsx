@@ -2,18 +2,19 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  Building,
+  Activity,
   Cable,
-  Cylinder,
+  ClipboardCheck,
+  Drill,
+  Droplets,
   Flame,
   Layers,
   Link2,
   MapPin,
-  PanelTop,
   ShieldCheck,
   Tag,
-  TreePine,
-  Wind,
+  Volume2,
+  Wrench,
   X,
 } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
@@ -23,8 +24,9 @@ import { hotspots } from '../../data/hotspots3d'
 // of the initial bundle (see CLAUDE.md perf note on the earlier 1.37MB hero).
 const Hero3DScene = lazy(() => import('../3d/Hero3DScene'))
 
-// Resolves the lucide icon name strings stored in data/hotspots3d.js.
-const ICONS = { Cable, Cylinder, Wind, Layers, PanelTop, Link2, TreePine, Building }
+// Resolves the lucide icon name strings stored in data/hotspots3d.js. `Layers`
+// is the fallback for any key not listed here.
+const ICONS = { ShieldCheck, Flame, Cable, Wrench, Link2, Volume2, Activity, Droplets, Drill, ClipboardCheck, Layers }
 
 const STAT_FIELDS = [
   { key: 'systemType', icon: Tag },
@@ -46,6 +48,11 @@ function ScenePlaceholder({ label }) {
 
 function InfoPanel({ hotspot, t, onClose, onSelectKey }) {
   const HotspotIcon = ICONS[hotspot.icon] ?? Layers
+  // No hotspot has `status: 'future'` yet (see data/hotspots3d.js) — this
+  // branch is inert scaffolding for when a reserved-but-not-modeled
+  // discipline gets its first hotspot, so adding one is a locale + data
+  // change, not a component change.
+  const isFuture = hotspot.status === 'future'
 
   return (
     <motion.div
@@ -65,7 +72,7 @@ function InfoPanel({ hotspot, t, onClose, onSelectKey }) {
       </button>
 
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember-600">
-        {t('building3d.panel.selectedLabel')}
+        {isFuture ? t('building3d.panel.comingSoonLabel') : t('building3d.panel.selectedLabel')}
       </p>
 
       <div className="mt-3 flex items-center gap-3 pr-6">
@@ -79,11 +86,12 @@ function InfoPanel({ hotspot, t, onClose, onSelectKey }) {
         {t(`building3d.hotspots.${hotspot.key}.description`)}
       </p>
 
+      {!isFuture && (
       <div className="mt-5 space-y-4 border-t border-white/10 pt-5">
         {STAT_FIELDS.map((field) => {
-          // "System Type" doesn't fit non-building-system hotspots (e.g.
-          // landscape/exterior design) — those set labelOverrideKey in
-          // data/hotspots3d.js to swap the label to "Service Type".
+          // "System Type" doesn't fit non-building-system hotspots — those
+          // set labelOverrideKey in data/hotspots3d.js to swap the label to
+          // "Service Type".
           const labelKey = field.key === 'systemType' ? (hotspot.labelOverrideKey ?? field.key) : field.key
 
           return (
@@ -101,6 +109,7 @@ function InfoPanel({ hotspot, t, onClose, onSelectKey }) {
           )
         })}
       </div>
+      )}
 
       <div className="mt-5 border-t border-white/10 pt-5">
         <div className="flex gap-2 overflow-x-auto pb-1">

@@ -10,12 +10,12 @@ const STAT_POSITIONS = [3, 9, 16]
 
 function CustomerCell({ logoSrc }) {
   return (
-    <div className="group relative flex items-center justify-center p-6 text-center transition-transform duration-300 hover:-translate-y-1 sm:p-8">
+    <div className="group relative flex aspect-[2/1] items-center justify-center p-3 transition-transform duration-300 hover:-translate-y-1">
       <span
         aria-hidden="true"
         className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-custom-400/40 transition-all duration-300 group-hover:bg-ember-600 group-hover:shadow-[0_0_10px_3px_rgba(227,30,36,0.5)]"
       />
-      <img src={logoSrc} alt="Logo" className="max-h-16 w-auto object-contain" loading="lazy" />
+      <img src={logoSrc} alt="Logo" className="h-full w-full object-contain" loading="lazy" />
     </div>
   )
 }

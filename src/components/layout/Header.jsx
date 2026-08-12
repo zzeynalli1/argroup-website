@@ -4,6 +4,7 @@ import Logo from '../ui/Logo'
 import LanguageSwitcher from '../ui/LanguageSwitcher'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import { useScrolled } from '../../hooks/useScrolled'
+import { socialLinks } from '../../data/socialLinks'
 
 const NAV_LINKS = [
   { to: '/', key: 'home' },
@@ -39,7 +40,7 @@ export default function Header() {
   return (
     <motion.header
       initial={false}
-      animate={{ backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.8)' }}
+      animate={{ backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 1)' }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`fixed inset-x-0 top-0 z-40 w-full transition-[backdrop-filter,box-shadow] duration-300 ease-out ${
         scrolled ? 'shadow-lg shadow-black/10 backdrop-blur-md' : ''
@@ -74,6 +75,20 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-6">
+          <div className="hidden items-center gap-3 border-r border-neutral-custom-400/20 pr-6 lg:flex">
+            {socialLinks.map(({ Icon, href, label }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="text-neutral-custom-600 transition-colors hover:text-ember-600"
+              >
+                <Icon className="h-6 w-6" />
+              </a>
+            ))}
+          </div>
           <Link
             to="/contact"
             className="inline-block whitespace-nowrap rounded-full bg-ember-600 px-5 py-2.5 text-sm font-semibold text-base-50 transition-colors duration-300 hover:bg-ember-800"

@@ -1,13 +1,48 @@
 {
   "pageTitle": "Contact",
   "subtitle": "Get in touch — let's discuss your project together.",
+  "hero": {
+    "eyebrow": "GET IN TOUCH",
+    "headingLine1": "Get in touch",
+    "headingLine2": "with us."
+  },
   "info": {
     "addressLabel": "Address",
     "phoneLabel": "Phone",
     "emailLabel": "Email",
-    "hoursLabel": "Business Hours"
+    "hoursLabel": "Business Hours",
+    "hoursValue": "08:00 - 18:00, Monday - Saturday"
+  },
+  "form": {
+    "heading": "Send a message",
+    "nameLabel": "Full name",
+    "namePlaceholder": "Your full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Your email address",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "Your phone number",
+    "serviceLabel": "Service",
+    "servicePlaceholder": "Select a service",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Your message",
+    "submit": "Send",
+    "privacyNote": "Your information is protected and never shared with third parties.",
+    "successMessage": "Thank you! Your message has been received.",
+    "errors": {
+      "nameRequired": "Name is required.",
+      "nameTooLong": "Name cannot exceed {max} characters.",
+      "emailRequired": "Email is required.",
+      "emailTooLong": "Email cannot exceed {max} characters.",
+      "emailInvalid": "Email format is invalid.",
+      "messageRequired": "Message is required.",
+      "messageTooLong": "Message cannot exceed {max} characters."
+    }
   },
   "map": {
     "title": "Map"
+  },
+  "closing": {
+    "eyebrow": "Quick contact",
+    "title": "Have a question? Get in touch directly."
   }
 }

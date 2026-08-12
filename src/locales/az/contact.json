@@ -1,13 +1,48 @@
 {
   "pageTitle": "Əlaqə",
-  "subtitle": "Bizimlə əlaqə saxlayın, layihənizi birlikdə müzakirə edək.",
+  "subtitle": "Layihənizlə bağlı sualınız, təklifiniz və ya əməkdaşlıq istəyiniz varsa, bizimlə əlaqə saxlayın. Komandamız sizə qısa zamanda dönüş edəcək.",
+  "hero": {
+    "eyebrow": "ƏLAQƏ",
+    "headingLine1": "Bizimlə",
+    "headingLine2": "əlaqə saxlayın."
+  },
   "info": {
     "addressLabel": "Ünvan",
     "phoneLabel": "Telefon",
-    "emailLabel": "Email",
-    "hoursLabel": "İş saatları"
+    "emailLabel": "E-mail",
+    "hoursLabel": "İş saatları",
+    "hoursValue": "08:00 - 18:00, Bazar ertəsi - Şənbə"
+  },
+  "form": {
+    "heading": "Mesaj göndərin",
+    "nameLabel": "Ad və soyad",
+    "namePlaceholder": "Adınız və soyadınız",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "E-mail ünvanınız",
+    "phoneLabel": "Telefon",
+    "phonePlaceholder": "Telefon nömrəniz",
+    "serviceLabel": "Xidmət növü",
+    "servicePlaceholder": "Xidmət seçin",
+    "messageLabel": "Mesaj",
+    "messagePlaceholder": "Mesajınız",
+    "submit": "Göndər",
+    "privacyNote": "Məlumatlarınız qorunur və üçüncü tərəflərlə paylaşılmır.",
+    "successMessage": "Təşəkkürlər! Mesajınız qeydə alındı.",
+    "errors": {
+      "nameRequired": "Ad daxil edilməlidir.",
+      "nameTooLong": "Ad {max} simvoldan uzun ola bilməz.",
+      "emailRequired": "E-poçt daxil edilməlidir.",
+      "emailTooLong": "E-poçt {max} simvoldan uzun ola bilməz.",
+      "emailInvalid": "E-poçt formatı düzgün deyil.",
+      "messageRequired": "Mesaj daxil edilməlidir.",
+      "messageTooLong": "Mesaj {max} simvoldan uzun ola bilməz."
+    }
   },
   "map": {
     "title": "Xəritə"
+  },
+  "closing": {
+    "eyebrow": "Sürətli əlaqə",
+    "title": "Sualınız var? Bizimlə birbaşa əlaqə saxlayın."
   }
 }

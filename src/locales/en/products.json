@@ -1,6 +1,24 @@
 {
   "pageTitle": "Products",
   "subtitle": "Our certified product range, built to international quality standards.",
+  "hero": {
+    "eyebrow": "OUR PRODUCTS",
+    "meta": "MATERIAL CATEGORIES"
+  },
+  "solutionFinder": {
+    "eyebrow": "APPLICATION AREAS",
+    "title": "Solutions by Application Area"
+  },
+  "tabs": {
+    "all": "All"
+  },
+  "categoryFilter": {
+    "label": "CATEGORY"
+  },
+  "brandFilter": {
+    "label": "BRAND"
+  },
+  "noResults": "No products match this filter.",
   "items": {
     "passiveFireProtection": {
       "name": "Passive Fire Protection Products",
@@ -26,5 +44,33 @@
       "name": "Marine and Anti-Corrosion Products",
       "description": "Protective coating systems for the marine industry and aggressive environments."
     }
+  },
+  "learnMore": "Learn More",
+  "whyChoose": {
+    "title": "Why Choose Our Products",
+    "items": {
+      "certifications": {
+        "title": "International Certifications",
+        "description": "We provide certified products that meet international quality standards."
+      },
+      "fireTested": {
+        "title": "Fire Tested Performance",
+        "description": "Our products are tested to meet fire safety requirements."
+      },
+      "premiumQuality": {
+        "title": "Premium Quality",
+        "description": "We supply high-quality products from recognized international brands."
+      },
+      "technicalSupport": {
+        "title": "Technical Support",
+        "description": "Our expert team is with you at every stage of your project."
+      }
+    }
+  },
+  "cta": {
+    "title": "We Help You Choose the Right Fire Protection Solution",
+    "subtitle": "Our expert team is here to help define the right products for your needs.",
+    "contactButton": "Contact Us",
+    "consultationButton": "Request Consultation"
   }
 }

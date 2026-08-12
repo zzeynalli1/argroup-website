@@ -1,5 +1,6 @@
 import Building3DSection from '../components/sections/Building3DSection'
 import Materials from '../components/sections/Materials'
+import ProcessTeaser from '../components/sections/ProcessTeaser'
 import Projects from '../components/sections/Projects'
 import BrandsSection from '../components/sections/BrandsSection'
 import PartnersSection from '../components/sections/PartnersSection'
@@ -14,6 +15,7 @@ export default function Home() {
           continuous section (same background, no divider) — see
           Materials.jsx. */}
       <Materials />
+      <ProcessTeaser />
       <Projects variant="compact" />
       <BrandsSection />
       <PartnersSection />

@@ -36,6 +36,7 @@
     "zoomOut": "Uzaqlaşdır",
     "panel": {
       "selectedLabel": "Seçilmiş sahə",
+      "comingSoonLabel": "Tezliklə",
       "systemType": "Sistem növü",
       "serviceType": "Xidmət növü",
       "applicationArea": "İstifadə sahəsi",
@@ -45,75 +46,83 @@
       "close": "Bağla"
     },
     "hotspots": {
-      "cableTray": {
-        "name": "Kabel Keçidi",
-        "description": "Kabellərin döşəmə və divarlardan keçdiyi açıqlıq. Bağlanmadıqda yanğın və tüstünün bir bölmədən digərinə yayılmasına yol açır.",
+      "passiveFireProtection": {
+        "name": "Boru Keçidinin Bağlanması",
+        "description": "Metal boru kəmərinin yanğına davamlı divardan keçdiyi nöqtə. Fire Stop sistemləri yanğının bölmələr arasında yayılmasının qarşısını alır və təxliyə üçün lazımi vaxtı təmin edir.",
         "systemType": "Passiv Yanğın Qorunması",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "metalPipe": {
-        "name": "Metal Boru Keçidi",
-        "description": "Metal boru kəmərlərinin struktur elementlərdən keçdiyi nöqtə. İstilik ötürücülüyü səbəbindən əlavə diqqət tələb edir.",
-        "systemType": "Passiv Yanğın Qorunması",
+      "fireproofingSystems": {
+        "name": "Struktur Elementin Fireproofing-i",
+        "description": "Daşıyıcı polad sütunun yanğından qorunması. Erkən planlaşdırma və düzgün tətbiq struktur elementlərin yüksək temperaturda daşıyıcılıq qabiliyyətini qoruyur.",
+        "systemType": "Fireproofing Sistemləri",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "pvcPipe": {
-        "name": "Plastik Boru Keçidi",
-        "description": "Plastik (PVC) boru kəmərlərinin keçid nöqtəsi. Yüksək temperaturda əriyərək açıqlıq yarada bilər, bu da xüsusi bağlama tələb edir.",
-        "systemType": "Passiv Yanğın Qorunması",
+      "cableProtection": {
+        "name": "Kabel Keçidinin Qorunması",
+        "description": "Elektrik və məlumat kabellərinin döşəmə/divar keçidlərində yanğından qorunması. Kabel materiallarının etibarlılığını və xidmət müddətini artırır.",
+        "systemType": "Kabel Qorunması",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "hvacDuct": {
-        "name": "HVAC Kanal Keçidi",
-        "description": "Ventilyasiya (HVAC) kanallarının keçid nöqtəsi. Tüstü və alovun hava kanalları vasitəsilə yayılmasının qarşısını almaq üçün qorunmalıdır.",
-        "systemType": "Passiv Yanğın Qorunması",
+      "mechanicalSupport": {
+        "name": "Asma Bərkitmə Sistemi",
+        "description": "Texniki xəttin tavandan asma çubuqlar və bərkitmə qısqaclarıyla dayaqlanması. Boru, kanal və kabel xəttlərinin etibarlı daşınması üçün xüsusi bərkitmə və dəstək sistemlərindən istifadə olunur.",
+        "systemType": "Mexaniki Dəstək Sistemləri",
         "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "floorWallJoint": {
-        "name": "Döşəmə-Divar Birləşməsi",
-        "description": "Döşəmə ilə divarın birləşdiyi struktur tikiş xətti. Bina hərəkəti zamanı açıla bilən bu boşluq yanğına qarşı bağlanmalıdır.",
-        "systemType": "Passiv Yanğın Qorunması",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "curtainWall": {
-        "name": "Fasad (Curtain Wall) Keçidi",
-        "description": "Fasad (curtain wall) sistemi ilə döşəmə arasındakı boşluq. Mərtəbələr arası yanğın yayılmasının qarşısını almaq üçün kritik nöqtədir.",
-        "systemType": "Passiv Yanğın Qorunması",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "structuralJoint": {
-        "name": "Konstruktiv Tikiş",
-        "description": "Binanın struktur hərəkətinə imkan verən tikiş xətti. Genişlənmə/daralma zamanı bütövlüyünü qoruyan elastik yanğın bağlaması tələb edir.",
-        "systemType": "Passiv Yanğın Qorunması",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "landscape": {
-        "name": "Landşaft Dizaynı",
-        "description": "Bina ətrafında funksional və estetik həyət düzənləməsi — yaşıl sahələr, gəzinti yolları və açıq məkan planlaması.",
-        "systemType": "Landşaft Arxitekturası",
-        "applicationArea": "Açıq sahə, həyət, yaşıl zona",
         "fireRating": "Aid deyil",
         "certification": "—"
       },
-      "exteriorDesign": {
-        "name": "Fasad və Eksteryer Dizaynı",
-        "description": "Binanın xarici görünüşü üçün müasir cladding sistemləri, fasad materialları və arxitektural həllər.",
-        "systemType": "Eksteryer Mühəndisliyi",
-        "applicationArea": "Fasad, cladding, xarici örtük",
+      "jointSealing": {
+        "name": "Struktur Tikişin Bağlanması",
+        "description": "Binanın struktur hərəkətinə imkan verən tikiş xətti. Fire Stop sistemləri bu boşluqları genişlənmə və daralma zamanı da bütövlüyünü qoruyan elastik materiallarla bağlayır.",
+        "systemType": "Passiv Yanğın Qorunması",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "acousticInsulation": {
+        "name": "Döşəmə-Divar Akustik İzolyasiyası",
+        "description": "Döşəmə ilə divarın birləşdiyi nöqtədə səs ötürülməsinin qarşısını alan akustik izolyasiya. Həm hava, həm də struktur yolu ilə yayılan səsi məhdudlaşdırır.",
+        "systemType": "Səs və Akustik İzolyasiya",
+        "applicationArea": "—",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      },
+      "vibrationSolutions": {
+        "name": "Dam Avadanlığının Vibrasiya Təcridi",
+        "description": "Damdakı mexaniki avadanlığın (generator, mühərrik qrupları və s.) vibrasiya-təcrid montaj altlıqları üzərində quraşdırılması. Avadanlıqdan yaranan vibrasiyanın struktur elementlərinə ötürülməsinin qarşısını alır.",
+        "systemType": "Vibrasiya Analizi və Həlləri",
+        "applicationArea": "—",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      },
+      "waterproofInjection": {
+        "name": "Divar-Döşəmə İnyeksiyası",
+        "description": "Divar-döşəmə birləşməsində nəmlik keçirməsinin qarşısını almaq üçün inyeksiya nöqtəsi. Beton konstruksiyalarda tikiş xətlərinin su keçirməzliyini təmin edir.",
+        "systemType": "Su İzolyasiyası İnyeksiyası",
+        "applicationArea": "—",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      },
+      "drillingCutting": {
+        "name": "Boru Keçidi üçün Qazma",
+        "description": "Almaz başlıqlı avadanlıqla betonda açılan dəqiq ölçülü keçid dəliyi, boru xəttinin yerləşdirilməsi üçün. Divar, döşəmə və digər beton səthlərdə tətbiq olunur.",
+        "systemType": "Qazma və Beton Kəsimi",
+        "applicationArea": "—",
+        "fireRating": "Aid deyil",
+        "certification": "—"
+      },
+      "engineeringTesting": {
+        "name": "Fasad Bərkitmə Nöqtəsinin Mühəndisliyi",
+        "description": "Fasad (curtain wall) bərkitmə nöqtəsində struktur etibarlılığı təmin edən mühəndislik xidmətləri: Dəstək Dizaynı, Pull-Out Test və Yük Analizi.",
+        "systemType": "Dəstək Dizaynı, Pull-Out Test və Yük Analizi",
+        "applicationArea": "—",
         "fireRating": "Aid deyil",
         "certification": "—"
       }
@@ -160,33 +169,28 @@
     }
   },
   "process": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
     "steps": {
-      "step1": { "title": "PLACEHOLDER" },
-      "step2": { "title": "PLACEHOLDER" },
-      "step3": { "title": "PLACEHOLDER" },
-      "step4": { "title": "PLACEHOLDER" }
-    }
-  },
-  "services": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "viewAll": "Bütün xidmətlər",
-    "readMore": "Ətraflı",
-    "imagePlaceholder": "Şəkil əlavə olunacaq",
-    "items": {
-      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+      "step1": {
+        "title": "Zonalara Bölünmə",
+        "description": "Yanğının yayılmasının qarşısını almaq üçün bina bölmələrə (kompartmentlərə) ayrılır."
+      },
+      "step2": {
+        "title": "Şaquli Təcrid",
+        "description": "Yanğın divarları alovun eyni mərtəbədə qonşu sahələrə yayılmasını gecikdirir."
+      },
+      "step3": {
+        "title": "Üfüqi Təcrid",
+        "description": "Yanğına davamlı döşəmə və tavan quruluşları alovun mərtəbələr arasında yayılmasının qarşısını alır."
+      },
+      "step4": {
+        "title": "Keçidlərin Bağlanması",
+        "description": "Boru, kabel və kanal keçidləri Fire Stop sistemləri ilə bağlanaraq bu qorumanı bütöv saxlayır."
+      }
     }
   },
   "processTeaser": {
     "heading": "Fire Stop bu şəkildə qoruyur.",
-    "description": "PLACEHOLDER",
+    "description": "Yanğının yayılmasının qarşısını almaq üçün binalar zonalara bölünür — bu qorumanın gücü isə hər bir kiçik açıqlığın necə bağlandığından asılıdır.",
     "cta": "Prosesi kəşf et"
   },
   "projects": {
@@ -225,9 +229,9 @@
   },
   "cta": {
     "label": "MÖHKƏM ƏSAS, ETİBARLI GƏLƏCƏK",
-    "titleLine1": "Bağlayın. Qoruyun.",
-    "titleLine2": "Etibar edin.",
-    "subtitle": "Firestop sadəcə məhsul deyil - bu, ürək rahatlığıdır.",
+    "titleLine1": "Layihəniz üçün",
+    "titleLine2": "konsultasiya alın",
+    "subtitle": "Mütəxəssis komandamız sizinlə əlaqə saxlayacaq.",
     "button": "Bizimlə Əlaqə"
   }
 }

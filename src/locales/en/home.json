@@ -36,6 +36,7 @@
     "zoomOut": "Zoom out",
     "panel": {
       "selectedLabel": "Selected Area",
+      "comingSoonLabel": "Coming Soon",
       "systemType": "System Type",
       "serviceType": "Service Type",
       "applicationArea": "Application Area",
@@ -45,75 +46,83 @@
       "close": "Close"
     },
     "hotspots": {
-      "cableTray": {
-        "name": "Cable Tray Penetration",
-        "description": "The opening where cables pass through floors and walls. Left unsealed, it lets fire and smoke spread from one compartment to another.",
+      "passiveFireProtection": {
+        "name": "Pipe Penetration Sealing",
+        "description": "The point where a metal pipe passes through a fire-rated wall. Fire Stop systems prevent fire from spreading between compartments and secure the time needed for evacuation.",
         "systemType": "Passive Fire Protection",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "metalPipe": {
-        "name": "Metal Pipe Penetration",
-        "description": "The point where metal pipework passes through structural elements. Its thermal conductivity calls for extra attention.",
-        "systemType": "Passive Fire Protection",
+      "fireproofingSystems": {
+        "name": "Structural Fireproofing",
+        "description": "Fire protection for a load-bearing steel column. Early planning and correct application preserve the structural element's load-bearing capacity at high temperatures.",
+        "systemType": "Fireproofing Systems",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "pvcPipe": {
-        "name": "PVC Pipe Penetration",
-        "description": "The penetration point for PVC pipework. It can melt under high heat and create an opening, which calls for a dedicated seal.",
-        "systemType": "Passive Fire Protection",
+      "cableProtection": {
+        "name": "Cable Penetration Protection",
+        "description": "Fire protection for electrical and data cables at floor/wall penetrations. Extends the reliability and service life of the cable materials.",
+        "systemType": "Cable Protection",
         "applicationArea": "—",
         "fireRating": "—",
         "certification": "—"
       },
-      "hvacDuct": {
-        "name": "HVAC Duct Penetration",
-        "description": "The penetration point for HVAC ductwork. It must be protected to stop fire and smoke spreading through the air ducts.",
-        "systemType": "Passive Fire Protection",
+      "mechanicalSupport": {
+        "name": "Hanger Support System",
+        "description": "A technical line suspended from the slab above on hanger rods and clamps. Dedicated fixing and support systems carry pipe, duct, and cable runs reliably.",
+        "systemType": "Mechanical Support Systems",
         "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "floorWallJoint": {
-        "name": "Floor-Wall Joint",
-        "description": "The structural joint line where floor meets wall. This gap can open under building movement and must be fire-sealed.",
-        "systemType": "Passive Fire Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "curtainWall": {
-        "name": "Curtain Wall Penetration",
-        "description": "The gap between the curtain wall system and the floor slab. A critical point for stopping fire spread between floors.",
-        "systemType": "Passive Fire Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "structuralJoint": {
-        "name": "Structural Joint",
-        "description": "The joint line that allows for the building's structural movement. It needs a flexible fire seal that keeps its integrity through expansion and contraction.",
-        "systemType": "Passive Fire Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
-      },
-      "landscape": {
-        "name": "Landscape Design",
-        "description": "Functional and aesthetic yard layout around the building — green spaces, walking paths, and open-area planning.",
-        "systemType": "Landscape Architecture",
-        "applicationArea": "Open area, yard, green zone",
         "fireRating": "Not applicable",
         "certification": "—"
       },
-      "exteriorDesign": {
-        "name": "Facade & Exterior Design",
-        "description": "Modern cladding systems, facade materials, and architectural solutions for the building's exterior appearance.",
-        "systemType": "Exterior Engineering",
-        "applicationArea": "Facade, cladding, exterior envelope",
+      "jointSealing": {
+        "name": "Structural Joint Sealing",
+        "description": "The joint line that allows for the building's structural movement. Fire Stop systems seal these gaps with flexible materials that keep their integrity through expansion and contraction.",
+        "systemType": "Passive Fire Protection",
+        "applicationArea": "—",
+        "fireRating": "—",
+        "certification": "—"
+      },
+      "acousticInsulation": {
+        "name": "Floor-Wall Acoustic Insulation",
+        "description": "Acoustic insulation at the floor-wall junction that limits sound transmission. Controls both airborne and structure-borne sound paths.",
+        "systemType": "Sound & Acoustic Insulation",
+        "applicationArea": "—",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      },
+      "vibrationSolutions": {
+        "name": "Rooftop Equipment Vibration Isolation",
+        "description": "Rooftop mechanical equipment (generators, engine groups, etc.) mounted on vibration-isolation pads. Prevents equipment-generated vibration from transferring into the structure.",
+        "systemType": "Vibration Analysis & Solutions",
+        "applicationArea": "—",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      },
+      "waterproofInjection": {
+        "name": "Wall-Floor Injection Point",
+        "description": "An injection point that stops moisture ingress at the wall-floor junction. Secures the water-tightness of joint lines in concrete structures.",
+        "systemType": "Waterproof Injection",
+        "applicationArea": "—",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      },
+      "drillingCutting": {
+        "name": "Core Drilling for Pipe Penetration",
+        "description": "A precisely sized opening cut into concrete with diamond-tipped equipment for a pipe run. Applied to walls, floors, and other concrete surfaces.",
+        "systemType": "Drilling & Concrete Cutting",
+        "applicationArea": "—",
+        "fireRating": "Not applicable",
+        "certification": "—"
+      },
+      "engineeringTesting": {
+        "name": "Facade Anchor Engineering",
+        "description": "Engineering services that secure structural reliability at the curtain-wall anchor point: Support Design, Pull-Out Test, and Load Analysis.",
+        "systemType": "Support Design, Pull-Out Test & Load Analysis",
+        "applicationArea": "—",
         "fireRating": "Not applicable",
         "certification": "—"
       }
@@ -160,33 +169,28 @@
     }
   },
   "process": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
     "steps": {
-      "step1": { "title": "PLACEHOLDER" },
-      "step2": { "title": "PLACEHOLDER" },
-      "step3": { "title": "PLACEHOLDER" },
-      "step4": { "title": "PLACEHOLDER" }
-    }
-  },
-  "services": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
-    "viewAll": "All Services",
-    "readMore": "Learn More",
-    "imagePlaceholder": "Image coming soon",
-    "items": {
-      "fireProtection": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "testing": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "construction": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "industrial": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "marine": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
-      "designEngineering": { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+      "step1": {
+        "title": "Zone Division",
+        "description": "The building is divided into fire compartments to contain the spread of fire."
+      },
+      "step2": {
+        "title": "Vertical Isolation",
+        "description": "Fire walls delay flame spreading to neighboring areas on the same floor."
+      },
+      "step3": {
+        "title": "Horizontal Isolation",
+        "description": "Fire-rated floor and ceiling assemblies stop flame from spreading between floors."
+      },
+      "step4": {
+        "title": "Sealing the Penetrations",
+        "description": "Pipe, cable, and duct penetrations are sealed with Fire Stop systems to keep that protection intact."
+      }
     }
   },
   "processTeaser": {
     "heading": "This is how Fire Stop protects.",
-    "description": "PLACEHOLDER",
+    "description": "Buildings are divided into zones to contain the spread of fire — and that protection is only as strong as how well every small opening in it is sealed.",
     "cta": "Discover the Process"
   },
   "projects": {
@@ -225,9 +229,9 @@
   },
   "cta": {
     "label": "STRONG FOUNDATION, RELIABLE FUTURE",
-    "titleLine1": "Seal it. Protect it.",
-    "titleLine2": "Trust it.",
-    "subtitle": "Firestop isn't just a product - it's peace of mind.",
+    "titleLine1": "Get a consultation",
+    "titleLine2": "for your project",
+    "subtitle": "Our expert team will get in touch with you.",
     "button": "Contact Us"
   }
 }

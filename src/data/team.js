@@ -1,67 +1,49 @@
 /**
- * Org-chart data for TeamTree.jsx. Names are intentionally "Ad Soyad"
- * placeholders (not the real CEO/Sales/Engineer names from
- * docs/argroup-knowledge-base.md) — the real KB only has 3 named
- * executives, which don't map cleanly onto this 4-department structure, so
- * inventing which real person leads which department here would be
- * fabricating an org relationship that isn't verified. Fill in real names
- * once the actual department structure is confirmed.
+ * AR Group organizational hierarchy for TeamTree.jsx.
  *
- * `company` is optional — set it (e.g. "AR Group Construction Services")
- * only when a person belongs to a different company/division than the rest
- * of the tree. `photo` is an optional path; leave null for the default
- * silhouette avatar.
+ * `name` is a real, verified name from docs/argroup-knowledge-base.md
+ * ("Leadership" section) — set to `null` where no individual is named in
+ * the KB for that function, so the card shows the role only, never an
+ * invented person. `positionKey` looks up the translated role/position
+ * label at locales/<locale>/about.json under `leadership.items.<id>.title`.
+ *
+ * No fabricated names, headcounts, or department structure beyond the
+ * confirmed leaders and AR Group's real service lines (engineering,
+ * on-site technical work, installation/operations).
  */
 export const teamData = {
-  id: 1,
-  name: 'Ad Soyad',
-  position: 'Direktor',
-  company: null,
+  id: 'management',
+  name: 'Ramin Mustafayev',
+  positionKey: 'ceo',
   photo: null,
   children: [
     {
-      id: 2,
-      name: 'Ad Soyad',
-      position: 'Fire Protection Şöbəsinin Müdiri',
-      company: null,
+      id: 'engineering',
+      name: null,
+      positionKey: 'engineer',
       photo: null,
-      children: [
-        { id: 6, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-        { id: 7, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-      ],
+      children: [],
     },
     {
-      id: 3,
-      name: 'Ad Soyad',
-      position: 'Construction Şöbəsinin Müdiri',
-      company: null,
+      id: 'purchasingSales',
+      name: 'Cavid Allahverdiyev',
+      positionKey: 'purchasingSales',
       photo: null,
-      children: [
-        { id: 8, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-        { id: 9, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-      ],
+      children: [],
     },
     {
-      id: 4,
-      name: 'Ad Soyad',
-      position: 'Design Engineering Şöbəsinin Müdiri',
-      company: null,
+      id: 'siteTeam',
+      name: null,
+      positionKey: 'siteTeam',
       photo: null,
-      children: [
-        { id: 10, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-        { id: 11, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-      ],
+      children: [],
     },
     {
-      id: 5,
-      name: 'Ad Soyad',
-      position: 'Testing/QA Şöbəsinin Müdiri',
-      company: null,
+      id: 'installation',
+      name: null,
+      positionKey: 'installation',
       photo: null,
-      children: [
-        { id: 12, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-        { id: 13, name: 'Ad Soyad', position: 'Mühəndis', company: null, photo: null, children: [] },
-      ],
+      children: [],
     },
   ],
 }

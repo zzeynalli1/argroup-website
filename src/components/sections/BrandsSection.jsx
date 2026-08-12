@@ -3,8 +3,8 @@ import { useTranslation } from '../../lib/i18n/useTranslation'
 
 function BrandCell({ logoSrc }) {
   return (
-    <div className="flex items-center justify-center p-6 text-center sm:p-8 md:p-10">
-      <img src={logoSrc} alt="Logo" className="max-h-16 w-auto object-contain" loading="lazy" />
+    <div className="flex aspect-[2/1] items-center justify-center border-2 border-transparent p-3 transition-all duration-200 hover:scale-[1.03] hover:border-ember-600">
+      <img src={logoSrc} alt="Logo" className="h-full w-full object-contain" loading="lazy" />
     </div>
   )
 }

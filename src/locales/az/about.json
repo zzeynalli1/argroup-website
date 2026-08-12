@@ -1,7 +1,19 @@
 {
   "pageTitle": "Haqqımızda",
   "subtitle": "Tikinti həllərində peşəkar xidmət göstəririk.",
+  "hero": {
+    "eyebrow": "HAQQINDA — AR GROUP",
+    "headline": {
+      "prefix": "Tikinti həllərində ",
+      "emphasis": "peşəkar",
+      "suffix": " xidmət göstəririk."
+    }
+  },
   "intro": "AR Group Construction Services — tikinti sənayesində peşəkar həllər təqdim edən şirkətdir. Passiv yanğın qorunması, mühəndislik dizaynı və tikinti xidmətləri sahəsində Azərbaycanın aparıcı layihələrinə tərəfdaşlıq edirik.",
+  "story": {
+    "eyebrow": "DƏYƏRLƏRİMİZ",
+    "visualLabel": "FIRE STOP TƏTBİQİ"
+  },
   "values": {
     "heading": "Dəyərlərimiz",
     "items": {
@@ -25,9 +37,84 @@
   },
   "stats": {
     "experience": "İllik təcrübə",
-    "completedProjects": "Tamamlanmış layihə",
-    "certifications": "Sertifikatlar",
-    "employeeCount": "Əməkdaş sayı"
+    "foundedLabel": "Təsis ili",
+    "sinceCaption": "2018-ci ildən Azərbaycanda Fire Stop passiv yanğın qorunması sistemlərinin quraşdırılmasında fəaliyyət göstəririk."
   },
-  "teamHeading": "Komandamız"
+  "leadership": {
+    "heading": "Komandamız",
+    "items": {
+      "ceo": { "title": "Baş İcraçı Direktor" },
+      "purchasingSales": { "title": "Satınalma və Satış Departamentinin Rəhbəri" },
+      "engineer": { "title": "Baş Mühəndis" },
+      "siteTeam": { "title": "Texniki / Sahə Komandası" },
+      "installation": { "title": "Quraşdırma və Əməliyyatlar" }
+    }
+  },
+  "capabilities": {
+    "eyebrow": "İXTİSASLARIMIZ",
+    "title": "Mühəndislik Bacarıqlarımız",
+    "primary": {
+      "label": "ƏSAS İXTİSAS",
+      "title": "Passiv Yanğın Qorunması",
+      "description": "Fire Stop və fireproofing sistemləri ilə yanğının və tüstünün yayılmasının qarşısını alırıq — 2018-ci ildən Azərbaycanda əsas ixtisasımız."
+    },
+    "items": {
+      "cableProtection": {
+        "title": "Kabel Qorunması",
+        "description": "Elektrik və məlumat kabellərinin yanğından qorunması, xidmət müddətinin artırılması."
+      },
+      "acousticInsulation": {
+        "title": "Akustik İzolyasiya",
+        "description": "Hava və struktur yolu ilə yayılan səsin mənbədə, keçiddə və qəbuledicidə idarə olunması."
+      },
+      "chemicalAnchoring": {
+        "title": "Kimyəvi Ankerləmə",
+        "description": "Struktur bərkitmələr üçün kimyəvi ankerləmə həlləri."
+      },
+      "concreteCutting": {
+        "title": "Beton Kəsimi və Sökülmə",
+        "description": "Almaz başlıqlı avadanlıqla dəqiq kəsim, qazma və sökülmə işləri."
+      },
+      "loadAnalysis": {
+        "title": "Yük Analizi və Dəstək Dizaynı",
+        "description": "MEP dəstək sistemləri üçün statik/dinamik yük hesablamaları və 3D modelləşdirmə."
+      },
+      "vibrationTesting": {
+        "title": "Vibrasiya Analizi və Testlər",
+        "description": "Pull-out test və vibrasiya ölçmələri ilə sistemlərin etibarlılığının təsdiqlənməsi."
+      },
+      "waterproofInjection": {
+        "title": "Su İzolyasiyası İnyeksiyası",
+        "description": "Divar-döşəmə birləşmələrində nəmlik keçirməsinin qarşısının alınması."
+      }
+    }
+  },
+  "compartmentation": {
+    "eyebrow": "YANAŞMAMIZ",
+    "title": "İdeyadan\nnəticəyə.",
+    "description": "Layihəni analiz edir, düzgün həlli planlayır, dəqiq icra edir və nəticəni texniki dəstəklə tamamlayırıq.",
+    "steps": {
+      "step1": {
+        "title": "Analiz",
+        "description": "Layihənin tələblərini, texniki şərtləri və tətbiq sahələrini analiz edirik."
+      },
+      "step2": {
+        "title": "Plan",
+        "description": "Uyğun həll, material və icra yanaşmasını müəyyənləşdiririk."
+      },
+      "step3": {
+        "title": "İcra",
+        "description": "İşləri təsdiqlənmiş texniki həllərə uyğun dəqiq şəkildə həyata keçiririk."
+      },
+      "step4": {
+        "title": "Dəstək",
+        "description": "İcra sonrası texniki dəstək və lazım olduqda əlavə həllər təqdim edirik."
+      }
+    }
+  },
+  "closing": {
+    "title": "Layihəniz üçün mühəndislik dəstəyi əldə edin.",
+    "subtitle": "Komandamız ehtiyaclarınıza uyğun həlli birlikdə müəyyən etmək üçün sizinlə əlaqə saxlayacaq.",
+    "button": "Bizimlə Əlaqə"
+  }
 }

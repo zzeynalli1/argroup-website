@@ -1,21 +1,14 @@
-import Section from '../components/ui/Section'
-import Values from '../components/sections/Values'
-import StatsPlaceholder from '../components/sections/StatsPlaceholder'
+import AboutHero from '../components/sections/AboutHero'
+import AboutApproach from '../components/sections/AboutApproach'
+import AboutStory from '../components/sections/AboutStory'
 import TeamTree from '../components/sections/TeamTree'
-import PageHeader from '../components/layout/PageHeader'
-import { useTranslation } from '../lib/i18n/useTranslation'
 
 export default function About() {
-  const { t } = useTranslation('about')
-
   return (
     <>
-      <PageHeader title={t('pageTitle')} breadcrumbLabel="Haqqımızda" subtitle={t('subtitle')} />
-      <Section id="about-intro">
-        <p className="text-neutral-custom-600 max-w-3xl">{t('intro')}</p>
-      </Section>
-      <Values />
-      <StatsPlaceholder />
+      <AboutHero />
+      <AboutApproach />
+      <AboutStory />
       <TeamTree />
     </>
   )

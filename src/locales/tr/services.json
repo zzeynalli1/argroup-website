@@ -1,10 +1,12 @@
 {
-  "fireProcess": {
-    "eyebrow": "İnteraktif Süreç",
-    "title": "Fire Protection Systems",
-    "subtitle": "Nasıl koruyoruz?",
-    "nextCta": "Diğer hizmetlere geç",
-    "steps": {
+  "hero": {
+    "eyebrow": "HİZMETLERİMİZ",
+    "title": "Yangın Güvenliği için Kapsamlı Mühendislik Hizmetleri",
+    "subtitle": "Fire Stop'tan Design Engineering'e kadar — her projede güvenilir mühendislik desteği."
+  },
+  "grid": {
+    "title": "Sunduğumuz Hizmetler",
+    "items": {
       "fireStopSystems": {
         "title": "Fire Stop Systems",
         "description": "Açıklık ve geçişlerin kapatılması"
@@ -16,12 +18,7 @@
       "cableProtection": {
         "title": "Kablo Koruması",
         "description": "Elektrik sistemlerinin güvenliği"
-      }
-    }
-  },
-  "otherServices": {
-    "title": "Diğer Hizmetlerimiz",
-    "items": {
+      },
       "testing": {
         "title": "Testing & Measurement Services",
         "description": "Pull-out test ve titreşim ölçümleriyle sistemlerin güvenilirliğini doğruluyoruz."
@@ -43,5 +40,10 @@
         "description": "Planlama aşamasından itibaren tam teknik tasarım desteği."
       }
     }
+  },
+  "cta": {
+    "title": "Projeniz için uzman desteği alın",
+    "subtitle": "Ekibimiz ihtiyaçlarınıza uygun çözümü belirlemek için sizinle iletişime geçecek.",
+    "button": "Bizimle İletişime Geçin"
   }
 }

@@ -1,10 +1,12 @@
 {
-  "fireProcess": {
-    "eyebrow": "Interactive Process",
-    "title": "Fire Protection Systems",
-    "subtitle": "How do we protect?",
-    "nextCta": "Go to other services",
-    "steps": {
+  "hero": {
+    "eyebrow": "OUR SERVICES",
+    "title": "Full-Scope Engineering Services for Fire Safety",
+    "subtitle": "From Fire Stop to Design Engineering — reliable engineering support on every project."
+  },
+  "grid": {
+    "title": "Services We Provide",
+    "items": {
       "fireStopSystems": {
         "title": "Fire Stop Systems",
         "description": "Sealing openings and penetrations"
@@ -16,12 +18,7 @@
       "cableProtection": {
         "title": "Cable Protection",
         "description": "Safety of electrical systems"
-      }
-    }
-  },
-  "otherServices": {
-    "title": "Our Other Services",
-    "items": {
+      },
       "testing": {
         "title": "Testing & Measurement Services",
         "description": "We confirm system reliability with pull-out tests and vibration measurements."
@@ -43,5 +40,10 @@
         "description": "Full technical design support starting from the planning stage."
       }
     }
+  },
+  "cta": {
+    "title": "Get expert support for your project",
+    "subtitle": "Our team will get in touch to help define the right solution for your needs.",
+    "button": "Contact Us"
   }
 }

@@ -1,6 +1,24 @@
 {
   "pageTitle": "Məhsullar",
   "subtitle": "Sertifikatlı, beynəlxalq keyfiyyət standartlarına uyğun məhsul çeşidimiz.",
+  "hero": {
+    "eyebrow": "MƏHSULLARIMIZ",
+    "meta": "MATERİAL KATEQORİYASI"
+  },
+  "solutionFinder": {
+    "eyebrow": "TƏTBİQ SAHƏLƏRİ",
+    "title": "Tətbiq Sahəsinə Görə Həllər"
+  },
+  "tabs": {
+    "all": "Hamısı"
+  },
+  "categoryFilter": {
+    "label": "KATEQORİYA"
+  },
+  "brandFilter": {
+    "label": "BREND"
+  },
+  "noResults": "Bu filtrə uyğun məhsul tapılmadı.",
   "items": {
     "passiveFireProtection": {
       "name": "Passiv Yanğın Məhsulları",
@@ -26,5 +44,33 @@
       "name": "Dəniz və Antikorroziya Məhsulları",
       "description": "Dəniz sənayesi və aqressiv mühitlər üçün qoruyucu örtük sistemləri."
     }
+  },
+  "learnMore": "Ətraflı",
+  "whyChoose": {
+    "title": "Məhsullarımızın Üstünlükləri",
+    "items": {
+      "certifications": {
+        "title": "Beynəlxalq Sertifikatlar",
+        "description": "Beynəlxalq keyfiyyət standartlarına uyğun sertifikatlı məhsullar təqdim edirik."
+      },
+      "fireTested": {
+        "title": "Yanğına Qarşı Sınaqdan Keçirilmişdir",
+        "description": "Məhsullarımız yanğın təhlükəsizliyi tələblərinə uyğun test edilir."
+      },
+      "premiumQuality": {
+        "title": "Premium Keyfiyyət",
+        "description": "Tanınmış beynəlxalq brendlərin yüksək keyfiyyətli məhsullarını təqdim edirik."
+      },
+      "technicalSupport": {
+        "title": "Texniki Dəstək",
+        "description": "Mütəxəssis komandamız layihənizin bütün mərhələlərində sizinlə birlikdədir."
+      }
+    }
+  },
+  "cta": {
+    "title": "Düzgün Yanğın Qorunması Həllini Seçməkdə Sizə Kömək Edirik",
+    "subtitle": "Mütəxəssis komandamız ehtiyaclarınıza uyğun məhsulları birlikdə müəyyənləşdirmək üçün buradadır.",
+    "contactButton": "Bizimlə Əlaqə",
+    "consultationButton": "Konsultasiya Tələb Edin"
   }
 }

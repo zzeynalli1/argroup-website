@@ -2,17 +2,11 @@ import { Fragment } from 'react'
 import { partners } from '../../data/partners'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 
-// Card is h-16 (64px) + mt-5 gap (20px) + half the dot's own height (4px) =
-// 88px from the card column's top to the dot's center — the connector line
-// below the row is pinned to that same offset so it passes through every
-// dot's center regardless of viewport width.
-const CONNECTOR_OFFSET = 88
-
 function PartnerCard({ logoSrc }) {
   return (
     <div className="group flex flex-col items-center">
-      <div className="flex h-16 w-24 shrink-0 items-center justify-center rounded-lg border border-neutral-custom-400/20 bg-base-50 px-2 text-center shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 xl:w-28">
-        <img src={logoSrc} alt="Logo" className="max-h-12 w-auto object-contain" loading="lazy" />
+      <div className="flex aspect-[2/1] w-36 shrink-0 items-center justify-center rounded-lg border border-neutral-custom-400/20 bg-base-50 p-3 shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 xl:w-40">
+        <img src={logoSrc} alt="Logo" className="h-full w-full object-contain" loading="lazy" />
       </div>
       <span
         aria-hidden="true"
@@ -39,12 +33,15 @@ export default function PartnersSection() {
         </div>
 
         <div className="relative mt-16">
+          {/* Card is w-36 (144px) at aspect-[2/1] = 72px tall, + mt-5 gap (20px) +
+              half the dot's own height (4px) = 96px to the dot's center;
+              xl:w-40 (160px) = 80px tall -> 104px. The line is pinned to the
+              same offsets so it passes through every dot's center. */}
           <div
             aria-hidden="true"
-            className="absolute left-4 right-4 hidden h-px bg-neutral-custom-400/25 lg:block"
-            style={{ top: `${CONNECTOR_OFFSET}px` }}
+            className="absolute left-4 right-4 top-[96px] hidden h-px bg-neutral-custom-400/25 lg:block xl:top-[104px]"
           />
-          <div className="flex flex-wrap items-start justify-center gap-x-1 gap-y-10 lg:flex-nowrap lg:gap-x-3 xl:gap-x-4">
+          <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:gap-x-5 xl:gap-x-6">
             {partners.map((logoSrc, index) => (
               <Fragment key={logoSrc}>
                 <PartnerCard logoSrc={logoSrc} />

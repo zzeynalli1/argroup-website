@@ -1,13 +1,48 @@
 {
   "pageTitle": "İletişim",
   "subtitle": "Bizimle iletişime geçin, projenizi birlikte değerlendirelim.",
+  "hero": {
+    "eyebrow": "BİZİMLE İLETİŞİME GEÇİN",
+    "headingLine1": "Bizimle",
+    "headingLine2": "iletişime geçin."
+  },
   "info": {
     "addressLabel": "Adres",
     "phoneLabel": "Telefon",
     "emailLabel": "E-posta",
-    "hoursLabel": "Çalışma Saatleri"
+    "hoursLabel": "Çalışma Saatleri",
+    "hoursValue": "08:00 - 18:00, Pazartesi - Cumartesi"
+  },
+  "form": {
+    "heading": "Mesaj gönderin",
+    "nameLabel": "Ad ve soyad",
+    "namePlaceholder": "Adınız ve soyadınız",
+    "emailLabel": "E-posta",
+    "emailPlaceholder": "E-posta adresiniz",
+    "phoneLabel": "Telefon",
+    "phonePlaceholder": "Telefon numaranız",
+    "serviceLabel": "Hizmet",
+    "servicePlaceholder": "Hizmet seçin",
+    "messageLabel": "Mesaj",
+    "messagePlaceholder": "Mesajınız",
+    "submit": "Gönder",
+    "privacyNote": "Bilgileriniz korunur ve üçüncü taraflarla paylaşılmaz.",
+    "successMessage": "Teşekkürler! Mesajınız alındı.",
+    "errors": {
+      "nameRequired": "Ad girilmelidir.",
+      "nameTooLong": "Ad {max} karakterden uzun olamaz.",
+      "emailRequired": "E-posta girilmelidir.",
+      "emailTooLong": "E-posta {max} karakterden uzun olamaz.",
+      "emailInvalid": "E-posta formatı geçersiz.",
+      "messageRequired": "Mesaj girilmelidir.",
+      "messageTooLong": "Mesaj {max} karakterden uzun olamaz."
+    }
   },
   "map": {
     "title": "Harita"
+  },
+  "closing": {
+    "eyebrow": "Hızlı iletişim",
+    "title": "Bir sorunuz mu var? Bizimle doğrudan iletişime geçin."
   }
 }
