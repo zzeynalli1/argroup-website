@@ -1,6 +1,4 @@
 import { Award, Lock, Shield, Users } from 'lucide-react'
-import GridTexture from '../ui/GridTexture'
-import TechnicalLines from '../ui/TechnicalLines'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 
 const VALUE_ITEMS = [
@@ -10,9 +8,9 @@ const VALUE_ITEMS = [
   { key: 'privacy', Icon: Lock },
 ]
 
-const WALL_IMAGE = '/images/values/ar-group-values-badge.png'
-const IMAGE_CLIP = 'polygon(0 0, 100% 0, 100% 32%, 34% 100%, 0 100%)'
+const WALL_IMAGE = '/images/values/Untitled design.webp'
 
+/** Original dark graphite value card, unchanged — restored as-is on request. */
 function ValueCard({ item, t }) {
   const Icon = item.Icon
   return (
@@ -30,75 +28,79 @@ function ValueCard({ item, t }) {
   )
 }
 
+function ValuesList({ t }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {VALUE_ITEMS.map((item) => (
+        <ValueCard key={item.key} item={item} t={t} />
+      ))}
+    </div>
+  )
+}
+
 /**
- * Values section — asymmetric composition: a full-bleed diagonally-cut
- * image on the left (absolute on desktop so it can reach the section's own
- * top/bottom edges) and dark graphite value cards on the right. No intro
- * sentence: about.json has no verified copy for one, so none is rendered
- * (values.heading + the four existing items are the only real content).
- * Mobile order is heading -> image -> cards, not image-first like desktop.
+ * Values section — built around the real AR Group badge photo (shield/team
+ * graphic on concrete, left) as the section's full visual foundation rather
+ * than a small illustration. `object-position: left` on both layouts keeps
+ * the badge graphic anchored to the frame's left edge on purpose: at cover
+ * scale, "left" is the one axis where the crop is guaranteed to eat into
+ * the plain light-concrete negative space on the right instead of the
+ * badge itself (see the object-fit:cover math this was checked against —
+ * whichever axis doesn't drive the scale is the one that gets cropped).
+ *
+ * Desktop: full-bleed image, values content anchored to the image's own
+ * light right-hand negative space — no separate panel/card sits on top of
+ * it. Mobile/tablet: the same image stacks above the content (badge first,
+ * full width, same left anchor) since there's no room to overlay text on
+ * the image without covering the badge.
  */
 export default function AboutStory() {
   const { t } = useTranslation('about')
 
   return (
-    <section className="relative overflow-hidden bg-concrete-100 py-14 md:py-20">
-      <GridTexture className="text-industrial-950" />
-      <TechnicalLines className="text-industrial-950" opacity="opacity-[0.03]" angle={16} />
+    <section className="relative overflow-hidden">
+      {/* Desktop: image is the section background; content overlays its right side */}
+      <div className="relative hidden lg:block lg:h-[720px]">
+        <img
+          src={WALL_IMAGE}
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: 'left center' }}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 flex items-center">
+          <div className="mx-auto flex w-full max-w-7xl px-6">
+            <div className="ml-auto w-full max-w-lg xl:max-w-xl">
+              <span aria-hidden="true" className="mb-5 block h-0.5 w-9 bg-ember-600" />
+              <h2 className="font-heading text-3xl font-bold leading-tight text-industrial-950 xl:text-4xl">
+                {t('values.heading')}
+              </h2>
+              <div className="mt-8">
+                <ValuesList t={t} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      {/* Desktop: full-bleed diagonally-cut image, left ~38% of the section */}
-      <div className="absolute inset-y-0 left-0 z-0 hidden w-[38%] lg:block">
-        <div className="relative h-full w-full" style={{ clipPath: IMAGE_CLIP }}>
+      {/* Mobile/tablet: badge stacked above content instead of overlaid */}
+      <div className="lg:hidden">
+        <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9]">
           <img
             src={WALL_IMAGE}
             alt=""
             className="h-full w-full object-cover"
-            style={{ objectPosition: '50% 46%' }}
+            style={{ objectPosition: 'left center' }}
             loading="lazy"
           />
         </div>
-        <svg
-          className="pointer-events-none absolute inset-0 h-full w-full text-ember-600"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M 58 0 C 74 12, 70 24, 60 33"
-            stroke="currentColor"
-            strokeWidth="0.35"
-            fill="none"
-            opacity="0.75"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
-        <div className="lg:pl-[calc(38%+2.5rem)]">
+        <div className="bg-concrete-100 px-6 py-10 sm:px-10">
           <span aria-hidden="true" className="mb-5 block h-0.5 w-9 bg-ember-600" />
-          <h2 className="font-heading text-3xl font-bold leading-tight text-industrial-950 md:text-4xl">
+          <h2 className="font-heading text-3xl font-bold leading-tight text-industrial-950">
             {t('values.heading')}
           </h2>
-
-          {/* Mobile/tablet only: image between heading and cards */}
-          <div className="my-8 lg:hidden">
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[10px]">
-              <span aria-hidden="true" className="absolute inset-x-0 top-0 z-10 h-1 bg-ember-600" />
-              <img
-                src={WALL_IMAGE}
-                alt=""
-                className="h-full w-full object-cover"
-                style={{ objectPosition: '50% 46%' }}
-                loading="lazy"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:mt-9 lg:grid-cols-4">
-            {VALUE_ITEMS.map((item) => (
-              <ValueCard key={item.key} item={item} t={t} />
-            ))}
+          <div className="mt-8">
+            <ValuesList t={t} />
           </div>
         </div>
       </div>

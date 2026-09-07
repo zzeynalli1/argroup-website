@@ -5,41 +5,133 @@
     "subtitle": "From Fire Stop to Design Engineering — reliable engineering support on every project."
   },
   "grid": {
-    "title": "Services We Provide",
-    "items": {
-      "fireStopSystems": {
-        "title": "Fire Stop Systems",
-        "description": "Sealing openings and penetrations"
-      },
-      "fireproofingSystems": {
-        "title": "Fireproofing Systems",
-        "description": "Protecting structural elements from fire"
-      },
-      "cableProtection": {
-        "title": "Cable Protection",
-        "description": "Safety of electrical systems"
-      },
-      "testing": {
-        "title": "Testing & Measurement Services",
-        "description": "We confirm system reliability with pull-out tests and vibration measurements."
-      },
-      "construction": {
-        "title": "Construction Services",
-        "description": "Concrete cutting, acoustic insulation, and load analysis services."
-      },
-      "industrial": {
-        "title": "Industrial",
-        "description": "Specialized engineering solutions for industrial facilities."
-      },
-      "marine": {
-        "title": "Marine",
-        "description": "Fire protection and engineering support for the marine industry."
-      },
-      "designEngineering": {
-        "title": "Design Engineering Services",
-        "description": "Full technical design support starting from the planning stage."
-      }
+    "title": "Services We Provide"
+  },
+  "categories": {
+    "passiveFireProtection": {
+      "title": "Passive Fire Protection",
+      "intro": "Passive systems that protect a building's fire safety — from sealing openings and penetrations to protecting structural elements and cables."
+    },
+    "testing": {
+      "title": "Testing & Measurement",
+      "intro": "We objectively confirm system reliability through pull-out tests and vibration measurements."
+    },
+    "construction": {
+      "title": "Construction & Technical Solutions",
+      "intro": "Technical support from concrete cutting and acoustic insulation to load analysis, support design, and vibration solutions."
+    },
+    "industrial": {
+      "title": "Industrial Solutions",
+      "intro": "Specialized engineering solutions for industrial facilities."
+    },
+    "marine": {
+      "title": "Marine Solutions",
+      "intro": "Fire protection and engineering support for the marine industry."
+    },
+    "designEngineering": {
+      "title": "Design Engineering",
+      "intro": "Full technical design support starting from the planning stage."
     }
+  },
+  "subServices": {
+    "fireStopSystems": { "title": "Fire Stop Systems", "description": "Sealing openings and penetrations" },
+    "fireproofingSystems": { "title": "Fireproofing Systems", "description": "Protecting structural elements from fire" },
+    "cableProtection": { "title": "Cable Fire Protection", "description": "Safety of electrical systems" },
+    "pullOutTest": { "title": "Pull-Out Test", "description": "Non-destructive assessment of concrete compressive strength" },
+    "vibrationTest": { "title": "Vibration Test", "description": "Evaluating product durability under vibration" },
+    "concreteCutting": { "title": "Concrete Cutting & Drilling", "description": "Precision cutting and drilling in concrete, brick, and tile" },
+    "acousticInsulation": { "title": "Acoustic Insulation", "description": "Limiting sound transmission" },
+    "loadAnalysis": { "title": "Dynamic & Static Load Analysis", "description": "Assessing load resistance of support structures" },
+    "supportDesign": { "title": "Support Design", "description": "Design of MEP support structures" },
+    "vibrationSolutions": { "title": "Vibration Analysis & Solutions", "description": "Reducing vibration from mechanical equipment" },
+    "waterproofInjection": { "title": "Waterproof Injection", "description": "Watertightness of wall-floor joints" }
+  },
+  "detail": {
+    "fireStopSystems": {
+      "lead": "A passive protection system that seals openings and penetrations to safeguard a building's fire safety.",
+      "about": "Fire Stop systems ensure the fire safety of a building — enabling evacuation and emergency access, and preventing fire from spreading to adjacent compartments even in the event of structural collapse. The core principle is fire compartmentalization.",
+      "applications": "Pipe, cable, and duct penetrations through fire-rated walls and floors; structural movement (expansion) joints.",
+      "technicalApproach": "Each penetration and joint is sealed with fire-stop materials suited to it, preserving compartment integrity; movement joints are sealed with elastic, fire-rated materials that remain effective through expansion and contraction."
+    },
+    "fireproofingSystems": {
+      "lead": "Fireproofing systems that protect structural elements from the effects of high temperature.",
+      "about": "Fireproofing systems protect structural elements — such as load-bearing steel — from the effects of fire. Reliable results depend on detailed, early planning of fire barriers.",
+      "applications": "Buildings and facilities where load-bearing structural elements (columns, beams, etc.) require fire protection.",
+      "technicalApproach": "Our team has passed the necessary training and certification for this work. The process covers identifying the requirement, designing the system, and implementing tested, optimized partition systems."
+    },
+    "cableProtection": {
+      "lead": "Protecting electrical and data cables to improve their fire safety and service life.",
+      "about": "Cable fire protection safeguards electrical and data cables at wall and floor penetrations, improving the reliability and service life of cable materials.",
+      "applications": "Fire-rated penetrations for metallic (copper, aluminum) and polymer-based (PVC, PE, XLPE, etc.) cables.",
+      "technicalApproach": "Our approach is built around extending cable service life — reducing waste and environmental impact compared to incineration or landfill disposal."
+    },
+    "pullOutTest": {
+      "lead": "A non-destructive test method for assessing the compressive strength of concrete.",
+      "about": "The pull-out test is a non-destructive method for evaluating the compressive strength of concrete structures.",
+      "applications": "Construction and structural projects where concrete quality and strength must be verified.",
+      "technicalApproach": "Specific-geometry test equipment measures pull-out force, which is then correlated to the concrete's compressive strength."
+    },
+    "vibrationTest": {
+      "lead": "A mechanical vibration test that objectively evaluates product performance and durability.",
+      "about": "Vibration testing uses mechanical vibration to objectively evaluate a product's performance, quality, and durability.",
+      "applications": "Equipment and systems exposed to vibrational stress that require performance and durability assessment.",
+      "technicalApproach": "The product is subjected to controlled vibration conditions, and the results are assessed objectively for performance and durability."
+    },
+    "concreteCutting": {
+      "lead": "Precision drilling and cutting of concrete using diamond-headed equipment.",
+      "about": "Drilling and concrete cutting services use diamond-headed equipment to create holes of various diameters in concrete, and to cut concrete, brick, and tile.",
+      "applications": "Construction work requiring precise cutting and drilling in concrete, brick, and tile for pipe and cable penetrations; wall demolition using industrial vacuums.",
+      "technicalApproach": "Two methods are used: wet cutting (continuous water cooling; produces wastewater that must be collected and removed; unsuitable for interior door/window work due to flooding risk) and dry cutting (slower, using industrial dust collectors; higher cost but minimal contamination and preserved finishing materials). Performance depends on tool strength, wall material, cutting depth, and weather conditions."
+    },
+    "acousticInsulation": {
+      "lead": "Insulation that limits sound transmission caused by vibration.",
+      "about": "Sound and acoustic insulation limits the transmission of sound caused by object vibration, addressing both airborne and structure-borne transmission paths.",
+      "applications": "Buildings and structural elements — such as floor-wall junctions — where sound transmission must be limited.",
+      "technicalApproach": "Three control strategies can be applied: source control (the primary approach), transmission-path control, and receiver-side treatment (the most complex and costly). Barrier effectiveness is assessed using transmission loss curves."
+    },
+    "loadAnalysis": {
+      "lead": "Engineering assessment of support structures' resistance to static and dynamic loads.",
+      "about": "Dynamic and static load analysis evaluates the load resistance of support frameworks — welded steel and modular components — over a facility's full operational life.",
+      "applications": "Projects where seismic forces must be accounted for (relevant across Azerbaijan), and pipe runs subject to thermal-expansion stress.",
+      "technicalApproach": "Analysis is carried out in line with regulatory requirements, which mandate this assessment, particularly in seismic zones."
+    },
+    "supportDesign": {
+      "lead": "Load calculations and design for MEP support structures.",
+      "about": "Support Design covers load calculations for MEP (mechanical/electrical/plumbing) support structures, with design aligned to architectural specifications.",
+      "applications": "Projects requiring the design of support structures for MEP systems and the preparation of shop drawings.",
+      "technicalApproach": "Design work is carried out using AutoCAD, Revit (Autodesk), and SolidWorks, with load calculations aligned to architectural specifications."
+    },
+    "vibrationSolutions": {
+      "lead": "Measuring and reducing vibration generated by mechanical equipment.",
+      "about": "Vibration analysis and solutions measure and mitigate vibration generated by mechanical equipment such as chillers, generators, and engine groups.",
+      "applications": "Facilities with vibration-prone platforms and mechanical equipment installations.",
+      "technicalApproach": "Our engineers measure vibration-prone platforms, simulate conditions using analysis software, and aim for complete or partial elimination of vibration — protecting comfort and extending equipment life through reduced maintenance."
+    },
+    "waterproofInjection": {
+      "lead": "Injection that seals wall-floor joints in concrete structures against moisture.",
+      "about": "Waterproof injection prevents moisture ingress at wall-floor joints in concrete structures.",
+      "applications": "Projects requiring waterproofing of joint lines in concrete structures.",
+      "technicalApproach": "Injection is applied at wall-floor junction points to achieve watertightness in these areas."
+    }
+  },
+  "detailLabels": {
+    "breadcrumbHome": "Services",
+    "sections": {
+      "about": { "number": "01", "eyebrow": "SYSTEM OVERVIEW", "title": "About the Service" },
+      "technicalApproach": { "number": "02", "eyebrow": "TECHNICAL INFO", "title": "Technical Approach" },
+      "workProcess": { "number": "03", "eyebrow": "PROCESS", "title": "Work Process" },
+      "applications": { "number": "04", "eyebrow": "APPLICATION", "title": "Application Areas" },
+      "related": { "number": "05", "eyebrow": "RELATED", "title": "Related Solutions" }
+    },
+    "ctaTitle": "Let's discuss your project.",
+    "ctaButton": "Contact Us",
+    "notFound": "Service not found.",
+    "backToServices": "Back to Services"
+  },
+  "categoryShell": {
+    "ctaText": "Contact us for more information.",
+    "ctaButton": "Contact Us",
+    "relatedLabel": "Related services"
   },
   "cta": {
     "title": "Get expert support for your project",

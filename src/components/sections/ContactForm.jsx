@@ -174,7 +174,7 @@ export default function ContactForm() {
               </option>
               {services.map((service) => (
                 <option key={service.key} value={service.key} className="text-industrial-950">
-                  {tServices(`grid.items.${service.key}.title`)}
+                  {tServices(`subServices.${service.key}.title`)}
                 </option>
               ))}
             </select>

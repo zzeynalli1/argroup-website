@@ -156,7 +156,7 @@ export const projects = [
   {
     id: 17,
     title: 'Hilton Garden Baku',
-    client: 'PMD Project',
+    client: 'MEP Contractor',
     status: 'completed',
     location: 'Bakı, Azərbaycan',
     imageWebp: '/images/projects/hilton-garden-baku.webp',
@@ -174,7 +174,7 @@ export const projects = [
   {
     id: 19,
     title: 'InterContinental Hotel',
-    client: 'Resant Group',
+    client: 'Gen Contractor',
     status: 'completed',
     location: 'Bakı, Azərbaycan',
     imageWebp: '/images/projects/intercontinental-hotel.webp',

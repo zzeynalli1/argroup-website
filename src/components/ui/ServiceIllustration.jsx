@@ -185,15 +185,136 @@ function DesignEngineering() {
   )
 }
 
+function VibrationTest() {
+  return (
+    <>
+      <Lines>
+        <rect x="70" y="105" width="60" height="25" />
+        <line x1="85" y1="130" x2="80" y2="140" />
+        <line x1="115" y1="130" x2="120" y2="140" />
+        <line x1="20" y1="75" x2="180" y2="75" />
+      </Lines>
+      <Accent>
+        <path d="M20,75 Q35,45 50,75 T80,75 T110,75 T140,75 T170,75" />
+        <line x1="100" y1="105" x2="100" y2="85" />
+      </Accent>
+    </>
+  )
+}
+
+function AcousticInsulation() {
+  return (
+    <>
+      <Lines>
+        <rect x="93" y="15" width="14" height="120" />
+        <path d="M20,75 A20,20 0 0 1 60,75" />
+        <path d="M8,75 A32,32 0 0 1 72,75" />
+      </Lines>
+      <Accent>
+        <path d="M145,75 A15,15 0 0 1 175,75" strokeDasharray="3 5" />
+        <path d="M132,75 A28,28 0 0 1 188,75" strokeDasharray="3 5" />
+      </Accent>
+    </>
+  )
+}
+
+function LoadAnalysis() {
+  return (
+    <>
+      <Lines>
+        <line x1="30" y1="70" x2="170" y2="70" />
+        <line x1="30" y1="70" x2="20" y2="90" />
+        <line x1="30" y1="70" x2="40" y2="90" />
+        <line x1="170" y1="70" x2="160" y2="90" />
+        <line x1="170" y1="70" x2="180" y2="90" />
+      </Lines>
+      <Accent>
+        <line x1="70" y1="30" x2="70" y2="65" />
+        <path d="M64,58 L70,68 L76,58" />
+        <line x1="130" y1="30" x2="130" y2="65" />
+        <path d="M124,58 L130,68 L136,58" />
+      </Accent>
+    </>
+  )
+}
+
+function SupportDesign() {
+  return (
+    <>
+      <Lines>
+        <line x1="100" y1="15" x2="100" y2="70" />
+        <line x1="60" y1="70" x2="140" y2="70" />
+        <line x1="60" y1="70" x2="50" y2="85" />
+        <line x1="140" y1="70" x2="150" y2="85" />
+        <line x1="30" y1="95" x2="170" y2="95" />
+      </Lines>
+      <Accent>
+        <rect x="88" y="62" width="24" height="16" rx="2" />
+        <circle cx="100" cy="15" r="3" />
+      </Accent>
+    </>
+  )
+}
+
+function VibrationSolutions() {
+  return (
+    <>
+      <Lines>
+        <rect x="55" y="25" width="90" height="16" />
+        <rect x="55" y="112" width="90" height="16" />
+      </Lines>
+      <Accent>
+        <path d="M75,41 L85,50 L75,59 L85,68 L75,77 L85,86 L75,95 L85,104 L75,112" />
+        <path d="M125,41 L115,50 L125,59 L115,68 L125,77 L115,86 L125,95 L115,104 L125,112" />
+      </Accent>
+    </>
+  )
+}
+
+function WaterproofInjection() {
+  return (
+    <>
+      <Lines>
+        <line x1="20" y1="110" x2="180" y2="110" />
+        <line x1="70" y1="110" x2="70" y2="20" />
+        <line x1="20" y1="118" x2="180" y2="118" />
+      </Lines>
+      <Accent>
+        <line x1="70" y1="60" x2="105" y2="95" />
+        <path d="M98,90 L108,98 L100,105" />
+        <circle cx="70" cy="114" r="2" fill="currentColor" />
+        <circle cx="80" cy="114" r="2" fill="currentColor" />
+      </Accent>
+    </>
+  )
+}
+
 const VARIANTS = {
-  fireStopSystems: FireStopSystems,
-  fireproofingSystems: FireproofingSystems,
-  cableProtection: CableProtection,
+  // category-level (used as the card illustration for the 3 name-only
+  // shell categories — Industrial/Marine/Design Engineering — on the main
+  // Services grid, since they have no sub-service cards of their own)
+  passiveFireProtection: FireStopSystems,
   testing: Testing,
   construction: Construction,
   industrial: Industrial,
   marine: Marine,
   designEngineering: DesignEngineering,
+  // sub-service-level (card illustrations on the main grid + detail-page
+  // hero visuals) — fireStopSystems/testing/construction diagrams double as
+  // both their category's shell art and their most representative
+  // sub-service's art (abstract line schematics, not literal photography,
+  // so reuse reads as intentional rather than duplicated).
+  fireStopSystems: FireStopSystems,
+  fireproofingSystems: FireproofingSystems,
+  cableProtection: CableProtection,
+  pullOutTest: Testing,
+  vibrationTest: VibrationTest,
+  concreteCutting: Construction,
+  acousticInsulation: AcousticInsulation,
+  loadAnalysis: LoadAnalysis,
+  supportDesign: SupportDesign,
+  vibrationSolutions: VibrationSolutions,
+  waterproofInjection: WaterproofInjection,
 }
 
 export default function ServiceIllustration({ variant, className = '' }) {

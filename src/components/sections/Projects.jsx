@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { projects } from '../../data/projects'
+import { projectDetails } from '../../data/projectDetails'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import ProjectDetailModal from '../ui/ProjectDetailModal'
 
 const COMPACT_COUNT = 6
 
@@ -30,7 +32,16 @@ function StatusBadge({ status, t }) {
   )
 }
 
-function ProjectCard({ project, t }) {
+function ProjectCard({ project, t, onOpen }) {
+  const clickable = Boolean(onOpen)
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onOpen(project)
+    }
+  }
+
   return (
     <motion.div
       layout
@@ -39,7 +50,11 @@ function ProjectCard({ project, t }) {
       exit={{ opacity: 0, y: -12 }}
       transition={{ duration: 0.3 }}
       whileHover={{ scale: 1.02 }}
-      className="group rounded-lg overflow-hidden border border-neutral-custom-400/20"
+      onClick={clickable ? () => onOpen(project) : undefined}
+      role={clickable ? 'button' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={clickable ? handleKeyDown : undefined}
+      className={`group rounded-lg overflow-hidden border border-neutral-custom-400/20 ${clickable ? 'cursor-pointer' : ''}`}
     >
       <div className="relative aspect-video overflow-hidden bg-neutral-custom-400/15">
         <picture>
@@ -70,62 +85,81 @@ function ProjectCard({ project, t }) {
  * `variant="compact"` (Home): first 6 projects, unfiltered, plus a
  * "view all" link to /projects.
  * `variant="full"` (/projects): all projects, with filter buttons.
+ * In both variants, cards for projects with verified detail data
+ * (data/projectDetails.js) open the SAME ProjectDetailModal instead of
+ * navigating anywhere — no separate route, no duplicated modal markup.
  */
 export default function Projects({ variant = 'full' }) {
   const { t } = useTranslation('home')
   const [filter, setFilter] = useState('all')
+  const [activeProject, setActiveProject] = useState(null)
 
   const visibleProjects =
     variant === 'compact' ? projects.slice(0, COMPACT_COUNT) : projects.filter((p) => matchesFilter(p, filter))
 
+  function handleOpen(project) {
+    const detail = projectDetails[project.id]
+    if (!detail) return
+    setActiveProject({ ...project, ...detail })
+  }
+
   return (
-    <section className="bg-base-50 py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="max-w-xl">
-          <span className="block w-16 h-1 bg-ember-600 mb-6" />
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-industrial-950">{t('projects.title')}</h2>
-          <p className="mt-4 text-neutral-custom-600">{t('projects.subtitle')}</p>
-        </div>
+    <>
+      <section className="bg-base-50 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="max-w-xl">
+            <span className="block w-16 h-1 bg-ember-600 mb-6" />
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-industrial-950">{t('projects.title')}</h2>
+            <p className="mt-4 text-neutral-custom-600">{t('projects.subtitle')}</p>
+          </div>
 
-        {variant === 'full' && (
-          <div className="mt-8 flex flex-wrap gap-2">
-            {FILTER_KEYS.map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setFilter(key)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filter === key
-                    ? 'bg-ember-600 text-base-50'
-                    : 'bg-neutral-custom-400/10 text-neutral-custom-600 hover:bg-neutral-custom-400/20'
-                }`}
+          {variant === 'full' && (
+            <div className="mt-8 flex flex-wrap gap-2">
+              {FILTER_KEYS.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setFilter(key)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    filter === key
+                      ? 'bg-ember-600 text-base-50'
+                      : 'bg-neutral-custom-400/10 text-neutral-custom-600 hover:bg-neutral-custom-400/20'
+                  }`}
+                >
+                  {t(`projects.filters.${key}`)}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {visibleProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  t={t}
+                  onOpen={projectDetails[project.id] ? handleOpen : undefined}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {variant === 'compact' && (
+            <div className="mt-10">
+              <Link
+                to="/projects"
+                className="inline-flex items-center gap-2 font-heading font-semibold text-industrial-950 hover:text-ember-600 transition-colors"
               >
-                {t(`projects.filters.${key}`)}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatePresence mode="popLayout">
-            {visibleProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} t={t} />
-            ))}
-          </AnimatePresence>
+                {t('projects.viewAll')}
+                <span>→</span>
+              </Link>
+            </div>
+          )}
         </div>
+      </section>
 
-        {variant === 'compact' && (
-          <div className="mt-10">
-            <Link
-              to="/projects"
-              className="inline-flex items-center gap-2 font-heading font-semibold text-industrial-950 hover:text-ember-600 transition-colors"
-            >
-              {t('projects.viewAll')}
-              <span>→</span>
-            </Link>
-          </div>
-        )}
-      </div>
-    </section>
+      <ProjectDetailModal project={activeProject} onClose={() => setActiveProject(null)} />
+    </>
   )
 }

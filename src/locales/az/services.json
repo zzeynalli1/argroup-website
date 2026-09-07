@@ -5,41 +5,133 @@
     "subtitle": "Yanğın Bağlamadan Dizayn Mühəndisliyinə qədər — hər layihədə etibarlı mühəndislik dəstəyi."
   },
   "grid": {
-    "title": "Təqdim Etdiyimiz Xidmətlər",
-    "items": {
-      "fireStopSystems": {
-        "title": "Yanğın Bağlama Sistemləri",
-        "description": "Açılış və keçidlərin bağlanması"
-      },
-      "fireproofingSystems": {
-        "title": "Yanğından Qoruma Sistemləri",
-        "description": "Struktur elementlərin alovdan qorunması"
-      },
-      "cableProtection": {
-        "title": "Kabel Qorunması",
-        "description": "Elektrik sistemlərinin təhlükəsizliyi"
-      },
-      "testing": {
-        "title": "Test və Ölçmə Xidmətləri",
-        "description": "Pull-out test və vibrasiya ölçmələri ilə sistemlərin etibarlılığını təsdiqləyirik."
-      },
-      "construction": {
-        "title": "Tikinti Xidmətləri",
-        "description": "Beton kəsimi, akustik izolyasiya və yük analizi xidmətləri."
-      },
-      "industrial": {
-        "title": "Sənaye",
-        "description": "Sənaye obyektləri üçün ixtisaslaşmış mühəndislik həlləri."
-      },
-      "marine": {
-        "title": "Dəniz Sənayesi",
-        "description": "Dəniz sənayesi üçün yanğın qorunması və mühəndislik dəstəyi."
-      },
-      "designEngineering": {
-        "title": "Dizayn Mühəndisliyi Xidmətləri",
-        "description": "Layihələndirmə mərhələsindən tam texniki dizayn dəstəyi."
-      }
+    "title": "Təqdim Etdiyimiz Xidmətlər"
+  },
+  "categories": {
+    "passiveFireProtection": {
+      "title": "Passiv Yanğından Mühafizə",
+      "intro": "Binanın yanğın təhlükəsizliyini təmin edən passiv sistemlər — açılış və keçidlərin bağlanmasından struktur elementlərin və kabellərin qorunmasına qədər."
+    },
+    "testing": {
+      "title": "Test və Ölçmə",
+      "intro": "Sistemlərin etibarlılığını pull-out test və vibrasiya ölçmələri ilə obyektiv şəkildə təsdiqləyirik."
+    },
+    "construction": {
+      "title": "Tikinti və Texniki Həllər",
+      "intro": "Beton deşmə və kəsmədən akustik izolyasiyaya, yük analizindən dayaq dizaynına və vibrasiya həllərinə qədər texniki dəstək."
+    },
+    "industrial": {
+      "title": "Sənaye Həlləri",
+      "intro": "Sənaye obyektləri üçün ixtisaslaşmış mühəndislik həlləri."
+    },
+    "marine": {
+      "title": "Marine Həlləri",
+      "intro": "Dəniz sənayesi üçün yanğın qorunması və mühəndislik dəstəyi."
+    },
+    "designEngineering": {
+      "title": "Mühəndislik və Layihələndirmə",
+      "intro": "Layihələndirmə mərhələsindən tam texniki dizayn dəstəyi."
     }
+  },
+  "subServices": {
+    "fireStopSystems": { "title": "Firestop Sistemləri", "description": "Açılış və keçidlərin bağlanması" },
+    "fireproofingSystems": { "title": "Fireproofing Sistemləri", "description": "Struktur elementlərin alovdan qorunması" },
+    "cableProtection": { "title": "Kabel Yanğın Mühafizəsi", "description": "Elektrik sistemlərinin təhlükəsizliyi" },
+    "pullOutTest": { "title": "Pull-Out Test", "description": "Betonun sıxılma möhkəmliyinin dağıdıcı olmayan qiymətləndirilməsi" },
+    "vibrationTest": { "title": "Vibrasiya Testi", "description": "Məhsulun vibrasiya davamlılığının qiymətləndirilməsi" },
+    "concreteCutting": { "title": "Beton Deşmə və Kəsmə", "description": "Beton, kərpic və kafeldə dəqiq kəsim və deşmə" },
+    "acousticInsulation": { "title": "Səs və Akustik İzolyasiya", "description": "Səs ötürülməsinin qarşısının alınması" },
+    "loadAnalysis": { "title": "Dinamik və Statik Yük Analizi", "description": "Dayaq strukturlarının yük davamlılığının qiymətləndirilməsi" },
+    "supportDesign": { "title": "Support Sistemlərinin Layihələndirilməsi", "description": "MEP dayaq strukturlarının layihələndirilməsi" },
+    "vibrationSolutions": { "title": "Vibrasiya Analizi və Həlləri", "description": "Mexaniki avadanlıqdan yaranan vibrasiyanın azaldılması" },
+    "waterproofInjection": { "title": "Su İzolyasiyası İnyeksiyası", "description": "Divar-döşəmə birləşmələrində su keçirməzliyinin təmini" }
+  },
+  "detail": {
+    "fireStopSystems": {
+      "lead": "Açılış və keçidlərin bağlanması yolu ilə binanın yanğın təhlükəsizliyini təmin edən passiv mühafizə sistemi.",
+      "about": "Fire Stop sistemləri binanın yanğın təhlükəsizliyini təmin edir — təxliyəni və qəza xidmətlərinin girişini mümkün edir, yanğının struktur çökməsi zamanı belə qonşu bölmələrə yayılmasının qarşısını alır. Əsas prinsip yanğın kompartmentləşdirilməsidir.",
+      "applications": "Yanğına davamlı divar və döşəmələrdən keçən boru, kabel və kanal keçidləri; binanın struktur hərəkətinə imkan verən tikiş (genişlənmə) xətləri.",
+      "technicalApproach": "Hər keçid və tikiş, kompartmentin bütövlüyünü qorumaq üçün müvafiq fire-stop materialları ilə bağlanır; tikişlərdə genişlənmə və daralma zamanı da etibarlılığını itirməyən elastik materiallardan istifadə olunur."
+    },
+    "fireproofingSystems": {
+      "lead": "Struktur elementləri yüksək temperaturun təsirindən qoruyan fireproofing sistemləri.",
+      "about": "Fireproofing sistemləri struktur elementləri — məsələn, daşıyıcı polad konstruksiyaları — yanğının təsirindən qoruyur. Etibarlı nəticə üçün yanğın baryerlərinin erkən və detallı planlaşdırılması vacibdir.",
+      "applications": "Daşıyıcı struktur elementlərin (sütun, tir və s.) yanğından qorunması tələb olunan bina və obyektlər.",
+      "technicalApproach": "Komandamız müvafiq təlim və sertifikasiyadan keçib. İş prosesi ehtiyacın müəyyənləşdirilməsini, sistemin dizaynını və test edilmiş, optimallaşdırılmış bölmə sistemlərinin tətbiqini əhatə edir."
+    },
+    "cableProtection": {
+      "lead": "Elektrik və məlumat kabellərinin yanğından qorunması və xidmət müddətinin artırılması.",
+      "about": "Kabel yanğın mühafizəsi elektrik və məlumat kabellərinin divar/döşəmə keçidlərində yanğından qorunmasını təmin edir, kabel materiallarının etibarlılığını və xidmət müddətini artırır.",
+      "applications": "Metal (mis, alüminium) və polimer əsaslı (PVC, PE, XLPE və s.) kabellərin yanğına davamlı keçidləri.",
+      "technicalApproach": "Yanaşma kabelin xidmət müddətinin uzadılmasına əsaslanır — bu, yandırma və ya poliqona aparmaqla müqayisədə tullantının və ətraf mühitə təsirin azaldılmasına xidmət edir."
+    },
+    "pullOutTest": {
+      "lead": "Betonun sıxılma möhkəmliyini dağıtmadan qiymətləndirən qeyri-destruktiv sınaq metodu.",
+      "about": "Pull-out test — beton konstruksiyaların sıxılma möhkəmliyini dağıtmadan qiymətləndirən sınaq metodudur.",
+      "applications": "Betonun keyfiyyətinin və möhkəmliyinin təsdiqlənməsi tələb olunan tikinti və struktur layihələri.",
+      "technicalApproach": "Xüsusi həndəsəli test avadanlığı ilə çıxarma qüvvəsi ölçülür və bu qüvvə betonun sıxılma möhkəmliyi ilə əlaqələndirilir."
+    },
+    "vibrationTest": {
+      "lead": "Məhsulun performansını və davamlılığını obyektiv qiymətləndirən mexaniki vibrasiya testi.",
+      "about": "Vibrasiya testi mexaniki vibrasiya vasitəsilə məhsulun performansını, keyfiyyətini və davamlılığını obyektiv şəkildə qiymətləndirir.",
+      "applications": "Vibrasiya təsirinə məruz qalan avadanlıq və sistemlərin keyfiyyət və davamlılıq qiymətləndirilməsi.",
+      "technicalApproach": "Test zamanı məhsul idarə olunan vibrasiya şəraitinə məruz qoyulur və nəticələr performans və davamlılıq baxımından obyektiv qiymətləndirilir."
+    },
+    "concreteCutting": {
+      "lead": "Almaz başlıqlı avadanlıqla betonda dəqiq kəsim və deşmə xidməti.",
+      "about": "Beton deşmə və kəsmə xidməti almaz başlıqlı avadanlıqla betonda müxtəlif diametrli dəliklərin açılmasını, həmçinin beton, kərpic və kafelin kəsilməsini əhatə edir.",
+      "applications": "Boru və kabel keçidləri üçün beton, kərpic, kafel materiallarında dəqiq kəsim və deşmə tələb olunan tikinti işləri; sənaye tozsoranları ilə divar sökülməsi.",
+      "technicalApproach": "İki üsul tətbiq olunur — yaş kəsim (davamlı su soyutması ilə; çirkab suyun yığılıb aparılmasını tələb edir; daxili qapı/pəncərə işlərində daşqın riski səbəbindən uyğun deyil) və quru kəsim (daha yavaş, sənaye tozsoranları ilə; daha yüksək dəyərli, lakin otağın minimal çirklənməsini və bitirmə materiallarının qorunmasını təmin edir). Performans alətin gücündən, divar materialından, kəsim dərinliyindən və hava şəraitindən asılıdır."
+    },
+    "acousticInsulation": {
+      "lead": "Vibrasiyadan yaranan səs ötürülməsini məhdudlaşdıran izolyasiya xidməti.",
+      "about": "Səs və akustik izolyasiya xidməti obyektin vibrasiyasından yaranan səs ötürülməsinin qarşısını almağa yönəlmişdir — həm hava, həm də struktur yolu ilə yayılan səs nəzərə alınır.",
+      "applications": "Səs ötürülməsinin məhdudlaşdırılması tələb olunan bina və struktur elementləri (məsələn, döşəmə-divar birləşmələri).",
+      "technicalApproach": "Üç strategiya tətbiq oluna bilər — mənbə nəzarəti (əsas yanaşma), ötürülmə yolunun nəzarəti və qəbuledici tərəfdə işlənmə (ən mürəkkəb və bahalı). Baryerlərin effektivliyi transmission loss əyriləri ilə qiymətləndirilir."
+    },
+    "loadAnalysis": {
+      "lead": "Dayaq strukturlarının statik və dinamik yüklərə davamlılığının mühəndislik qiymətləndirilməsi.",
+      "about": "Dinamik və statik yük analizi dayaq strukturlarının — qaynaqlanmış polad və modul komponentlərin — obyektin bütün istismar müddəti ərzində yükə davamlılığını qiymətləndirir.",
+      "applications": "Seysmik qüvvələrin nəzərə alınması tələb olunan layihələr (Azərbaycan üçün aktualdır) və boru xətlərində termal genişlənmədən yaranan gərginliyin qiymətləndirilməsi.",
+      "technicalApproach": "Analiz tənzimləyici orqanların tələblərinə uyğun aparılır — bu tələb xüsusilə seysmik zonalarda məcburidir."
+    },
+    "supportDesign": {
+      "lead": "MEP dayaq strukturları üçün yük hesablamaları və dizaynı.",
+      "about": "Support Design xidməti MEP (mexaniki/elektrik/santexnika) dayaq strukturları üçün yük hesablamalarını və arxitektura spesifikasiyalarına uyğun dizaynı əhatə edir.",
+      "applications": "MEP sistemlərinin dayaq strukturlarının layihələndirilməsi və istehsal (shop) çertyojlarının hazırlanması tələb olunan layihələr.",
+      "technicalApproach": "Dizayn AutoCAD, Revit (Autodesk) və SolidWorks proqram təminatları ilə aparılır, yük hesablamaları arxitektura spesifikasiyalarına uyğunlaşdırılır."
+    },
+    "vibrationSolutions": {
+      "lead": "Mexaniki avadanlıqdan yaranan vibrasiyanın ölçülməsi və azaldılması.",
+      "about": "Vibrasiya analizi və həlləri mexaniki avadanlıqdan (çillər, generator, mühərrik qrupları və s.) yaranan vibrasiyanı ölçür və azaldır.",
+      "applications": "Vibrasiyaya məruz qalan platformalar və mexaniki avadanlıqların quraşdırıldığı obyektlər.",
+      "technicalApproach": "Mühəndislərimiz vibrasiyaya məruz qalan platformaları ölçür, analiz proqram təminatı ilə simulyasiya edir və vibrasiyanın tam və ya qismən aradan qaldırılmasını hədəfləyir — bu, həm rahatlığı qoruyur, həm də azalan baxım tezliyi ilə avadanlığın ömrünü uzadır."
+    },
+    "waterproofInjection": {
+      "lead": "Beton konstruksiyalarda divar-döşəmə birləşmələrini nəmlikdən qoruyan inyeksiya.",
+      "about": "Su izolyasiyası inyeksiyası beton konstruksiyalarda divar-döşəmə birləşmələrində nəmlik keçməsinin qarşısını alır.",
+      "applications": "Beton konstruksiyalarda tikiş xətlərinin su keçirməzliyinin təmin edilməsi tələb olunan layihələr.",
+      "technicalApproach": "İnyeksiya divar-döşəmə birləşmə nöqtələrinə tətbiq olunaraq bu sahələrin su keçirməzliyini təmin edir."
+    }
+  },
+  "detailLabels": {
+    "breadcrumbHome": "Xidmətlər",
+    "sections": {
+      "about": { "number": "01", "eyebrow": "SİSTEM HAQQINDA", "title": "Xidmət Haqqında" },
+      "technicalApproach": { "number": "02", "eyebrow": "TEXNİKİ MƏLUMAT", "title": "Texniki Yanaşma" },
+      "workProcess": { "number": "03", "eyebrow": "PROSES", "title": "İş Prosesi" },
+      "applications": { "number": "04", "eyebrow": "TƏTBİQ", "title": "Tətbiq Sahələri" },
+      "related": { "number": "05", "eyebrow": "ƏLAQƏLİ", "title": "Əlaqəli Həllər" }
+    },
+    "ctaTitle": "Layihənizi müzakirə edək.",
+    "ctaButton": "Bizimlə əlaqə",
+    "notFound": "Xidmət tapılmadı.",
+    "backToServices": "Xidmətlərə qayıt"
+  },
+  "categoryShell": {
+    "ctaText": "Ətraflı məlumat üçün bizimlə əlaqə saxlayın.",
+    "ctaButton": "Bizimlə əlaqə",
+    "relatedLabel": "Əlaqəli xidmətlər"
   },
   "cta": {
     "title": "Layihəniz üçün mütəxəssis dəstəyi alın",

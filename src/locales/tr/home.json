@@ -205,6 +205,16 @@
     "status": {
       "completed": "Tamamlandı",
       "ongoing": "Devam Ediyor"
+    },
+    "modal": {
+      "close": "Kapat",
+      "client": "Müşteri",
+      "status": "Durum",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi",
+      "ongoing": "Devam Ediyor",
+      "descriptionLabel": "Proje Hakkında",
+      "workPerformedLabel": "Yapılan İşler"
     }
   },
   "brands": {

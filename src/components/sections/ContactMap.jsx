@@ -3,9 +3,8 @@ import { useTranslation } from '../../lib/i18n/useTranslation'
 import { ADDRESS, EMAIL, PHONES } from '../../data/contactInfo'
 
 /**
- * Coordinates are AR Group's real Google Maps place pin
- * (İzzət Orucova 18, Xətai, Baku), captured from the live site's own
- * "view on map" link — not a generic address-string guess.
+ * Coordinates for Nərimanov rayonu, Ələsgər Qayıbov küçəsi, 1222
+ * (40°25'17.9"N 49°52'41.7"E), converted from DMS.
  *
  * The CSS `filter` is a dark/desaturated approximation applied to the raw
  * `output=embed` iframe. Real branded map styling (a proper JSON style
@@ -13,8 +12,8 @@ import { ADDRESS, EMAIL, PHONES } from '../../data/contactInfo'
  * a billing-enabled API key, not the no-key iframe embed — out of scope
  * until that credential exists.
  */
-const LAT = 40.3821575
-const LNG = 49.8759006
+const LAT = 40.421639
+const LNG = 49.87825
 const MAP_SRC = `https://www.google.com/maps?q=${LAT},${LNG}&z=15&output=embed`
 
 export default function ContactMap() {

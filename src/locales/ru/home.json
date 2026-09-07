@@ -205,6 +205,16 @@
     "status": {
       "completed": "Завершено",
       "ongoing": "В процессе"
+    },
+    "modal": {
+      "close": "Закрыть",
+      "client": "Клиент",
+      "status": "Статус",
+      "startDate": "Дата начала",
+      "endDate": "Дата окончания",
+      "ongoing": "Продолжается",
+      "descriptionLabel": "О проекте",
+      "workPerformedLabel": "Выполненные работы"
     }
   },
   "brands": {

@@ -20,32 +20,56 @@
   },
   "noResults": "Bu filtrə uyğun məhsul tapılmadı.",
   "items": {
+    "vibrationInsulation": {
+      "name": "Vibrasiya İzolyasiyası",
+      "description": "Mexaniki vibrasiyanı azaldan və avadanlığın ömrünü uzadan izolyasiya həlləri."
+    },
+    "soundAcoustic": {
+      "name": "Səs və Akustik İzolyasiya Materialları",
+      "description": "Səs-küyü azaldan və akustik komfortu artıran izolyasiya materialları."
+    },
+    "supportFitting": {
+      "name": "Dəstək və Bərkitmə Sistemləri",
+      "description": "Bərkitmə, modul dəstək və ankraj sistemlərini əhatə edən struktur həllər."
+    },
+    "couplings": {
+      "name": "Birləşdirici Elementlər",
+      "description": "Boru və sistemlərin etibarlı birləşməsi üçün qoşqu və keçid elementləri."
+    },
     "passiveFireProtection": {
       "name": "Passiv Yanğın Məhsulları",
       "description": "Yanğın və tüstünün yayılmasının qarşısını alan sertifikatlı bağlama sistemləri."
-    },
-    "pipingSystems": {
-      "name": "Borular və Birləşdirici Sistemlər",
-      "description": "Sənaye və tikinti layihələri üçün yüksək keyfiyyətli boru və birləşmə həlləri."
-    },
-    "vibrationAcoustic": {
-      "name": "Vibrasiya və Akustik İzolyasiya",
-      "description": "Səs-küy və vibrasiyanı azaldan, avadanlığın ömrünü uzadan izolyasiya materialları."
     },
     "thermalInsulation": {
       "name": "İstilik İzolyasiyası",
       "description": "Yüksək temperaturlu mühitlər üçün effektiv termal izolyasiya məhsulları."
     },
-    "ventilationSystems": {
-      "name": "Ventilyasiya Sistemləri",
-      "description": "Bina və tunellər üçün tüstü çıxarma və hava dövranı sistemləri."
+    "pipes": {
+      "name": "Borular",
+      "description": "Sənaye və tikinti layihələri üçün yüksək keyfiyyətli boru həlləri."
+    },
+    "fans": {
+      "name": "Fanlar",
+      "description": "Bina və tunellər üçün tüstü çıxarma və hava dövranı fan sistemləri."
     },
     "marineAnticorrosion": {
       "name": "Dəniz və Antikorroziya Məhsulları",
       "description": "Dəniz sənayesi və aqressiv mühitlər üçün qoruyucu örtük sistemləri."
     }
   },
+  "groups": {
+    "vibrationAcousticGroup": {
+      "label": "Vibrasiya və Akustika"
+    },
+    "supportCouplingsGroup": {
+      "label": "Dəstək və Birləşmələr"
+    }
+  },
   "learnMore": "Ətraflı",
+  "materials": {
+    "close": "Bağla",
+    "selectPrompt": "Ətraflı məlumat üçün məhsul seçin."
+  },
   "whyChoose": {
     "title": "Məhsullarımızın Üstünlükləri",
     "items": {

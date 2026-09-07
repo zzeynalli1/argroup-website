@@ -57,7 +57,7 @@ export default function Header() {
             transition={{ duration: 0.3, ease: 'easeOut' }}
             style={{ willChange: 'transform', transformOrigin: 'left center' }}
           >
-            <Logo className="h-14" />
+            <Logo className="h-16" />
           </motion.div>
         </Link>
 

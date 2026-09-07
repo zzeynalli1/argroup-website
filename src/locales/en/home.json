@@ -205,6 +205,16 @@
     "status": {
       "completed": "Completed",
       "ongoing": "Ongoing"
+    },
+    "modal": {
+      "close": "Close",
+      "client": "Client",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "ongoing": "Ongoing",
+      "descriptionLabel": "About the Project",
+      "workPerformedLabel": "Work Performed"
     }
   },
   "brands": {

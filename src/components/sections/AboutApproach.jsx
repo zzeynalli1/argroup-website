@@ -36,23 +36,17 @@ function StepNode({ step, index, t }) {
 }
 
 /**
- * Dark approach section: left label/heading/paragraph, right a connected
- * 01-04 engineering-style sequence for AR Group's own project process (one
- * system, not four cards), and the verified fact panel (AboutStats) sitting
- * inside this same section rather than as its own full-width section.
+ * Dark approach section: left label/heading/paragraph, right an 01-04
+ * sequence of independent process points for AR Group's own project process
+ * (no connecting line between them), and the verified fact panel
+ * (AboutStats) sitting inside this same section rather than as its own
+ * full-width section.
  */
 export default function AboutApproach() {
   const { t } = useTranslation('about')
 
   return (
     <section className="relative overflow-hidden bg-industrial-900 pb-10 pt-14 md:pb-14 md:pt-18">
-      <span
-        aria-hidden="true"
-        className="absolute left-6 top-1/3 hidden -translate-y-1/2 -rotate-90 select-none whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.4em] text-white/20 lg:block"
-      >
-        AR GROUP — FIRESTOP
-      </span>
-
       <div className="relative mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-6">
           <div className="lg:col-span-4">
@@ -68,7 +62,6 @@ export default function AboutApproach() {
           </div>
 
           <div className="relative lg:col-span-8 lg:pt-1">
-            <span aria-hidden="true" className="absolute inset-x-0 top-[38px] hidden h-px bg-white/10 lg:block" />
             <div className="relative flex flex-col gap-10 sm:flex-row sm:gap-2">
               {STEPS.map((step, index) => (
                 <StepNode key={step.key} step={step} index={index} t={t} />

@@ -20,32 +20,56 @@
   },
   "noResults": "Bu filtreye uygun ürün bulunamadı.",
   "items": {
+    "vibrationInsulation": {
+      "name": "Titreşim Yalıtımı",
+      "description": "Ekipman ömrünü uzatan ve mekanik titreşimi azaltan yalıtım çözümleri."
+    },
+    "soundAcoustic": {
+      "name": "Ses ve Akustik Yalıtım Malzemeleri",
+      "description": "Gürültüyü azaltan ve akustik konforu artıran yalıtım malzemeleri."
+    },
+    "supportFitting": {
+      "name": "Destek ve Bağlantı Sistemleri",
+      "description": "Sabitleme, modüler destek ve ankraj sistemlerini kapsayan yapısal çözümler."
+    },
+    "couplings": {
+      "name": "Bağlantı Elemanları",
+      "description": "Boru ve sistemlerin güvenli birleşimi için bağlantı elemanları."
+    },
     "passiveFireProtection": {
       "name": "Pasif Yangın Ürünleri",
       "description": "Yangın ve dumanın yayılmasını önleyen sertifikalı kapama sistemleri."
-    },
-    "pipingSystems": {
-      "name": "Boru ve Bağlantı Sistemleri",
-      "description": "Endüstriyel ve inşaat projeleri için yüksek kaliteli boru ve bağlantı çözümleri."
-    },
-    "vibrationAcoustic": {
-      "name": "Titreşim ve Akustik Yalıtım",
-      "description": "Gürültü ve titreşimi azaltan, ekipman ömrünü uzatan yalıtım malzemeleri."
     },
     "thermalInsulation": {
       "name": "Isı Yalıtımı",
       "description": "Yüksek sıcaklıklı ortamlar için etkili termal yalıtım ürünleri."
     },
-    "ventilationSystems": {
-      "name": "Havalandırma Sistemleri",
-      "description": "Bina ve tüneller için duman tahliye ve hava sirkülasyon sistemleri."
+    "pipes": {
+      "name": "Borular",
+      "description": "Endüstriyel ve inşaat projeleri için yüksek kaliteli boru çözümleri."
+    },
+    "fans": {
+      "name": "Fanlar",
+      "description": "Bina ve tüneller için duman tahliye ve hava sirkülasyon fan sistemleri."
     },
     "marineAnticorrosion": {
       "name": "Deniz ve Korozyon Önleyici Ürünler",
       "description": "Deniz endüstrisi ve agresif ortamlar için koruyucu kaplama sistemleri."
     }
   },
+  "groups": {
+    "vibrationAcousticGroup": {
+      "label": "Titreşim ve Akustik"
+    },
+    "supportCouplingsGroup": {
+      "label": "Destek ve Bağlantılar"
+    }
+  },
   "learnMore": "Daha Fazla",
+  "materials": {
+    "close": "Kapat",
+    "selectPrompt": "Detayları görmek için bir ürün seçin."
+  },
   "whyChoose": {
     "title": "Ürünlerimizin Avantajları",
     "items": {

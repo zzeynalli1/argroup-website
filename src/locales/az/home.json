@@ -205,6 +205,16 @@
     "status": {
       "completed": "Tamamlanmış",
       "ongoing": "Davam edir"
+    },
+    "modal": {
+      "close": "Bağla",
+      "client": "Müştəri",
+      "status": "Status",
+      "startDate": "Başlama tarixi",
+      "endDate": "Bitmə tarixi",
+      "ongoing": "Davam edir",
+      "descriptionLabel": "Layihə haqqında",
+      "workPerformedLabel": "Görülən İşlər"
     }
   },
   "brands": {

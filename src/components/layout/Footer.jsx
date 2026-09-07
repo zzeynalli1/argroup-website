@@ -13,14 +13,14 @@ const QUICK_LINKS = [
 
 // Real AR Group contact data — see docs/argroup-knowledge-base.md. Only the
 // column heading/labels go through i18n; these static values do not.
-const ADDRESS = 'İzzət Orucova 18, Xətai, Bakı, Azərbaycan'
+const ADDRESS = 'Nərimanov rayonu, Ələsgər Qayıbov küçəsi, 1222'
 const PHONE = { display: '+994 55 490 74 24', href: 'tel:+994554907424' }
 const EMAIL = 'office@argroup.az'
 
 function ColumnHeading({ children }) {
   return (
     <div>
-      <p className="text-sm font-bold uppercase tracking-wide text-industrial-950">{children}</p>
+      <p className="text-sm font-bold uppercase tracking-wide text-base-50">{children}</p>
       <span className="mt-2 block h-0.5 w-9 bg-ember-600" />
     </div>
   )
@@ -31,11 +31,11 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="relative mt-auto w-full overflow-hidden border-t-2 border-ember-600 bg-base-100 text-industrial-950">
+    <footer className="relative mt-auto w-full overflow-hidden border-t-2 border-ember-600 bg-industrial-700 text-base-50">
       <div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo className="h-16" />
-          <p className="mt-4 max-w-xs text-sm text-neutral-custom-600">{t('description')}</p>
+          <Logo className="h-20" inverted showBackground />
+          <p className="mt-4 max-w-xs text-sm text-neutral-custom-300">{t('description')}</p>
         </div>
 
         <div>
@@ -43,7 +43,7 @@ export default function Footer() {
           <ul className="mt-4 space-y-2">
             {QUICK_LINKS.map((link) => (
               <li key={link.to}>
-                <Link to={link.to} className="text-sm text-neutral-custom-600 hover:text-ember-600 transition-colors">
+                <Link to={link.to} className="text-sm text-neutral-custom-300 hover:text-ember-600 transition-colors">
                   {t(`links.${link.key}`)}
                 </Link>
               </li>
@@ -53,7 +53,7 @@ export default function Footer() {
 
         <div>
           <ColumnHeading>{t('contactHeading')}</ColumnHeading>
-          <ul className="mt-4 space-y-2 text-sm text-neutral-custom-600">
+          <ul className="mt-4 space-y-2 text-sm text-neutral-custom-300">
             <li>{ADDRESS}</li>
             <li>
               <a href={PHONE.href} className="hover:text-ember-600 transition-colors">
@@ -87,8 +87,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="relative border-t border-neutral-custom-400/20">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-neutral-custom-600 sm:flex-row">
+      <div className="relative border-t border-base-50/10">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-6 py-6 text-xs text-neutral-custom-400 sm:flex-row">
           <p>{t('copyright').replace('{year}', year)}</p>
           {/* Simple current-language indicator — the functional switcher lives in Header. */}
           <span>{locale.toUpperCase()}</span>
