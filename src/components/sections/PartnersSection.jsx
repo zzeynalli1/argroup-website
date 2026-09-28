@@ -62,7 +62,13 @@ export default function PartnersSection() {
               <span className="h-5 w-5 animate-spin rounded-full border-2 border-industrial-950/15 border-t-ember-600" />
             </div>
           ) : (
-            <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:gap-x-5 xl:gap-x-6">
+            /* lg+: single non-wrapping row (see comment above re: the
+               connecting line) — 7 fixed-width cards + separators can
+               exceed the viewport around the lg/xl breakpoints, so the row
+               scrolls horizontally within itself (justify-start keeps every
+               card reachable by scroll) instead of the whole page gaining
+               a horizontal scrollbar. */
+            <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:justify-start lg:gap-x-5 lg:overflow-x-auto xl:gap-x-6">
               {partners.map((partner, index) => (
                 <Fragment key={partner.id ?? partner.logoSrc}>
                   <PartnerCard {...partner} />
