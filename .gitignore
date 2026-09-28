@@ -32,3 +32,5 @@ supabase/.temp/
 *.sln
 *.sw?
 .claude/agents/
+.vercel
+.env*
