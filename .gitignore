@@ -18,6 +18,9 @@ build
 .env.local
 .env.*.local
 
+# Supabase CLI local cache (created by running `supabase`/`npx supabase`)
+supabase/.temp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
