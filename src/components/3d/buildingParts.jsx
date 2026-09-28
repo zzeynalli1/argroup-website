@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+import * as THREE from 'three'
 import { Instance, Instances, RoundedBox } from '@react-three/drei'
 import { hardwareMaterial, galvanizedMaterial } from './buildingMaterials'
 
@@ -396,6 +398,381 @@ export function CableTraySupport({ position, dropHeight = 0.3, span = 0.26, mate
       <InstancedCylinders positions={rodPositions} radius={0.012} length={dropHeight} material={material} />
       <mesh position={[0, -dropHeight, 0]} material={material} dispose={null} castShadow>
         <boxGeometry args={[0.05, 0.03, span + 0.05]} />
+      </mesh>
+    </group>
+  )
+}
+
+/**
+ * --- Engineering-systems detail pass: new primitives -----------------------
+ * Added for the 9 hotspot-reveal assemblies' visual-quality upgrade. Same
+ * conventions as everything above: no boolean/CSG geometry, external/shared
+ * materials always get `dispose={null}`, local (non-shared) geometry built
+ * once via `useMemo` doesn't need it. `ConcreteSection`/`FirestopSeal` use
+ * `THREE.ExtrudeGeometry` on a `THREE.Shape` with a hole — genuine 3D bore
+ * geometry (a real annular gap/cut edge), not a boolean subtraction, using a
+ * standard three.js feature (shape-with-holes extrusion) rather than a CSG
+ * library. Both rely on three.js's own `ExtrudeGeometry` material-group
+ * convention: group 0 = the flat front/back cap faces, group 1 = every
+ * extruded side face (the shape's own outer perimeter AND each hole's inner
+ * wall) — physically correct here, since the outer edge and the bore wall
+ * are both "cut substrate", the same material either way.
+ */
+
+// A local chunk of concrete/substrate with a real circular bore through it —
+// the wall/slab section immediately around a penetration, not the building's
+// whole wall (that's ExteriorShell's job; this is the close-up detail a
+// hotspot reveal shows). Local hole axis runs along Z (shape drawn in the
+// XY plane, matching `FirestopCollar`'s own default-rotation convention);
+// pass `rotation={[Math.PI / 2, 0, 0]}` for a floor/ceiling penetration, same
+// as every other penetration primitive in this file.
+export function ConcreteSection({
+  position,
+  rotation = [0, 0, 0],
+  size = [0.55, 0.55],
+  depth = 0.2,
+  holeRadius = 0.13,
+  holeOffset = [0, 0],
+  faceMaterial,
+  edgeMaterial,
+  segments = 28,
+}) {
+  const [w, h] = size
+  const [holeOffsetX, holeOffsetY] = holeOffset
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    shape.moveTo(-w / 2, -h / 2)
+    shape.lineTo(w / 2, -h / 2)
+    shape.lineTo(w / 2, h / 2)
+    shape.lineTo(-w / 2, h / 2)
+    shape.closePath()
+    const hole = new THREE.Path()
+    hole.absarc(holeOffsetX, holeOffsetY, holeRadius, 0, Math.PI * 2, true)
+    shape.holes.push(hole)
+    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: segments, steps: 1 })
+    geom.translate(0, 0, -depth / 2)
+    geom.computeVertexNormals()
+    return geom
+  }, [w, h, depth, holeRadius, holeOffsetX, holeOffsetY, segments])
+
+  return (
+    <mesh
+      position={position}
+      rotation={rotation}
+      geometry={geometry}
+      material={[faceMaterial, edgeMaterial ?? faceMaterial]}
+      dispose={null}
+      castShadow
+      receiveShadow
+    />
+  )
+}
+
+// The firestop fill itself — a washer/annulus of sealant material genuinely
+// occupying the gap between a penetrating service's OD (`innerRadius`) and
+// the opening edge (`outerRadius`), built the same shape-with-hole-extrude
+// way as `ConcreteSection` above, plus a proud surface bead ring at the
+// visible face (the tooled tri-bead finish a real firestop application has
+// at the exposed edge, distinct from a flush, invisible fill). Distinct from
+// `FirestopCollar` (the mounting-flange/ring hardware a collar-type product
+// is fixed to the substrate with) — a real assembly combines both: this is
+// the fill, `FirestopCollar` is the visible hardware in front of it.
+export function FirestopSeal({
+  position,
+  rotation = [0, 0, 0],
+  innerRadius = 0.105,
+  outerRadius = 0.14,
+  depth = 0.2,
+  fillMaterial,
+  beadMaterial,
+  segments = 28,
+}) {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    shape.absarc(0, 0, outerRadius, 0, Math.PI * 2, false)
+    const hole = new THREE.Path()
+    hole.absarc(0, 0, innerRadius, 0, Math.PI * 2, true)
+    shape.holes.push(hole)
+    const geom = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: segments, steps: 1 })
+    geom.translate(0, 0, -depth / 2)
+    geom.computeVertexNormals()
+    return geom
+  }, [innerRadius, outerRadius, depth, segments])
+
+  const beadRadius = (innerRadius + outerRadius) / 2
+  const beadTube = Math.max(0.006, (outerRadius - innerRadius) * 0.24)
+
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh geometry={geometry} material={fillMaterial} dispose={null} castShadow receiveShadow />
+      <mesh
+        position={[0, 0, depth / 2 + 0.004]}
+        rotation={[Math.PI / 2, 0, 0]}
+        material={beadMaterial ?? fillMaterial}
+        dispose={null}
+        castShadow
+      >
+        <torusGeometry args={[beadRadius, beadTube, 8, segments]} />
+      </mesh>
+    </group>
+  )
+}
+
+const CABLE_LAYOUT_AXES = {
+  x: (a, b) => [0, a, b],
+  y: (a, b) => [a, 0, b],
+  z: (a, b) => [a, b, 0],
+}
+const CABLE_INSTANCE_ROTATION = {
+  x: [0, 0, Math.PI / 2],
+  y: [0, 0, 0],
+  z: [Math.PI / 2, 0, 0],
+}
+
+// A bundle of N individual thin cables at a tray cross-section — each with a
+// small seeded position jitter so the bundle reads as installed individual
+// conductors laid by hand, not a perfect factory-stamped array. `axis` is
+// which world/local axis the cables RUN along (their length); the jitter
+// grid fills the other two. One `Instances` draw call regardless of count.
+export function CableBundle({
+  position,
+  rotation,
+  axis = 'x',
+  count = 6,
+  spacing = 0.045,
+  radius = 0.013,
+  length = 1.6,
+  material,
+  seed = 1,
+}) {
+  const positions = useMemo(() => {
+    const perRow = Math.ceil(Math.sqrt(count))
+    const layout = CABLE_LAYOUT_AXES[axis]
+    const result = []
+    let s = (seed * 9301 + 49297) % 233280
+    for (let i = 0; i < count; i++) {
+      const row = Math.floor(i / perRow)
+      const col = i % perRow
+      s = (s * 9301 + 49297) % 233280
+      const jitterA = (s / 233280 - 0.5) * spacing * 0.3
+      s = (s * 9301 + 49297) % 233280
+      const jitterB = (s / 233280 - 0.5) * spacing * 0.3
+      const a = col * spacing - ((perRow - 1) * spacing) / 2 + jitterA
+      const b = row * spacing - ((perRow - 1) * spacing) / 2 + jitterB
+      result.push(layout(a, b))
+    }
+    return result
+  }, [axis, count, spacing, seed])
+
+  return (
+    <group position={position} rotation={rotation}>
+      <Instances limit={positions.length} castShadow material={material} dispose={null}>
+        <cylinderGeometry args={[radius, radius, length, 8]} />
+        {positions.map((p, i) => (
+          <Instance key={i} position={p} rotation={CABLE_INSTANCE_ROTATION[axis]} />
+        ))}
+      </Instances>
+    </group>
+  )
+}
+
+// A threaded hanger rod with a hex nut at each end (and an optional washer
+// under each nut) — the standard MEP support-rod hardware, reads convincingly
+// at this scale as a nut + washer rather than actual helical thread geometry
+// (per the brief: "don't over-engineer actual helical geometry"). Local axis
+// Y, matching every other vertical-member primitive in this file.
+export function ThreadedRod({
+  position,
+  rotation = [0, 0, 0],
+  length = 0.4,
+  radius = 0.012,
+  material = hardwareMaterial,
+  nutTop = true,
+  nutBottom = true,
+  washerTop = false,
+  washerBottom = false,
+}) {
+  const nutRadius = radius * 2.1
+  const nutHeight = radius * 1.6
+  const washerRadius = radius * 2.6
+  const washerHeight = radius * 0.5
+
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh material={material} dispose={null} castShadow>
+        <cylinderGeometry args={[radius, radius, length, 10]} />
+      </mesh>
+      {nutTop && (
+        <mesh position={[0, length / 2 - nutHeight / 2, 0]} material={material} dispose={null} castShadow>
+          <cylinderGeometry args={[nutRadius, nutRadius, nutHeight, 6]} />
+        </mesh>
+      )}
+      {nutBottom && (
+        <mesh position={[0, -length / 2 + nutHeight / 2, 0]} material={material} dispose={null} castShadow>
+          <cylinderGeometry args={[nutRadius, nutRadius, nutHeight, 6]} />
+        </mesh>
+      )}
+      {washerTop && (
+        <mesh position={[0, length / 2 - nutHeight - washerHeight / 2, 0]} material={material} dispose={null} castShadow>
+          <cylinderGeometry args={[washerRadius, washerRadius, washerHeight, 12]} />
+        </mesh>
+      )}
+      {washerBottom && (
+        <mesh position={[0, -length / 2 + nutHeight + washerHeight / 2, 0]} material={material} dispose={null} castShadow>
+          <cylinderGeometry args={[washerRadius, washerRadius, washerHeight, 12]} />
+        </mesh>
+      )}
+    </group>
+  )
+}
+
+// A strut/support-channel profile (real MEP hanger hardware, e.g. Unistrut-
+// style): a back web + two side walls + two inward lips at the open face —
+// built from primitive boxes (no extrude needed at this fidelity), reads as
+// a real C-section rather than a bare square tube thanks to the open slot +
+// lips. Local axis Y (a vertical drop/post channel); rotate for a horizontal
+// cross-member.
+export function SupportChannel({ position, rotation = [0, 0, 0], length = 0.4, width = 0.041, wall = 0.0025, material = galvanizedMaterial }) {
+  const half = width / 2
+  const lipWidth = width * 0.22
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh position={[0, 0, -half + wall / 2]} material={material} dispose={null} castShadow>
+        <boxGeometry args={[width, length, wall]} />
+      </mesh>
+      <mesh position={[-half + wall / 2, 0, 0]} material={material} dispose={null} castShadow>
+        <boxGeometry args={[wall, length, width]} />
+      </mesh>
+      <mesh position={[half - wall / 2, 0, 0]} material={material} dispose={null} castShadow>
+        <boxGeometry args={[wall, length, width]} />
+      </mesh>
+      <mesh position={[-half + lipWidth / 2, 0, half - wall / 2]} material={material} dispose={null} castShadow>
+        <boxGeometry args={[lipWidth, length, wall]} />
+      </mesh>
+      <mesh position={[half - lipWidth / 2, 0, half - wall / 2]} material={material} dispose={null} castShadow>
+        <boxGeometry args={[lipWidth, length, wall]} />
+      </mesh>
+    </group>
+  )
+}
+
+// A split pipe/duct clamp band — two arced half-loops (torus segments, each
+// leaving a real gap) bridged by two bolt lugs at the split points, instead
+// of one unbroken decorative ring. Local axis matches `PipeSupport`'s own
+// strap-ring convention (band lies in the XY plane, wraps a Y-axis pipe).
+export function Clamp({ position, rotation = [0, 0, 0], pipeRadius = 0.1, material = hardwareMaterial, boltMaterial = hardwareMaterial }) {
+  const bandRadius = pipeRadius + 0.014
+  const tube = 0.012
+  const lugOffset = bandRadius + tube
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh rotation={[Math.PI / 2, 0, Math.PI * 0.04]} material={material} dispose={null} castShadow>
+        <torusGeometry args={[bandRadius, tube, 8, 20, Math.PI * 0.92]} />
+      </mesh>
+      <mesh rotation={[Math.PI / 2, 0, Math.PI * 1.04]} material={material} dispose={null} castShadow>
+        <torusGeometry args={[bandRadius, tube, 8, 20, Math.PI * 0.92]} />
+      </mesh>
+      <mesh position={[lugOffset, 0, 0]} material={boltMaterial} dispose={null} castShadow>
+        <boxGeometry args={[0.024, 0.05, 0.02]} />
+      </mesh>
+      <mesh position={[-lugOffset, 0, 0]} material={boltMaterial} dispose={null} castShadow>
+        <boxGeometry args={[0.024, 0.05, 0.02]} />
+      </mesh>
+    </group>
+  )
+}
+
+// A concrete wedge/expansion anchor: an exposed bolt shaft + hex head +
+// washer, protruding from the substrate face at local y=0 (the embedded
+// portion inside the concrete isn't modeled — only what a real inspection
+// would ever see). Local axis Y, pointing away from the substrate it's
+// anchored into; rotate to match the surface (e.g. `[Math.PI, 0, 0]` for a
+// ceiling-mounted anchor pointing down).
+export function Anchor({ position, rotation = [0, 0, 0], length = 0.05, radius = 0.008, material = hardwareMaterial }) {
+  const headRadius = radius * 2.3
+  const headHeight = radius * 1.8
+  const washerRadius = radius * 2.8
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh position={[0, length / 2, 0]} material={material} dispose={null} castShadow>
+        <cylinderGeometry args={[radius, radius, length, 8]} />
+      </mesh>
+      <mesh position={[0, length + headHeight / 2, 0]} material={material} dispose={null} castShadow>
+        <cylinderGeometry args={[headRadius, headRadius, headHeight, 6]} />
+      </mesh>
+      <mesh position={[0, length + 0.002, 0]} material={material} dispose={null} castShadow>
+        <cylinderGeometry args={[washerRadius, washerRadius, 0.004, 12]} />
+      </mesh>
+    </group>
+  )
+}
+
+// A thin, soft/fibrous-looking insulation layer — a plain box (the "cheap on
+// purpose" fallback the brief explicitly allows: matte, high-roughness
+// material tuning rather than a new noise-texture pipeline for one small
+// layer). Named/parametric so a wall build-up reads as a deliberate layer,
+// not an unlabeled inline mesh.
+export function InsulationLayer({ position, rotation = [0, 0, 0], size = [0.5, 0.08, 0.06], material }) {
+  return (
+    <mesh position={position} rotation={rotation} material={material} dispose={null} castShadow receiveShadow>
+      <boxGeometry args={size} />
+    </mesh>
+  )
+}
+
+// A real coil-spring curve, swept into a tube — cheap (one TubeGeometry, one
+// draw call) and mechanically legible as an actual compression spring rather
+// than a decorative cylinder.
+class SpringCurve extends THREE.Curve {
+  constructor(radius, height, turns) {
+    super()
+    this.radius = radius
+    this.height = height
+    this.turns = turns
+  }
+  getPoint(t, target = new THREE.Vector3()) {
+    const angle = t * Math.PI * 2 * this.turns
+    const y = t * this.height - this.height / 2
+    return target.set(Math.cos(angle) * this.radius, y, Math.sin(angle) * this.radius)
+  }
+}
+
+// A vibration isolator: bottom bearing plate -> isolation element (a real
+// coil spring, or an elastomer block for the `'pad'` variant) -> top bearing
+// plate, self-contained (the plates a real isolator assembly always has, not
+// separate meshes the caller has to place). Local axis Y.
+export function Isolator({
+  position,
+  rotation = [0, 0, 0],
+  type = 'spring',
+  radius = 0.06,
+  height = 0.09,
+  turns = 5,
+  tube = 0.008,
+  material,
+  plateMaterial = hardwareMaterial,
+  plateRadius,
+  plateHeight = 0.012,
+}) {
+  const curve = useMemo(() => new SpringCurve(radius, height, turns), [radius, height, turns])
+  const pr = plateRadius ?? radius + 0.02
+
+  return (
+    <group position={position} rotation={rotation}>
+      <mesh position={[0, -height / 2 - plateHeight / 2, 0]} material={plateMaterial} dispose={null} castShadow>
+        <cylinderGeometry args={[pr, pr, plateHeight, 20]} />
+      </mesh>
+      {type === 'spring' ? (
+        <mesh material={material} dispose={null} castShadow>
+          <tubeGeometry args={[curve, turns * 10, tube, 6, false]} />
+        </mesh>
+      ) : (
+        <mesh material={material} dispose={null} castShadow>
+          <boxGeometry args={[radius * 1.7, height, radius * 1.7]} />
+        </mesh>
+      )}
+      <mesh position={[0, height / 2 + plateHeight / 2, 0]} material={plateMaterial} dispose={null} castShadow>
+        <cylinderGeometry args={[pr, pr, plateHeight, 20]} />
       </mesh>
     </group>
   )

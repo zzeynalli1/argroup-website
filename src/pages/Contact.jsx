@@ -8,12 +8,12 @@ export default function Contact() {
   return (
     <>
       <section className="relative overflow-hidden bg-base-100">
-        {/* One continuous architectural scene (public/images/contact-architecture.png)
+        {/* One continuous architectural scene (public/images/contact-architecture.webp)
             behind the whole composition — left copy and the form panel both sit on
             top of it, rather than each getting its own separate image treatment. */}
         <div className="absolute inset-0">
           <img
-            src="/images/contact-architecture.png"
+            src="/images/contact-architecture.webp"
             alt=""
             aria-hidden="true"
             className="h-full w-full object-cover"

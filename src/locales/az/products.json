@@ -70,6 +70,17 @@
     "close": "Bağla",
     "selectPrompt": "Ətraflı məlumat üçün məhsul seçin."
   },
+  "proflame": {
+    "brand": "PROFLAME",
+    "description": "Divar və döşəmələrdə kabel, yanar borular və yanar izolyasiya edilmiş metal boruların keçidlərində 2–4 saata qədər yanğın izolyasiyasını təmin edən, yüksək genişlənmə xüsusiyyətlərinə malik yanğın durdurucu materiallar.",
+    "linkLabel": "SAYT",
+    "products": {
+      "firestopCoating": "Yanğın durdurucu boya",
+      "firestopCollar": "Fire Stop kələbçə",
+      "firestopWrap": "Fire Stop Sarğı",
+      "fireResistantFoam": "Yanğına davamlı köpük"
+    }
+  },
   "whyChoose": {
     "title": "Məhsullarımızın Üstünlükləri",
     "items": {

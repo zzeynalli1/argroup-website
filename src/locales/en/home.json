@@ -28,8 +28,9 @@
     }
   },
   "building3d": {
-    "title": "PLACEHOLDER",
-    "subtitle": "PLACEHOLDER",
+    "titleLine1": "Explore the systems",
+    "titleLine2": "you can't see.",
+    "subtitle": "Explore the engineering solutions applied in construction on an interactive model.",
     "loading": "Loading...",
     "hint": "Click a red marker to explore the system",
     "zoomIn": "Zoom in",
@@ -37,94 +38,45 @@
     "panel": {
       "selectedLabel": "Selected Area",
       "comingSoonLabel": "Coming Soon",
-      "systemType": "System Type",
-      "serviceType": "Service Type",
-      "applicationArea": "Application Area",
-      "fireRating": "Fire Rating",
-      "certification": "Certification",
       "detailsCta": "Learn More",
       "close": "Close"
     },
     "hotspots": {
       "passiveFireProtection": {
         "name": "Pipe Penetration Sealing",
-        "description": "The point where a metal pipe passes through a fire-rated wall. Fire Stop systems prevent fire from spreading between compartments and secure the time needed for evacuation.",
-        "systemType": "Passive Fire Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
+        "description": "The point where a metal pipe passes through a fire-rated wall. Fire Stop systems prevent fire from spreading between compartments and secure the time needed for evacuation."
       },
       "fireproofingSystems": {
         "name": "Structural Fireproofing",
-        "description": "Fire protection for a load-bearing steel column. Early planning and correct application preserve the structural element's load-bearing capacity at high temperatures.",
-        "systemType": "Fireproofing Systems",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
+        "description": "Fire protection for a load-bearing steel column. Early planning and correct application preserve the structural element's load-bearing capacity at high temperatures."
       },
       "cableProtection": {
         "name": "Cable Penetration Protection",
-        "description": "Fire protection for electrical and data cables at floor/wall penetrations. Extends the reliability and service life of the cable materials.",
-        "systemType": "Cable Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
+        "description": "Fire protection for electrical and data cables at floor/wall penetrations. Extends the reliability and service life of the cable materials."
       },
       "mechanicalSupport": {
         "name": "Hanger Support System",
-        "description": "A technical line suspended from the slab above on hanger rods and clamps. Dedicated fixing and support systems carry pipe, duct, and cable runs reliably.",
-        "systemType": "Mechanical Support Systems",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
+        "description": "A technical line suspended from the slab above on hanger rods and clamps. Dedicated fixing and support systems carry pipe, duct, and cable runs reliably."
       },
       "jointSealing": {
         "name": "Structural Joint Sealing",
-        "description": "The joint line that allows for the building's structural movement. Fire Stop systems seal these gaps with flexible materials that keep their integrity through expansion and contraction.",
-        "systemType": "Passive Fire Protection",
-        "applicationArea": "—",
-        "fireRating": "—",
-        "certification": "—"
+        "description": "The joint line that allows for the building's structural movement. Fire Stop systems seal these gaps with flexible materials that keep their integrity through expansion and contraction."
       },
       "acousticInsulation": {
         "name": "Floor-Wall Acoustic Insulation",
-        "description": "Acoustic insulation at the floor-wall junction that limits sound transmission. Controls both airborne and structure-borne sound paths.",
-        "systemType": "Sound & Acoustic Insulation",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
+        "description": "Acoustic insulation at the floor-wall junction that limits sound transmission. Controls both airborne and structure-borne sound paths."
       },
       "vibrationSolutions": {
         "name": "Rooftop Equipment Vibration Isolation",
-        "description": "Rooftop mechanical equipment (generators, engine groups, etc.) mounted on vibration-isolation pads. Prevents equipment-generated vibration from transferring into the structure.",
-        "systemType": "Vibration Analysis & Solutions",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
-      },
-      "waterproofInjection": {
-        "name": "Wall-Floor Injection Point",
-        "description": "An injection point that stops moisture ingress at the wall-floor junction. Secures the water-tightness of joint lines in concrete structures.",
-        "systemType": "Waterproof Injection",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
+        "description": "Rooftop mechanical equipment (generators, engine groups, etc.) mounted on vibration-isolation pads. Prevents equipment-generated vibration from transferring into the structure."
       },
       "drillingCutting": {
         "name": "Core Drilling for Pipe Penetration",
-        "description": "A precisely sized opening cut into concrete with diamond-tipped equipment for a pipe run. Applied to walls, floors, and other concrete surfaces.",
-        "systemType": "Drilling & Concrete Cutting",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
+        "description": "A precisely sized opening cut into concrete with diamond-tipped equipment for a pipe run. Applied to walls, floors, and other concrete surfaces."
       },
       "engineeringTesting": {
         "name": "Facade Anchor Engineering",
-        "description": "Engineering services that secure structural reliability at the curtain-wall anchor point: Support Design, Pull-Out Test, and Load Analysis.",
-        "systemType": "Support Design, Pull-Out Test & Load Analysis",
-        "applicationArea": "—",
-        "fireRating": "Not applicable",
-        "certification": "—"
+        "description": "Engineering services that secure structural reliability at the curtain-wall anchor point: Support Design, Pull-Out Test, and Load Analysis."
       }
     }
   },
@@ -155,17 +107,23 @@
     "titleHighlight": "is a risk.",
     "subtitle": "We seal the gaps that protect your building.",
     "viewSystemsCta": "View Systems",
-    "detailsCta": "Learn more",
-    "checklist": {
-      "sealing": "Fire-rated sealing",
-      "certified": "Certified system",
-      "installation": "Professional installation"
-    },
     "items": {
-      "cableTray": { "name": "Cable Tray Penetration" },
-      "metalPipe": { "name": "Metal Pipe Penetration" },
-      "hvacDuct": { "name": "HVAC Duct Penetration" },
-      "pvcPipe": { "name": "PVC Pipe Penetration" }
+      "cablePenetration": {
+        "title": "Cable penetration",
+        "description": "Openings where cable lines pass through a wall are sealed with a suitable firestop system, limiting the spread of fire and smoke to the adjoining space."
+      },
+      "metalPipePenetration": {
+        "title": "Metal pipe penetration",
+        "description": "At wall and floor penetrations for metal pipes, the gap left around the pipe is sealed with a suitable firestop material."
+      },
+      "ductPenetration": {
+        "title": "Air duct penetration",
+        "description": "At openings where air ducts pass through fire compartments, properly sealing around the penetration limits the spread of fire and smoke between compartments."
+      },
+      "plasticPipePenetration": {
+        "title": "Plastic pipe penetration",
+        "description": "At plastic pipe penetrations, a suitable passive fire protection solution protects the opening around the pipe in the event of a fire."
+      }
     }
   },
   "process": {
@@ -196,7 +154,9 @@
   "projects": {
     "title": "Projects Our Clients Trust Us With",
     "subtitle": "We take part in Azerbaijan's leading construction projects.",
-    "viewAll": "All Projects",
+    "completionDate": "Completion date",
+    "previousGroup": "Previous projects",
+    "nextGroup": "Next projects",
     "filters": {
       "all": "All",
       "completed": "Completed",

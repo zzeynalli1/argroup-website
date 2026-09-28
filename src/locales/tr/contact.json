@@ -35,7 +35,8 @@
       "emailTooLong": "E-posta {max} karakterden uzun olamaz.",
       "emailInvalid": "E-posta formatı geçersiz.",
       "messageRequired": "Mesaj girilmelidir.",
-      "messageTooLong": "Mesaj {max} karakterden uzun olamaz."
+      "messageTooLong": "Mesaj {max} karakterden uzun olamaz.",
+      "submitFailed": "Mesajınız gönderilemedi. Lütfen kısa bir süre sonra tekrar deneyin."
     }
   },
   "map": {

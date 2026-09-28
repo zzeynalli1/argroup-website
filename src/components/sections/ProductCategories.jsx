@@ -14,19 +14,19 @@ const PANELS = [
     key: 'passiveFireProtection',
     icon: Flame,
     featured: true,
-    image: '/images/products/firestop-category.png',
+    image: '/images/products/firestop-category.webp',
     objectPosition: 'object-[68%_center] lg:object-center',
   },
   {
     key: 'vibrationInsulation',
     icon: Waves,
-    image: '/images/products/vibration-category.png',
+    image: '/images/products/vibration-category.webp',
     objectPosition: 'object-[62%_center] lg:object-center',
   },
   {
     key: 'soundAcoustic',
     icon: Volume2,
-    image: '/images/products/acoustic-category.png',
+    image: '/images/products/acoustic-category.webp',
     objectPosition: 'object-[78%_center] lg:object-[68%_center]',
   },
 ]

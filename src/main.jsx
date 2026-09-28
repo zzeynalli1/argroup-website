@@ -3,11 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { I18nProvider } from './lib/i18n/I18nContext'
+import { AuthProvider } from './lib/auth/AuthContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <I18nProvider>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </I18nProvider>
   </StrictMode>,
 )

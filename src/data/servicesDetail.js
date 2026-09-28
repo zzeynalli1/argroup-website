@@ -31,6 +31,16 @@ export const serviceCategories = [
           overview: 'Fire compartmentalization detail',
           workProcess: 'Work process — Fire Stop Systems',
         },
+        // Real supplied process image (public/images/services/). `markers`
+        // are hand-measured percent x-positions of this specific image's own
+        // baked-in 01-04 circles (2160x728 source) — ProcessStageShowcase
+        // never draws its own numbered badge over a `src` image, so these
+        // only drive hover/tap zone boundaries, not visible markup.
+        processImage: {
+          src: '/images/services/passive-fire/firestop.webp',
+          aspect: 'aspect-[2160/728]',
+          markers: [{ x: '13%' }, { x: '37.5%' }, { x: '61%' }, { x: '86%' }],
+        },
       },
       {
         key: 'fireproofingSystems',
@@ -41,6 +51,11 @@ export const serviceCategories = [
           overview: 'Fireproofing coating / partition system detail',
           workProcess: 'Work process — Fireproofing Systems',
         },
+        processImage: {
+          src: '/images/services/passive-fire/fireproofing.webp',
+          aspect: 'aspect-[2159/728]',
+          markers: [{ x: '13.5%' }, { x: '38%' }, { x: '62%' }, { x: '86%' }],
+        },
       },
       {
         key: 'cableProtection',
@@ -50,6 +65,11 @@ export const serviceCategories = [
           hero: 'Cable-tray fire protection system',
           overview: 'Cable penetration / sealing detail',
           workProcess: 'Work process — Cable Fire Protection',
+        },
+        processImage: {
+          src: '/images/services/passive-fire/cable-fire-protection.webp',
+          aspect: 'aspect-[1938/812]',
+          markers: [{ x: '13%' }, { x: '37%' }, { x: '61%' }, { x: '86%' }],
         },
       },
     ],
@@ -69,6 +89,11 @@ export const serviceCategories = [
           overview: 'Pull-out test rig / geometry detail',
           workProcess: 'Work process — Pull Out Test',
         },
+        processImage: {
+          src: '/images/services/testing/pull-out-test.webp',
+          aspect: 'aspect-[1942/809]',
+          markers: [{ x: '16%' }, { x: '49%' }, { x: '83%' }],
+        },
       },
       {
         key: 'vibrationTest',
@@ -78,6 +103,11 @@ export const serviceCategories = [
           hero: 'Vibration test equipment and waveform readout',
           overview: 'Mechanical vibration test environment',
           workProcess: 'Work process — Vibration Test',
+        },
+        processImage: {
+          src: '/images/services/testing/vibration-test.webp',
+          aspect: 'aspect-[2056/765]',
+          markers: [{ x: '11%' }, { x: '36%' }, { x: '62%' }, { x: '87%' }],
         },
       },
     ],
@@ -97,6 +127,11 @@ export const serviceCategories = [
           overview: 'Diamond core drilling / cutting equipment detail',
           workProcess: 'Work process — Drilling and Concrete Cutting',
         },
+        processImage: {
+          src: '/images/services/construction/drilling-cutting.webp',
+          aspect: 'aspect-[2170/725]',
+          markers: [{ x: '17%' }, { x: '51%' }, { x: '84%' }],
+        },
       },
       {
         key: 'acousticInsulation',
@@ -106,6 +141,11 @@ export const serviceCategories = [
           hero: 'Architectural acoustic material environment',
           overview: 'Acoustic insulation barrier detail',
           workProcess: 'Work process — Sound and Acoustic Insulation',
+        },
+        processImage: {
+          src: '/images/services/construction/acoustic-insulation.webp',
+          aspect: 'aspect-[2170/725]',
+          markers: [{ x: '12.5%' }, { x: '37.5%' }, { x: '62.5%' }, { x: '87.5%' }],
         },
       },
       {
@@ -117,6 +157,11 @@ export const serviceCategories = [
           overview: 'Support framework load analysis detail',
           workProcess: 'Work process — Dynamic and Static Load Analysis',
         },
+        processImage: {
+          src: '/images/services/construction/load-analysis.webp',
+          aspect: 'aspect-[2170/725]',
+          markers: [{ x: '12.5%' }, { x: '37.5%' }, { x: '62.5%' }, { x: '87.5%' }],
+        },
       },
       {
         key: 'supportDesign',
@@ -126,6 +171,11 @@ export const serviceCategories = [
           hero: 'MEP support / engineering model',
           overview: 'Support structure technical drawing detail',
           workProcess: 'Work process — Support Design',
+        },
+        processImage: {
+          src: '/images/services/construction/support-design.webp',
+          aspect: 'aspect-[2170/725]',
+          markers: [{ x: '12.5%' }, { x: '37%' }, { x: '61.5%' }, { x: '87%' }],
         },
       },
       {
@@ -137,15 +187,31 @@ export const serviceCategories = [
           overview: 'Vibration-prone platform measurement detail',
           workProcess: 'Work process — Vibration Analysis and Solutions',
         },
+        processImage: {
+          src: '/images/services/construction/vibration-solutions.webp',
+          aspect: 'aspect-[1942/809]',
+          markers: [{ x: '16%' }, { x: '47%' }, { x: '82%' }],
+        },
       },
       {
-        key: 'waterproofInjection',
-        slug: 'waterproof-injection',
-        icon: 'Droplets',
+        key: 'seismic',
+        slug: 'seismic-solutions',
+        icon: 'Activity',
         imageSlots: {
-          hero: 'Waterproof injection at wall-floor joint',
-          overview: 'Injection point / joint sealing detail',
-          workProcess: 'Work process — Waterproof Injection',
+          hero: 'Seismic engineering structural assessment',
+          overview: 'Seismic reinforcement / structural detail',
+          workProcess: 'Work process — Seismic Engineering',
+        },
+        // Real supplied process image (public/images/services/construction/),
+        // same 2170x725 frame size as concreteCutting/acousticInsulation/
+        // loadAnalysis/supportDesign above. `markers` are hand-measured
+        // (pixel-centroid, not eyeballed) x-positions of this image's own
+        // baked-in 01-04 dot markers — see the other entries' own comment on
+        // why these only drive hover/tap zone boundaries, never visible markup.
+        processImage: {
+          src: '/images/services/construction/seismic-system.webp',
+          aspect: 'aspect-[2170/725]',
+          markers: [{ x: '16%' }, { x: '40%' }, { x: '55.5%' }, { x: '95.5%' }],
         },
       },
     ],
@@ -167,10 +233,9 @@ export const serviceCategories = [
   {
     id: 6,
     key: 'designEngineering',
-    number: '06',
+    number: '04',
     icon: 'PenTool',
     subServices: [],
-    relatedKeys: ['supportDesign', 'loadAnalysis', 'vibrationSolutions'],
   },
 ]
 

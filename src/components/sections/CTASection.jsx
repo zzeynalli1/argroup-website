@@ -13,7 +13,7 @@ export default function CTASection() {
         <picture>
           <source srcSet="/images/cta/cta-building.webp" type="image/webp" />
           <img
-            src="/images/cta/cta-building.jpg"
+            src="/images/cta/cta-building.webp"
             alt="AR Group tikinti sahəsi"
             loading="lazy"
             className="h-56 w-full object-cover object-right sm:h-72"
@@ -25,7 +25,7 @@ export default function CTASection() {
         <picture>
           <source srcSet="/images/cta/cta-building.webp" type="image/webp" />
           <img
-            src="/images/cta/cta-building.jpg"
+            src="/images/cta/cta-building.webp"
             alt="AR Group tikinti sahəsi"
             loading="lazy"
             className="h-full w-full object-cover object-right"

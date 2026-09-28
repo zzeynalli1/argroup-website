@@ -70,6 +70,17 @@
     "close": "Kapat",
     "selectPrompt": "Detayları görmek için bir ürün seçin."
   },
+  "proflame": {
+    "brand": "",
+    "description": "",
+    "linkLabel": "",
+    "products": {
+      "firestopCoating": "",
+      "firestopCollar": "",
+      "firestopWrap": "",
+      "fireResistantFoam": ""
+    }
+  },
   "whyChoose": {
     "title": "Ürünlerimizin Avantajları",
     "items": {

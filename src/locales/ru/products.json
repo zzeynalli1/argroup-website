@@ -70,6 +70,17 @@
     "close": "Закрыть",
     "selectPrompt": "Выберите продукт, чтобы увидеть подробности."
   },
+  "proflame": {
+    "brand": "",
+    "description": "",
+    "linkLabel": "",
+    "products": {
+      "firestopCoating": "",
+      "firestopCollar": "",
+      "firestopWrap": "",
+      "fireResistantFoam": ""
+    }
+  },
   "whyChoose": {
     "title": "Преимущества Наших Продуктов",
     "items": {

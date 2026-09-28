@@ -35,7 +35,8 @@
       "emailTooLong": "E-poçt {max} simvoldan uzun ola bilməz.",
       "emailInvalid": "E-poçt formatı düzgün deyil.",
       "messageRequired": "Mesaj daxil edilməlidir.",
-      "messageTooLong": "Mesaj {max} simvoldan uzun ola bilməz."
+      "messageTooLong": "Mesaj {max} simvoldan uzun ola bilməz.",
+      "submitFailed": "Mesaj göndərilə bilmədi. Zəhmət olmasa bir az sonra yenidən cəhd edin."
     }
   },
   "map": {

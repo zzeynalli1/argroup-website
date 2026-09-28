@@ -1,22 +1,25 @@
 import { useState } from 'react'
-import { ChevronDown, Lock, Mail, MessageSquare, Phone, User } from 'lucide-react'
+import { ChevronDown, Loader2, Lock, Mail, MessageSquare, Phone, User } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import { services } from '../../data/servicesDetail'
+import { submitContactMessage } from '../../lib/cms/contactMessages'
 
 /**
- * Contact form — structure + client-side validation only.
- *
- * IMPORTANT: this does NOT talk to any backend yet. `handleSubmit` is a
- * placeholder that just validates and shows a local success message.
- * When the backend is ready, wire the fetch/POST call here and add
- * server-side validation, SQL-injection-safe query handling, spam/bot
- * protection (e.g. a CAPTCHA or honeypot field), and rate limiting on
- * the API route — none of that can be enforced from the client alone.
+ * Contact form — structure + client-side validation, backed by a real
+ * Supabase insert (see lib/cms/contactMessages.js). Client-side validation
+ * below is a UX convenience only; the database re-enforces the same limits
+ * via CHECK constraints (0003_contact_messages.sql) since client checks can
+ * always be bypassed.
  *
  * Security notes:
- * - No dangerouslySetInnerHTML / raw HTML rendering anywhere in this form.
- * - All fields are length-limited client-side; the backend must re-validate
- *   and re-limit these regardless, since client-side checks can be bypassed.
+ * - No dangerouslySetInnerHTML / raw HTML rendering anywhere in this form —
+ *   submitted text is stored and later displayed in the admin as plain text.
+ * - Raw Supabase/Postgres errors are never shown to the visitor — see
+ *   submitContactMessage's toSafeError, which collapses every failure to
+ *   one generic, localized message.
+ * - v1 has no CAPTCHA/honeypot/rate limiting (documented abuse surface —
+ *   see the migration's own header comment); anonymous INSERT-only RLS is
+ *   the only guard against a visitor reading other submissions.
  */
 
 const LIMITS = {
@@ -39,6 +42,8 @@ export default function ContactForm() {
   const [values, setValues] = useState(initialFormState)
   const [errors, setErrors] = useState({})
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   function validate(v) {
     const errs = {}
@@ -71,8 +76,13 @@ export default function ContactForm() {
     setValues((prev) => ({ ...prev, [name]: value }))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+
+    // Guards against a double-click/double-tap firing a second insert while
+    // the first is still in flight, in addition to the submit button itself
+    // being disabled below while `submitting`.
+    if (submitting) return
 
     const validationErrors = validate(values)
     setErrors(validationErrors)
@@ -82,12 +92,23 @@ export default function ContactForm() {
       return
     }
 
-    // Placeholder submit — no backend yet.
-    // TODO(backend): POST to an API route with server-side validation,
-    // SQL-injection-safe parameterized queries, spam/bot protection, and
-    // rate limiting before this goes live.
-    setSubmitted(true)
-    setValues(initialFormState)
+    setSubmitting(true)
+    setSubmitError('')
+
+    try {
+      await submitContactMessage(values)
+      setSubmitted(true)
+      setValues(initialFormState)
+    } catch {
+      // submitContactMessage already logs the real error — the raw message
+      // it returns is Azerbaijani-only (shared with the admin CMS modules),
+      // which would break this form's own i18n for en/ru/tr visitors, so
+      // the localized `form.errors.submitFailed` key is shown instead.
+      setSubmitError(t('form.errors.submitFailed'))
+      setSubmitted(false)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -204,12 +225,16 @@ export default function ContactForm() {
 
         <button
           type="submit"
-          className="group flex w-full items-center justify-center gap-2 rounded-sm bg-ember-600 py-4 text-sm font-semibold uppercase tracking-wide text-base-50 transition-colors hover:bg-ember-800"
+          disabled={submitting}
+          className="group flex w-full items-center justify-center gap-2 rounded-sm bg-ember-600 py-4 text-sm font-semibold uppercase tracking-wide text-base-50 transition-colors hover:bg-ember-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
+          {submitting && <Loader2 size={16} className="animate-spin" />}
           {t('form.submit')}
-          <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-            →
-          </span>
+          {!submitting && (
+            <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+              →
+            </span>
+          )}
         </button>
 
         <p className="flex items-center gap-2 text-xs text-neutral-custom-400">
@@ -217,6 +242,7 @@ export default function ContactForm() {
           {t('form.privacyNote')}
         </p>
 
+        {submitError && <p className="text-sm text-ember-600">{submitError}</p>}
         {submitted && <p className="text-sm text-success-500">{t('form.successMessage')}</p>}
       </form>
     </div>

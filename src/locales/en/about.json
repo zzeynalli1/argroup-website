@@ -41,14 +41,7 @@
     "sinceCaption": "Since 2018, we have been installing Fire Stop passive fire protection systems across Azerbaijan."
   },
   "leadership": {
-    "heading": "Our Team",
-    "items": {
-      "ceo": { "title": "Chief Executive Officer" },
-      "purchasingSales": { "title": "Head of Purchasing and Sales Department" },
-      "engineer": { "title": "Main Engineer" },
-      "siteTeam": { "title": "Technical / Site Team" },
-      "installation": { "title": "Installation & Operations" }
-    }
+    "heading": "Our Team"
   },
   "capabilities": {
     "eyebrow": "OUR CAPABILITIES",
@@ -116,5 +109,15 @@
     "title": "Get engineering support for your project.",
     "subtitle": "Our team will get in touch to help define the right solution for your needs.",
     "button": "Contact Us"
+  },
+  "awards": {
+    "eyebrow": "AWARDS",
+    "title": "Our Awards",
+    "empty": "Award information is currently being confirmed and will be added soon."
+  },
+  "catalog": {
+    "title": "Our Catalog",
+    "subtitle": "Explore our company's service and product catalog.",
+    "downloadCta": "Download Catalog"
   }
 }

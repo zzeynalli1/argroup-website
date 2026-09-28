@@ -4,5 +4,7 @@
   "services": "Hizmetler",
   "products": "Ürünler",
   "contact": "İletişim",
-  "cta": "Bize Ulaşın"
+  "cta": "Bize Ulaşın",
+  "openMenu": "Menüyü aç",
+  "closeMenu": "Menüyü kapat"
 }

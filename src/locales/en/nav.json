@@ -4,5 +4,7 @@
   "services": "Services",
   "products": "Products",
   "contact": "Contact",
-  "cta": "Contact Us"
+  "cta": "Contact Us",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu"
 }

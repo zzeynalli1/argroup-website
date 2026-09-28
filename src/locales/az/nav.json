@@ -4,5 +4,7 @@
   "services": "Xidmətlər",
   "products": "Məhsullar",
   "contact": "Əlaqə",
-  "cta": "Bizimlə əlaqə"
+  "cta": "Bizimlə əlaqə",
+  "openMenu": "Menyunu aç",
+  "closeMenu": "Menyunu bağla"
 }

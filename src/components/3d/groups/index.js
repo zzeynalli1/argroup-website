@@ -5,7 +5,6 @@ import MechanicalSupport from './MechanicalSupport'
 import JointSealing from './JointSealing'
 import AcousticInsulation from './AcousticInsulation'
 import VibrationSolutions from './VibrationSolutions'
-import WaterproofInjection from './WaterproofInjection'
 import DrillingCutting from './DrillingCutting'
 import EngineeringTesting from './EngineeringTesting'
 import ExteriorShell from './ExteriorShell'
@@ -13,6 +12,7 @@ import Structure from './Structure'
 import InteriorArchitecture from './InteriorArchitecture'
 import Architecture from './Architecture'
 import RooftopShell from './RooftopShell'
+import SiteEnvironment from './SiteEnvironment'
 import FutureZone from './FutureZone'
 
 /**
@@ -21,7 +21,7 @@ import FutureZone from './FutureZone'
  * one file + one entry here, not touching existing groups.
  *
  * `id` doubles as the group key hotspots reference via `hotspot.group` (see
- * data/hotspots3d.js). For the 10 current hotspot-driven systems, `id`
+ * data/hotspots3d.js). For the 9 current hotspot-driven systems, `id`
  * equals that hotspot's own id 1:1, preserving exactly which meshes
  * highlight/dim together today (see the Phase 0 note in each group file for
  * why they aren't split further). `structure`/`interiorArchitecture` replace
@@ -45,7 +45,6 @@ export const SYSTEM_GROUPS = [
   { id: 'jointSealing', Component: JointSealing, category: 'current', defaultVisible: true },
   { id: 'acousticInsulation', Component: AcousticInsulation, category: 'current', defaultVisible: true },
   { id: 'vibrationSolutions', Component: VibrationSolutions, category: 'current', defaultVisible: true },
-  { id: 'waterproofInjection', Component: WaterproofInjection, category: 'current', defaultVisible: true },
   { id: 'drillingCutting', Component: DrillingCutting, category: 'current', defaultVisible: true },
   { id: 'engineeringTesting', Component: EngineeringTesting, category: 'current', defaultVisible: true },
 
@@ -55,6 +54,11 @@ export const SYSTEM_GROUPS = [
   { id: 'interiorArchitecture', Component: InteriorArchitecture, category: 'current', defaultVisible: true },
   { id: 'architecture', Component: Architecture, category: 'current', defaultVisible: true },
   { id: 'rooftopShell', Component: RooftopShell, category: 'current', defaultVisible: true },
+  // Minimal exterior site dressing (plaza/planters/bollard lights) — static,
+  // non-hotspot context; see SiteEnvironment.jsx. Distinct from the
+  // `exterior`/`landscape` FutureZone entries below, which stay reserved for
+  // a real future hotspot-driven Exterior Design / Landscape service.
+  { id: 'siteEnvironment', Component: SiteEnvironment, category: 'current', defaultVisible: true },
 
   // --- Future, reserved-but-not-modeled groups (see the reserved-zone
   //     table in .claude/agents/3d-modeling-agent.md). Render nothing until

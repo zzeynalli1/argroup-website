@@ -3,6 +3,7 @@ import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import { useTranslation } from '../lib/i18n/useTranslation'
 import { getCategoryByKey, getServiceBySlug, services } from '../data/servicesDetail'
 import ImagePlaceholder from '../components/ui/ImagePlaceholder'
+import ProcessStageShowcase from '../components/ui/ProcessStageShowcase'
 import TechnicalLines from '../components/ui/TechnicalLines'
 import Reveal from '../components/ui/Reveal'
 import Button from '../components/ui/Button'
@@ -41,7 +42,7 @@ function DetailHero({ service, category, t }) {
 
         <div className="mt-8 grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <Reveal>
-            <h1 className="font-heading text-3xl font-bold leading-tight text-industrial-950 md:text-5xl">
+            <h1 className="font-heading text-4xl font-bold leading-[1.05] tracking-tight text-industrial-950 md:text-6xl">
               {t(`subServices.${service.key}.title`)}
             </h1>
             <span aria-hidden="true" className="mt-5 block h-1 w-16 bg-ember-600" />
@@ -93,14 +94,67 @@ function DetailTechnical({ service, t }) {
   )
 }
 
+/**
+ * Renders whatever verified content actually exists below the process image
+ * — a short intro paragraph, a list of benefits (any length), both, or
+ * neither. No fixed slot count: a service with only `shortIntro` renders
+ * just that; a service with neither renders nothing extra.
+ */
+function DetailProcessSupport({ service, t }) {
+  const shortIntroKey = `detail.${service.key}.shortIntro`
+  const shortIntro = t(shortIntroKey)
+  const hasIntro = typeof shortIntro === 'string' && shortIntro !== shortIntroKey
+
+  const benefits = t(`detail.${service.key}.benefits`)
+  const hasBenefits = Array.isArray(benefits) && benefits.length > 0
+
+  if (!hasIntro && !hasBenefits) return null
+
+  return (
+    <div className="mt-12 grid grid-cols-1 gap-x-12 gap-y-8 md:mt-16 lg:grid-cols-12">
+      {hasIntro && (
+        <Reveal className={hasBenefits ? 'lg:col-span-5' : 'lg:col-span-9'}>
+          <p className="text-lg leading-[1.75] text-neutral-custom-600">{shortIntro}</p>
+        </Reveal>
+      )}
+      {hasBenefits && (
+        <Reveal
+          delay={0.1}
+          className={`grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 ${hasIntro ? 'lg:col-span-7' : 'lg:col-span-12 lg:grid-cols-3'}`}
+        >
+          {benefits.map((benefit, index) => (
+            <div key={index} className="border-l-2 border-ember-600 pl-5">
+              <p className="font-heading text-sm font-semibold uppercase tracking-wide text-industrial-950">{benefit.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-custom-600">{benefit.description}</p>
+            </div>
+          ))}
+        </Reveal>
+      )}
+    </div>
+  )
+}
+
 function DetailWorkProcess({ service, t }) {
+  const rawStages = t(`detail.${service.key}.process`)
+  const stagesKey = `detail.${service.key}.process`
+  const stages = rawStages !== stagesKey ? rawStages : t('process.genericStages')
+  const processImage = service.processImage
+
   return (
     <section className="bg-base-100 py-16 md:py-24">
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading eyebrow={t('detailLabels.sections.workProcess.eyebrow')} title={t('detailLabels.sections.workProcess.title')} />
         <Reveal delay={0.1} className="mt-5">
-          <ImagePlaceholder label={service.imageSlots.workProcess} aspect="aspect-[16/6]" tone="light" className="w-full" />
+          <ProcessStageShowcase
+            image={service.imageSlots.workProcess}
+            src={processImage?.src}
+            aspect={processImage?.aspect}
+            markers={processImage?.markers}
+            stages={stages}
+            tone="light"
+          />
         </Reveal>
+        <DetailProcessSupport service={service} t={t} />
       </div>
     </section>
   )
@@ -178,7 +232,14 @@ export default function ServiceDetailPage() {
 
   const category = getCategoryByKey(service.categoryKey)
   const related = services.filter((s) => s.categoryKey === service.categoryKey && s.key !== service.key)
-  const applicationsContent = t(`detail.${service.key}.applications`)
+  // Same missing-key guard as DetailWorkProcess/DetailProcessSupport below —
+  // t() returns the literal dotted key when it's missing from both the
+  // current locale and the az fallback (see useTranslation.js), so a
+  // service with no verified `applications` copy (e.g. seismic) must not
+  // render that raw key string as if it were real content.
+  const applicationsKey = `detail.${service.key}.applications`
+  const rawApplicationsContent = t(applicationsKey)
+  const applicationsContent = rawApplicationsContent !== applicationsKey ? rawApplicationsContent : null
 
   return (
     <>

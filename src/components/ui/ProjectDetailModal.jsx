@@ -35,9 +35,9 @@ function InfoField({ label, value, accent = false }) {
 /**
  * Architectural project-dossier modal opened from the Home page's compact
  * Projects section (see components/sections/Projects.jsx). Content is
- * data-driven only — every field comes from the merged
- * data/projects.js + data/projectDetails.js record passed in as `project`;
- * this component never hardcodes copy for a specific project/slug.
+ * data-driven only — every field comes from the Supabase `projects` row
+ * passed in as `project` (see lib/cms/projects.js's adaptProjectRow); this
+ * component never hardcodes copy for a specific project/slug.
  */
 export default function ProjectDetailModal({ project, onClose }) {
   const { t, locale } = useTranslation('home')
@@ -112,10 +112,7 @@ export default function ProjectDetailModal({ project, onClose }) {
             className="relative flex h-full w-full flex-col overflow-y-auto bg-base-50 md:h-auto md:max-h-[90vh] md:w-[80vw] md:max-w-5xl"
           >
             <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-industrial-950 md:aspect-[21/9]">
-              <picture>
-                <source srcSet={project.imageWebp} type="image/webp" />
-                <img src={project.imageJpg} alt={project.title} className="h-full w-full object-cover" />
-              </picture>
+              <img src={project.imageWebp} alt={project.title} className="h-full w-full object-cover" />
               <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-industrial-950/70 via-transparent to-transparent" />
 
               <button
@@ -153,8 +150,21 @@ export default function ProjectDetailModal({ project, onClose }) {
                   <InfoField label={t('projects.modal.startDate')} value={formatDate(project.startDate)} />
                   <InfoField
                     label={t('projects.modal.endDate')}
-                    value={project.endDate ? formatDate(project.endDate) : t('projects.modal.ongoing')}
+                    value={
+                      project.endDate
+                        ? formatDate(project.endDate)
+                        : project.status === 'ongoing'
+                          ? t('projects.modal.ongoing')
+                          : null
+                    }
                   />
+                  {/* completionDate is distinct from the endDate above —
+                      it's reserved for a separately-verified completion
+                      date and stays unset today, so this only renders once
+                      real data is entered for a completed project. */}
+                  {project.status === 'completed' && project.completionDate && (
+                    <InfoField label={t('projects.completionDate')} value={formatDate(project.completionDate)} />
+                  )}
                 </div>
               </div>
 

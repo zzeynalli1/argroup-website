@@ -20,7 +20,7 @@ export default function ProductsHero() {
   return (
     <section className="relative overflow-hidden bg-industrial-950 py-24 md:py-32 lg:py-36">
       <img
-        src="/images/products/products-hero.png"
+        src="/images/products/products-hero.webp"
         alt=""
         className="absolute inset-0 h-full w-full object-cover object-right-top"
       />

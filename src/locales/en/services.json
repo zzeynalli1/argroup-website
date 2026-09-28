@@ -1,11 +1,9 @@
 {
   "hero": {
     "eyebrow": "OUR SERVICES",
-    "title": "Full-Scope Engineering Services for Fire Safety",
+    "title": "From Engineering\nto Execution.",
+    "titleHighlight": "Execution",
     "subtitle": "From Fire Stop to Design Engineering — reliable engineering support on every project."
-  },
-  "grid": {
-    "title": "Services We Provide"
   },
   "categories": {
     "passiveFireProtection": {
@@ -44,74 +42,180 @@
     "loadAnalysis": { "title": "Dynamic & Static Load Analysis", "description": "Assessing load resistance of support structures" },
     "supportDesign": { "title": "Support Design", "description": "Design of MEP support structures" },
     "vibrationSolutions": { "title": "Vibration Analysis & Solutions", "description": "Reducing vibration from mechanical equipment" },
-    "waterproofInjection": { "title": "Waterproof Injection", "description": "Watertightness of wall-floor joints" }
+    "seismic": { "title": "Seismic", "description": "Engineering solutions to improve buildings' resistance to seismic effects" }
   },
   "detail": {
     "fireStopSystems": {
       "lead": "A passive protection system that seals openings and penetrations to safeguard a building's fire safety.",
+      "shortIntro": "Firestop systems ensure the safe evacuation of people during a fire, support firefighting operations, and prevent flames from spreading to other areas.",
       "about": "Fire Stop systems ensure the fire safety of a building — enabling evacuation and emergency access, and preventing fire from spreading to adjacent compartments even in the event of structural collapse. The core principle is fire compartmentalization.",
       "applications": "Pipe, cable, and duct penetrations through fire-rated walls and floors; structural movement (expansion) joints.",
-      "technicalApproach": "Each penetration and joint is sealed with fire-stop materials suited to it, preserving compartment integrity; movement joints are sealed with elastic, fire-rated materials that remain effective through expansion and contraction."
+      "technicalApproach": "Each penetration and joint is sealed with fire-stop materials suited to it, preserving compartment integrity; movement joints are sealed with elastic, fire-rated materials that remain effective through expansion and contraction.",
+      "benefits": [
+        { "title": "Safe evacuation", "description": "Allows people to leave the building safely." },
+        { "title": "Firefighting capability", "description": "Creates the conditions for firefighting and rescue operations." },
+        { "title": "Preventing spread", "description": "Limits fire from spreading to other compartments and nearby areas." }
+      ],
+      "process": [
+        { "title": "Open penetration", "description": "A pipe or cable penetration creates a weak point for fire to spread to another area." },
+        { "title": "Firestop application", "description": "The area around the penetration is sealed with the appropriate firestop material." },
+        { "title": "Fire exposure", "description": "The firestop system limits the passage of flame and smoke through the penetration." },
+        { "title": "Protection", "description": "The sealed penetration helps prevent the fire from spreading to another area." }
+      ]
     },
     "fireproofingSystems": {
       "lead": "Fireproofing systems that protect structural elements from the effects of high temperature.",
+      "shortIntro": "Our certified, trained team plans and implements structural fireproofing systems. Positioning fire barriers correctly early in the project allows for more effective and safer solutions.",
       "about": "Fireproofing systems protect structural elements — such as load-bearing steel — from the effects of fire. Reliable results depend on detailed, early planning of fire barriers.",
       "applications": "Buildings and facilities where load-bearing structural elements (columns, beams, etc.) require fire protection.",
-      "technicalApproach": "Our team has passed the necessary training and certification for this work. The process covers identifying the requirement, designing the system, and implementing tested, optimized partition systems."
+      "technicalApproach": "Our team has passed the necessary training and certification for this work. The process covers identifying the requirement, designing the system, and implementing tested, optimized partition systems.",
+      "benefits": [
+        { "title": "Certified team", "description": "Design and installation work is carried out by trained specialists." },
+        { "title": "Early planning", "description": "Correctly positioning fire barriers early in the project enables effective planning." },
+        { "title": "Right system selection", "description": "Suitable, optimized, and tested systems are planned for the structure." }
+      ],
+      "process": [
+        { "title": "Steel structure", "description": "The load-bearing steel element is prepared before fireproofing is applied." },
+        { "title": "Fireproofing application", "description": "The steel surface is coated with a fire-resistant protective material." },
+        { "title": "Fire exposure", "description": "The protective coating creates a thermal barrier between the steel structure and the flame." },
+        { "title": "Protected structure", "description": "The fireproofing layer continues protecting the steel element against the effects of fire." }
+      ]
     },
     "cableProtection": {
       "lead": "Protecting electrical and data cables to improve their fire safety and service life.",
+      "shortIntro": "Protecting cables helps extend their service life and reduces material and resource consumption. AR Group supports an approach focused on sustainability and reducing environmental impact.",
       "about": "Cable fire protection safeguards electrical and data cables at wall and floor penetrations, improving the reliability and service life of cable materials.",
       "applications": "Fire-rated penetrations for metallic (copper, aluminum) and polymer-based (PVC, PE, XLPE, etc.) cables.",
-      "technicalApproach": "Our approach is built around extending cable service life — reducing waste and environmental impact compared to incineration or landfill disposal."
+      "technicalApproach": "Our approach is built around extending cable service life — reducing waste and environmental impact compared to incineration or landfill disposal.",
+      "benefits": [
+        { "title": "Longer service life", "description": "Protecting cable systems helps extend their service life." },
+        { "title": "Resource savings", "description": "Longer material use helps reduce additional resource consumption." },
+        { "title": "Sustainable approach", "description": "Reducing environmental impact and resource consumption is one of our core approaches." }
+      ],
+      "process": [
+        { "title": "Cable line", "description": "Cable lines are laid on the metal support (tray) system." },
+        { "title": "Fire protection", "description": "A fire-resistant protective system is applied around the cable line." },
+        { "title": "Fire exposure", "description": "The protective system isolates the cable line from direct exposure to fire." },
+        { "title": "Sustained protection", "description": "The protective layer maintains the cable line's protection throughout the fire." }
+      ]
     },
     "pullOutTest": {
       "lead": "A non-destructive test method for assessing the compressive strength of concrete.",
+      "shortIntro": "The pull-out test is based on measuring the pull-out force of an element installed in hardened concrete. Pull-out forces obtained with test equipment matching a specific geometry allow results to be evaluated in relation to the concrete's compressive strength.",
       "about": "The pull-out test is a non-destructive method for evaluating the compressive strength of concrete structures.",
       "applications": "Construction and structural projects where concrete quality and strength must be verified.",
-      "technicalApproach": "Specific-geometry test equipment measures pull-out force, which is then correlated to the concrete's compressive strength."
+      "technicalApproach": "Specific-geometry test equipment measures pull-out force, which is then correlated to the concrete's compressive strength.",
+      "process": [
+        { "title": "Anchor preparation", "description": "The anchor installed in the concrete is prepared for the pull-out test." },
+        { "title": "Pull-out test", "description": "A controlled tensile load is applied to the anchor with the test device, and the reading is measured." },
+        { "title": "Result evaluation", "description": "The measurement is recorded and the anchor's test result is evaluated." }
+      ]
     },
     "vibrationTest": {
       "lead": "A mechanical vibration test that objectively evaluates product performance and durability.",
+      "shortIntro": "Vibration testing is a test method used to objectively evaluate the performance and quality of an object or product under mechanical vibration conditions. The measurement results allow for analysis and comparison on a scientific basis.",
       "about": "Vibration testing uses mechanical vibration to objectively evaluate a product's performance, quality, and durability.",
       "applications": "Equipment and systems exposed to vibrational stress that require performance and durability assessment.",
-      "technicalApproach": "The product is subjected to controlled vibration conditions, and the results are assessed objectively for performance and durability."
+      "technicalApproach": "The product is subjected to controlled vibration conditions, and the results are assessed objectively for performance and durability.",
+      "process": [
+        { "title": "Equipment preparation", "description": "The mechanical equipment is prepared in working condition for vibration measurement." },
+        { "title": "Sensor placement", "description": "Vibration sensors are attached to the equipment and measurement data is recorded." },
+        { "title": "Vibration measurement", "description": "The vibration signals generated while the equipment operates are measured and monitored." },
+        { "title": "Results analysis", "description": "The collected vibration data is analyzed to assess the equipment's condition." }
+      ]
     },
     "concreteCutting": {
       "lead": "Precision drilling and cutting of concrete using diamond-headed equipment.",
+      "shortIntro": "Drilling holes of various diameters in concrete and cutting work are carried out with diamond-headed equipment. Depending on working conditions, wet cutting with water or cleaner methods using industrial dust extractors can be applied.",
       "about": "Drilling and concrete cutting services use diamond-headed equipment to create holes of various diameters in concrete, and to cut concrete, brick, and tile.",
       "applications": "Construction work requiring precise cutting and drilling in concrete, brick, and tile for pipe and cable penetrations; wall demolition using industrial vacuums.",
-      "technicalApproach": "Two methods are used: wet cutting (continuous water cooling; produces wastewater that must be collected and removed; unsuitable for interior door/window work due to flooding risk) and dry cutting (slower, using industrial dust collectors; higher cost but minimal contamination and preserved finishing materials). Performance depends on tool strength, wall material, cutting depth, and weather conditions."
+      "technicalApproach": "Two methods are used: wet cutting (continuous water cooling; produces wastewater that must be collected and removed; unsuitable for interior door/window work due to flooding risk) and dry cutting (slower, using industrial dust collectors; higher cost but minimal contamination and preserved finishing materials). Performance depends on tool strength, wall material, cutting depth, and weather conditions.",
+      "benefits": [
+        { "title": "Diamond technology", "description": "Precise drilling and cutting in concrete, brick, and tile is carried out with diamond-headed equipment." },
+        { "title": "Wet cutting", "description": "Continuous water supply helps cool the cutting area and manage waste." },
+        { "title": "Dust reduction", "description": "Special mechanisms and industrial dust extractors significantly reduce contamination of the space." }
+      ],
+      "process": [
+        { "title": "Work area preparation", "description": "Drilling and cutting points are marked out and the work area is prepared." },
+        { "title": "Diamond drilling and cutting", "description": "The concrete is precisely drilled or cut using diamond-tipped equipment." },
+        { "title": "Dust and water management", "description": "The water and waste generated during the work are managed with suitable collection systems." }
+      ]
     },
     "acousticInsulation": {
       "lead": "Insulation that limits sound transmission caused by vibration.",
+      "shortIntro": "Noise travels through air as pressure waves and through structures as vibration. For an effective acoustic solution, the sound source, the transmission path, and the receiver affected by the noise must all be assessed together.",
       "about": "Sound and acoustic insulation limits the transmission of sound caused by object vibration, addressing both airborne and structure-borne transmission paths.",
       "applications": "Buildings and structural elements — such as floor-wall junctions — where sound transmission must be limited.",
-      "technicalApproach": "Three control strategies can be applied: source control (the primary approach), transmission-path control, and receiver-side treatment (the most complex and costly). Barrier effectiveness is assessed using transmission loss curves."
+      "technicalApproach": "Three control strategies can be applied: source control (the primary approach), transmission-path control, and receiver-side treatment (the most complex and costly). Barrier effectiveness is assessed using transmission loss curves.",
+      "benefits": [
+        { "title": "Sound source", "description": "Noise control starts by assessing the source where the problem originates." },
+        { "title": "Transmission path", "description": "Sound can be transmitted to other areas through the air or through structural vibration." },
+        { "title": "Receiver", "description": "The person, room, or other space affected by the noise is considered when developing the solution." }
+      ],
+      "process": [
+        { "title": "Noise measurement", "description": "The noise level in the space is measured to identify the source of the problem." },
+        { "title": "Acoustic analysis", "description": "An acoustic solution is developed based on the measurement results and the space's characteristics." },
+        { "title": "Insulation system installation", "description": "Suitable sound and acoustic insulation materials are applied." },
+        { "title": "Acoustic comfort", "description": "The applied system helps reduce noise and unwanted sound transmission." }
+      ]
     },
     "loadAnalysis": {
       "lead": "Engineering assessment of support structures' resistance to static and dynamic loads.",
+      "shortIntro": "Load-bearing structures are subject to both static and dynamic loads throughout their service life. Detailed load analysis for welded steel and modular support systems is an essential part of structural design.",
       "about": "Dynamic and static load analysis evaluates the load resistance of support frameworks — welded steel and modular components — over a facility's full operational life.",
       "applications": "Projects where seismic forces must be accounted for (relevant across Azerbaijan), and pipe runs subject to thermal-expansion stress.",
-      "technicalApproach": "Analysis is carried out in line with regulatory requirements, which mandate this assessment, particularly in seismic zones."
+      "technicalApproach": "Analysis is carried out in line with regulatory requirements, which mandate this assessment, particularly in seismic zones.",
+      "benefits": [
+        { "title": "Static loads", "description": "Static loads acting on support structures are accounted for in engineering calculations." },
+        { "title": "Dynamic loads", "description": "The effect of dynamic loads, such as seismic forces, on support structures is analyzed." },
+        { "title": "Additional effects", "description": "Effects such as thermal expansion of pipelines can also generate additional dynamic loads." }
+      ],
+      "process": [
+        { "title": "Existing structure", "description": "The load-bearing structure and the loads acting on it are identified." },
+        { "title": "Load analysis", "description": "The structure's behavior under load is analyzed using an engineering model." },
+        { "title": "Connection verification", "description": "The connection and support points of the load-bearing elements are assessed." },
+        { "title": "Design finalization", "description": "The structural solution is finalized based on the analysis results." }
+      ]
     },
     "supportDesign": {
       "lead": "Load calculations and design for MEP support structures.",
+      "shortIntro": "Increasingly complex MEP systems require more precisely engineered support and hanger structures. AR Group's engineering department provides design services from load calculations to shop drawings and 3D models.",
       "about": "Support Design covers load calculations for MEP (mechanical/electrical/plumbing) support structures, with design aligned to architectural specifications.",
       "applications": "Projects requiring the design of support structures for MEP systems and the preparation of shop drawings.",
-      "technicalApproach": "Design work is carried out using AutoCAD, Revit (Autodesk), and SolidWorks, with load calculations aligned to architectural specifications."
+      "technicalApproach": "Design work is carried out using AutoCAD, Revit (Autodesk), and SolidWorks, with load calculations aligned to architectural specifications.",
+      "benefits": [
+        { "title": "MEP support design", "description": "Support and hanger structures are designed for pipes, ducts, and other MEP installations." },
+        { "title": "Load calculations", "description": "Detailed load calculations and engineering work required for support structures are prepared." },
+        { "title": "2D & 3D design", "description": "Drawings can be prepared in AutoCAD and Revit, and 3D models in SolidWorks." }
+      ],
+      "process": [
+        { "title": "Design", "description": "The support and hanger structures required for MEP systems are designed." },
+        { "title": "Support system assembly", "description": "A suitable support structure is formed for pipes, ducts, and other MEP lines." },
+        { "title": "3D modeling", "description": "The support system is modeled in a three-dimensional environment together with the MEP lines." },
+        { "title": "Technical details", "description": "Details of the profiles, brackets, hangers, and connection elements are prepared." }
+      ]
     },
     "vibrationSolutions": {
       "lead": "Measuring and reducing vibration generated by mechanical equipment.",
+      "shortIntro": "Vibration isolation is applied to reduce the transmission of vibration generated by mechanical equipment and machinery to the structure and surrounding environment. Our engineering department measures vibration levels, analyzes them, and prepares suitable solutions.",
       "about": "Vibration analysis and solutions measure and mitigate vibration generated by mechanical equipment such as chillers, generators, and engine groups.",
       "applications": "Facilities with vibration-prone platforms and mechanical equipment installations.",
-      "technicalApproach": "Our engineers measure vibration-prone platforms, simulate conditions using analysis software, and aim for complete or partial elimination of vibration — protecting comfort and extending equipment life through reduced maintenance."
+      "technicalApproach": "Our engineers measure vibration-prone platforms, simulate conditions using analysis software, and aim for complete or partial elimination of vibration — protecting comfort and extending equipment life through reduced maintenance.",
+      "benefits": [
+        { "title": "Measurement", "description": "Vibration levels are determined by taking the necessary measurements at platforms where vibration is present." },
+        { "title": "Analysis and simulation", "description": "Measured vibration readings are analyzed and simulated in analysis software." },
+        { "title": "Isolation solution", "description": "A suitable solution aimed at reducing vibration is prepared for generators, engines, chillers, and other vibration-generating equipment." }
+      ],
+      "process": [
+        { "title": "Vibration measurement", "description": "Vibration levels are determined by measuring at the relevant points." },
+        { "title": "Analysis and simulation", "description": "The measurement results are analyzed and simulated in analysis software." },
+        { "title": "Isolation solution", "description": "A suitable solution is prepared to fully or partially reduce the vibration." }
+      ]
     },
-    "waterproofInjection": {
-      "lead": "Injection that seals wall-floor joints in concrete structures against moisture.",
-      "about": "Waterproof injection prevents moisture ingress at wall-floor joints in concrete structures.",
-      "applications": "Projects requiring waterproofing of joint lines in concrete structures.",
-      "technicalApproach": "Injection is applied at wall-floor junction points to achieve watertightness in these areas."
+    "seismic": {
+      "lead": "Engineering support focused on improving a building's resistance to seismic effects.",
+      "about": "Seismic engineering covers assessing and strengthening a structure's behavior under the forces generated during an earthquake.",
+      "technicalApproach": "The approach is based on assessing the structure's existing condition and accounting for seismic forces in the design process."
     }
   },
   "detailLabels": {
@@ -130,12 +234,24 @@
   },
   "categoryShell": {
     "ctaText": "Contact us for more information.",
-    "ctaButton": "Contact Us",
-    "relatedLabel": "Related services"
+    "ctaButton": "Contact Us"
   },
   "cta": {
     "title": "Get expert support for your project",
     "subtitle": "Our team will get in touch to help define the right solution for your needs.",
     "button": "Contact Us"
+  },
+  "process": {
+    "genericStages": [
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    ]
+  },
+  "explorer": {
+    "viewFullPage": "View full page",
+    "close": "Close",
+    "selectHint": "Select to view details"
   }
 }

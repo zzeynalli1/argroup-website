@@ -41,14 +41,7 @@
     "sinceCaption": "2018-ci ildən Azərbaycanda Fire Stop passiv yanğın qorunması sistemlərinin quraşdırılmasında fəaliyyət göstəririk."
   },
   "leadership": {
-    "heading": "Komandamız",
-    "items": {
-      "ceo": { "title": "Baş İcraçı Direktor" },
-      "purchasingSales": { "title": "Satınalma və Satış Departamentinin Rəhbəri" },
-      "engineer": { "title": "Baş Mühəndis" },
-      "siteTeam": { "title": "Texniki / Sahə Komandası" },
-      "installation": { "title": "Quraşdırma və Əməliyyatlar" }
-    }
+    "heading": "Komandamız"
   },
   "capabilities": {
     "eyebrow": "İXTİSASLARIMIZ",
@@ -116,5 +109,15 @@
     "title": "Layihəniz üçün mühəndislik dəstəyi əldə edin.",
     "subtitle": "Komandamız ehtiyaclarınıza uyğun həlli birlikdə müəyyən etmək üçün sizinlə əlaqə saxlayacaq.",
     "button": "Bizimlə Əlaqə"
+  },
+  "awards": {
+    "eyebrow": "MÜKAFATLAR",
+    "title": "Mükafatlarımız",
+    "empty": "Mükafat məlumatları hazırda təsdiqlənmə mərhələsindədir və tezliklə əlavə olunacaq."
+  },
+  "catalog": {
+    "title": "Kataloqumuz",
+    "subtitle": "Şirkətimizin xidmət və məhsul kataloqu ilə tanış olun.",
+    "downloadCta": "Kataloqu endir"
   }
 }

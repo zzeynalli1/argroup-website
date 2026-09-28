@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
 import { COLORS, hardwareMaterial, firestopStaticMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
-import { Pipe, TrayRail, FirestopCollar, FirestopBoard, InstancedBoxes, InstancedCylinders, CableTraySupport } from '../buildingParts'
+import {
+  TrayRail,
+  FirestopCollar,
+  FirestopBoard,
+  InstancedBoxes,
+  InstancedCylinders,
+  CableTraySupport,
+  CableBundle,
+  Clamp,
+} from '../buildingParts'
 
 const GROUP_ID = 'cableProtection'
 
@@ -44,24 +53,38 @@ export default function CableProtection({ activeGroup = null, hoveredGroup = nul
 
   return (
     <group visible={visible}>
+      {/* Three tiers of individual cables (not one fat cylinder) — each tier
+          a small bundle with believable thickness/spacing/jitter. */}
       {[0, 1, 2].map((i) => (
-        <Pipe
+        <CableBundle
           key={i}
           position={[-2, 0.95 + i * 0.1, -1.3]}
-          rotation={[0, 0, Math.PI / 2]}
-          radius={0.04}
+          axis="x"
+          count={4}
+          spacing={0.045}
+          radius={0.013}
           length={1.6}
           material={trayMat}
+          seed={i + 1}
         />
       ))}
+      {/* Fire-resistant wrap around the run's wall-side section — a real
+          protective coating on the cables themselves, distinct from the
+          firestop board sealing the wall penetration below. */}
+      <mesh position={[-2.55, 1.02, -1.3]} rotation={[0, 0, Math.PI / 2]} material={collarMat} dispose={null} castShadow>
+        <cylinderGeometry args={[0.11, 0.11, 0.3, 16, 1, true]} />
+      </mesh>
       <TrayRail position={[-2, 0.82, -1.42]} length={1.8} material={trayRailMat} />
       <TrayRail position={[-2, 0.82, -1.18]} length={1.8} material={trayRailMat} />
       <InstancedBoxes positions={rungPositions} size={[0.02, 0.02, 0.3]} material={trayRailMat} />
       <TrayRail position={[-1.15, 1.6, -1.42]} rotation={[0, 0, Math.PI / 2]} length={0.8} material={trayRailMat} />
       <TrayRail position={[-1.15, 1.6, -1.18]} rotation={[0, 0, Math.PI / 2]} length={0.8} material={trayRailMat} />
-      {/* Trapeze hanger (Phase 3): the horizontal run's real fixed point to
-          the slab above, clear of the rung positions. */}
+      {/* Trapeze hanger: the horizontal run's real fixed point to the slab
+          above, clear of the rung positions. */}
       <CableTraySupport position={[-1.9, 1.12, -1.3]} dropHeight={0.3} span={0.26} material={hardwareMaterial} />
+      {/* Clamp where the vertical riser meets the horizontal run — a real
+          fixed connection, not two tray sections just touching. */}
+      <Clamp position={[-1.15, 1.6, -1.3]} pipeRadius={0.05} material={trayRailMat} />
       <FirestopCollar
         position={[-2, 0.95, -1.92]}
         rotation={[0, 0, Math.PI / 2]}

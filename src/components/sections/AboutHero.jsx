@@ -11,7 +11,7 @@ import { useTranslation } from '../../lib/i18n/useTranslation'
  * exactly (see about.json per locale).
  *
  * Desktop: the hero image (AR Group's concrete-wall logo render,
- * public/images/hero/ar-group-concrete-wall-2.png) is full-bleed behind the
+ * public/images/hero/ar-group-concrete-wall-2.webp) is full-bleed behind the
  * ENTIRE section, not just the right column — a multi-stop white gradient
  * layered on top is what actually reveals it, going from ~97% opaque over
  * the text column down to fully transparent by the right side. That's the
@@ -26,7 +26,7 @@ export default function AboutHero() {
     <section className="relative overflow-hidden bg-base-50">
       <div className="absolute inset-0 hidden lg:block">
         <img
-          src="/images/hero/ar-group-concrete-wall-2.png"
+          src="/images/hero/ar-group-concrete-wall-2.webp"
           alt=""
           className="h-full w-full object-cover"
           style={{ objectPosition: '65% 45%' }}
@@ -82,7 +82,7 @@ export default function AboutHero() {
 
       <div className="relative h-48 w-full sm:h-56 lg:hidden">
         <img
-          src="/images/hero/ar-group-concrete-wall-2.png"
+          src="/images/hero/ar-group-concrete-wall-2.webp"
           alt=""
           className="h-full w-full object-cover"
           style={{

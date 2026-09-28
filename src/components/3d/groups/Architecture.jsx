@@ -1,7 +1,15 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
-import { COLORS, glazingMaterial, framingMaterial, hardwareMaterial, galvanizedMaterial } from '../buildingMaterials'
-import { InstancedBoxes } from '../buildingParts'
+import {
+  COLORS,
+  curtainWallGlassMaterial,
+  framingMaterial,
+  hardwareMaterial,
+  galvanizedMaterial,
+  stairTreadMaterial,
+  panelCharcoalMaterial,
+} from '../buildingMaterials'
+import { InstancedBoxes, InstancedCylinders } from '../buildingParts'
 
 const HALF_W = 3
 
@@ -15,7 +23,29 @@ const HALF_W = 3
 const BAY_Z_START = 0.82
 const BAY_Z_END = 1.98
 const BAY_Y_START = 0.08
-const BAY_Y_END = 3.52
+// Massing pass: raised from 3.52 to 4.0 so this bay reads as a glazed
+// stairwell tower rising above the main roofline (parapet top 3.96 — see
+// RooftopShell.jsx's `Parapet`), matching the reference's corner stair
+// tower. Everything below (grid rows, transoms, anchor clips at y=1.2/2.4)
+// is computed off this constant or off the untouched 1.2/2.4 floor lines,
+// so raising it only stretches the top glazing row (2.4..4.0) taller — no
+// existing anchor moves. Old value (3.52) is kept here in this comment
+// since nothing else in the file reads it anymore.
+const BAY_Y_END = 4.0
+// Reference-fidelity pass: was a flat cap + low upstand lip; the reference
+// shows a small, slightly PITCHED dark enclosure capping this tower (a
+// shallow gable, not a flat roof) — rebuilt as two tilted slabs meeting at
+// a ridge instead. Base is unchanged (BAY_Y_END=4.0); apex/ridge geometry is
+// tuned so the mesh's real highest point stays at/under 4.15 — the old
+// flat-cap's max, already used to re-derive both camera presets in
+// hotspots3d.js — so no camera/hotspot re-derivation is needed here either.
+// Centerline rise base->apex. Kept intentionally short of the old flat cap's
+// 4.15 max: the slab's own half-thickness projects a little further
+// vertically at the ridge (see the inline math below), and the ridge
+// flashing bar sits on top of that — both accounted for so the mesh's real
+// highest point still lands at/under 4.15, not just this centerline number.
+const TOWER_RIDGE_RISE = 0.11
+const TOWER_SLAB_THK = 0.045
 
 // Perimeter posts (bay edges) + 2 interior mullions splitting the bay into
 // 3 vertical lites. The second interior mullion (z=1.66) lands right next
@@ -59,21 +89,36 @@ const RIGHT_COLUMN_Z1 = BAY_Z_END
 export default function Architecture({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const isFacadeEmphasized = FACADE_HOTSPOT_GROUPS.has(activeGroup) || FACADE_HOTSPOT_GROUPS.has(hoveredGroup)
 
+  // Base tint/opacity now comes from `curtainWallGlassMaterial` (see that
+  // material's own comment: this bay used to share the shared, brighter
+  // `glazingMaterial`, which is what made it read as a blown-out white wall
+  // and overpower the front facade) — only the emissive highlight on
+  // select/hover still comes from this per-mesh material, same as before.
   const highlightGlassMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: glazingMaterial.color,
+        color: curtainWallGlassMaterial.color,
         transparent: true,
-        opacity: isFacadeEmphasized ? 0.16 : glazingMaterial.opacity,
-        roughness: glazingMaterial.roughness,
-        metalness: glazingMaterial.metalness,
-        emissive: isFacadeEmphasized ? COLORS.ember600 : '#000000',
-        emissiveIntensity: isFacadeEmphasized ? 0.3 : 0,
-        envMapIntensity: glazingMaterial.envMapIntensity,
+        opacity: isFacadeEmphasized ? 0.16 : curtainWallGlassMaterial.opacity,
+        roughness: curtainWallGlassMaterial.roughness,
+        metalness: curtainWallGlassMaterial.metalness,
+        emissive: isFacadeEmphasized ? COLORS.ember600 : curtainWallGlassMaterial.emissive,
+        emissiveIntensity: isFacadeEmphasized ? 0.3 : curtainWallGlassMaterial.emissiveIntensity,
+        envMapIntensity: curtainWallGlassMaterial.envMapIntensity,
         side: THREE.DoubleSide,
       }),
     [isFacadeEmphasized]
   )
+  // These two materials are handed to meshes via a plain `material={...}`
+  // prop (not a JSX `<meshStandardMaterial>` child), so R3F never takes
+  // ownership of them for auto-dispose — only each mesh's own fiber unmount
+  // would trigger that, which doesn't happen here (these meshes are
+  // static/always mounted). Without this, every time `isFacadeEmphasized`
+  // flips (each drillingCutting/engineeringTesting hover or select) recreated
+  // a brand new material above and left the previous one's compiled GPU
+  // program/uniforms resident with nothing left referencing it — same leak
+  // `useSystemMaterial.js` already guards against for every other group.
+  useEffect(() => () => highlightGlassMat.dispose(), [highlightGlassMat])
 
   const highlightFrameMat = useMemo(
     () =>
@@ -86,6 +131,7 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
       }),
     [isFacadeEmphasized]
   )
+  useEffect(() => () => highlightFrameMat.dispose(), [highlightFrameMat])
 
   const grid = useMemo(() => {
     const panels = []
@@ -132,7 +178,7 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
         <mesh
           key={p.key}
           position={[HALF_W, p.y, p.z]}
-          material={p.isRightColumn ? highlightGlassMat : glazingMaterial}
+          material={p.isRightColumn ? highlightGlassMat : curtainWallGlassMaterial}
           dispose={null}
           receiveShadow
         >
@@ -191,6 +237,153 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
           wall needs at every level it passes, not just a post standing on
           its own. */}
       <InstancedBoxes positions={anchorClipPositions} size={[0.05, 0.035, 0.03]} material={hardwareMaterial} />
+
+      {/* Small, slightly pitched dark cap over the tower's own footprint,
+          raising this corner above the main roofline (parapet top 3.96 —
+          RooftopShell.jsx) so it reads as a stairwell tower with its own
+          roof, matching the reference's dark gabled enclosure beside the
+          stair tower. Two tilted slabs meeting at a shared ridge point.
+          Screenshot-verified bug fix: the previous version derived each
+          slab's position from an ad-hoc offset (`halfSpan/2 +/- 0.025`)
+          plus a flat, un-rotated `+TOWER_SLAB_THK/2` nudge to the Y center —
+          that flat nudge doesn't correctly follow the slab's own rotated
+          local axes, which both lifted the whole roof off its base (the
+          visible "gap" against the wall below) and, combined with an
+          independently-eyeballed rotation angle, made the two sides read as
+          asymmetric/warped instead of a clean mirrored gable. Rebuilt below
+          from each slab's own two real endpoints (its base corner and the
+          shared ridge point) using `atan2`/distance — this is
+          geometrically guaranteed to make both slabs meet exactly at the
+          same ridge point with mirrored angles, no eyeballed offsets. */}
+      {(() => {
+        const towerCenterX = HALF_W - 0.5
+        const halfSpan = 0.5 // tower footprint half-width (1.0 total, same as before)
+        const slabZ = bayWidth + 0.3
+        const ridgeOverlap = 0.04 // small extra length past the ridge point so the two slabs visibly overlap/close the seam, covered by the ridge cap below
+        const ridgeX = towerCenterX
+        const ridgeY = BAY_Y_END + TOWER_RIDGE_RISE
+
+        // Returns { center:[x,y], length, angle } for a slab running from
+        // (x0,y0) to (x1,y1) in the local X-Y (cross-section) plane,
+        // extended by `overlap` past (x1,y1) — verified by construction:
+        // the slab's own end (local x = +length/2, before the overlap
+        // extension) lands exactly on (x1,y1), and (local x = -length/2)
+        // lands exactly on (x0,y0), for ANY angle, since `angle` is derived
+        // directly from the two points via atan2 rather than assumed.
+        function slopeSlab(x0, y0, x1, y1, overlap) {
+          const dx = x1 - x0
+          const dy = y1 - y0
+          const baseLen = Math.sqrt(dx * dx + dy * dy)
+          const ux = dx / baseLen
+          const uy = dy / baseLen
+          const length = baseLen + overlap
+          return {
+            center: [x0 + ux * (length / 2), y0 + uy * (length / 2)],
+            length,
+            angle: Math.atan2(dy, dx),
+          }
+        }
+
+        const left = slopeSlab(towerCenterX - halfSpan, BAY_Y_END, ridgeX, ridgeY, ridgeOverlap)
+        const right = slopeSlab(towerCenterX + halfSpan, BAY_Y_END, ridgeX, ridgeY, ridgeOverlap)
+
+        return (
+          <>
+            <mesh
+              position={[left.center[0], left.center[1], bayCenterZ]}
+              rotation={[0, 0, left.angle]}
+              material={panelCharcoalMaterial}
+              dispose={null}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[left.length, TOWER_SLAB_THK, slabZ]} />
+            </mesh>
+            <mesh
+              position={[right.center[0], right.center[1], bayCenterZ]}
+              rotation={[0, 0, right.angle]}
+              material={panelCharcoalMaterial}
+              dispose={null}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[right.length, TOWER_SLAB_THK, slabZ]} />
+            </mesh>
+            {/* Ridge flashing bar along the apex, centered on the shared
+                ridge point both slabs actually meet at. */}
+            <mesh position={[ridgeX, ridgeY, bayCenterZ]} material={galvanizedMaterial} dispose={null} castShadow>
+              <boxGeometry args={[0.08, 0.022, slabZ]} />
+            </mesh>
+          </>
+        )
+      })()}
+
+      {/* Interior stair, visible through the glazing bay — individual
+          stepped treads (not the old two continuous flat ramps, which read
+          from outside as one big opaque diagonal mass that made the whole
+          bay look like solid wall rather than glass with stairs behind it).
+          Three short flights (one per floor gap) with a landing slab at the
+          top of each, plus a simple sloped guardrail — enough real "stair"
+          silhouette to read correctly at this camera distance per the
+          brief's "doesn't need to be ornate" guidance, without pretending
+          to be a fully-detailed switchback (this bay is too shallow in X
+          for a real return flight). */}
+      {(() => {
+        const stairX = HALF_W - 0.28
+        const z0 = 1.0
+        const z1 = 1.85
+        const stepCount = 6
+        const stepDepth = (z1 - z0) / stepCount + 0.02
+        const flights = [
+          { y0: 0.25, y1: 1.1 },
+          { y0: 1.35, y1: 2.2 },
+          { y0: 2.45, y1: 3.3 },
+        ]
+        const treadPositions = flights.flatMap(({ y0, y1 }) =>
+          Array.from({ length: stepCount }, (_, i) => {
+            const t = (i + 0.5) / stepCount
+            return [stairX, y0 + (y1 - y0) * t, z0 + (z1 - z0) * t]
+          })
+        )
+        const railPostPositions = flights.flatMap(({ y0, y1 }) =>
+          [0.15, 0.5, 0.85].map((t) => [stairX, y0 + (y1 - y0) * t + 0.42, z0 + (z1 - z0) * t])
+        )
+        return (
+          <>
+            <InstancedBoxes positions={treadPositions} size={[0.34, 0.04, stepDepth]} material={stairTreadMaterial} />
+            {flights.map(({ y1 }, i) => (
+              <mesh key={i} position={[stairX, y1 + 0.02, z1 + 0.02]} material={hardwareMaterial} dispose={null} castShadow receiveShadow>
+                <boxGeometry args={[0.4, 0.035, 0.34]} />
+              </mesh>
+            ))}
+            {/* Simple sloped guardrail: posts following each flight's rise,
+                capped with a top rail per flight. */}
+            <InstancedCylinders positions={railPostPositions} radius={0.012} length={0.8} material={hardwareMaterial} />
+            {flights.map(({ y0, y1 }, i) => {
+              const dz = z1 - z0
+              const dy = y1 - y0
+              // Rotation around X maps local +Y (the rail box's own length
+              // axis, args[1]) to world (0, cos(angle), sin(angle)) — so
+              // angle must be atan2(dz, dy), not atan2(dy, dz), to align
+              // that axis with the actual (dy, dz) rise/run direction.
+              const railAngle = Math.atan2(dz, dy)
+              const railLength = Math.sqrt(dy * dy + dz * dz)
+              return (
+                <mesh
+                  key={i}
+                  position={[stairX, (y0 + y1) / 2 + 0.42, (z0 + z1) / 2]}
+                  rotation={[railAngle, 0, 0]}
+                  material={hardwareMaterial}
+                  dispose={null}
+                  castShadow
+                >
+                  <boxGeometry args={[0.02, railLength, 0.02]} />
+                </mesh>
+              )
+            })}
+          </>
+        )
+      })()}
     </group>
   )
 }

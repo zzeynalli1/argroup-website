@@ -41,14 +41,7 @@
     "sinceCaption": "2018'den bu yana Azerbaycan genelinde Fire Stop pasif yangın koruma sistemleri kuruyoruz."
   },
   "leadership": {
-    "heading": "Ekibimiz",
-    "items": {
-      "ceo": { "title": "İcra Direktörü" },
-      "purchasingSales": { "title": "Satınalma ve Satış Departmanı Müdürü" },
-      "engineer": { "title": "Baş Mühendis" },
-      "siteTeam": { "title": "Teknik / Saha Ekibi" },
-      "installation": { "title": "Montaj ve Operasyonlar" }
-    }
+    "heading": "Ekibimiz"
   },
   "capabilities": {
     "eyebrow": "YETKİNLİKLERİMİZ",
@@ -116,5 +109,15 @@
     "title": "Projeniz için mühendislik desteği alın.",
     "subtitle": "Ekibimiz ihtiyaçlarınıza uygun çözümü birlikte belirlemek için sizinle iletişime geçecek.",
     "button": "Bizimle İletişime Geçin"
+  },
+  "awards": {
+    "eyebrow": "ÖDÜLLER",
+    "title": "Ödüllerimiz",
+    "empty": "Ödül bilgileri şu anda onaylanma aşamasındadır ve yakında eklenecektir."
+  },
+  "catalog": {
+    "title": "Kataloğumuz",
+    "subtitle": "Şirketimizin hizmet ve ürün kataloğunu inceleyin.",
+    "downloadCta": "Kataloğu İndir"
   }
 }

@@ -35,7 +35,8 @@
       "emailTooLong": "Email cannot exceed {max} characters.",
       "emailInvalid": "Email format is invalid.",
       "messageRequired": "Message is required.",
-      "messageTooLong": "Message cannot exceed {max} characters."
+      "messageTooLong": "Message cannot exceed {max} characters.",
+      "submitFailed": "Your message could not be sent. Please try again shortly."
     }
   },
   "map": {

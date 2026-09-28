@@ -158,6 +158,141 @@ export const concreteMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: CONCRETE_ENV_INTENSITY,
 })
 
+// --- Massing/materials pass: reference-inspired exterior palette ---
+// Distinct from `concreteMaterial` above (kept as-is for structural
+// elements — columns/beams/slabs, which stay a neutral structural tone and
+// are mostly concealed by the envelope anyway) because the exterior
+// envelope itself needed to shift toward the reference's warmer light-grey
+// plaster/concrete finish without re-tinting every structural mesh that
+// happens to share the old material. Reuses the same CC0 concrete texture
+// set (no new texture load) — only `color` (a multiply tint) differs.
+export const facadeMaterial = new THREE.MeshStandardMaterial({
+  color: '#D8D2C7',
+  map: concreteColorMap,
+  normalMap: concreteNormalMap,
+  roughnessMap: concreteRoughnessMap,
+  roughness: 0.92,
+  metalness: 0.03,
+  envMapIntensity: CONCRETE_ENV_INTENSITY,
+})
+
+// Graphite/charcoal metal accent panel (reference's dark facade band) — a
+// visible but not-pure-black metal, distinct from `framingMaterial`
+// (window/curtain-wall frames) so the two dark tones read as different
+// products at different scales, same as real cladding systems do. Reuses
+// the painted-steel texture set already loaded for `steelMaterial`.
+// Screenshot-verified fix: the tower roof (Architecture.jsx) built from this
+// material caught a bright specular blowout at its tilted, grazing-light
+// angle and read as light grey rather than dark graphite — same root cause
+// as the entrance-glass bug above (roughness too low for a flat panel
+// facing a strong directional light). Roughness raised, envMapIntensity
+// trimmed further so the dark base color/texture actually dominates.
+// Screenshot-verified SECOND fix: on the front wall's accent-pier/
+// passiveFireProtection bay (ExteriorShell.jsx) — a mostly self-shadowed
+// corner that gets little direct key-light contribution — this material's
+// combination of a very dark base color + the scene's N8AO/contrast/AGX
+// post-processing pipeline crushed it to a literal (0,0,0) pure-black void
+// with zero readable texture, pixel-sampled and confirmed (not a geometry
+// gap: a debug unlit-material pass over every rect tiling this bay showed
+// full, seamless coverage with no gap). Same fix pattern already proven on
+// `popCapMaterial` below: a small constant NEUTRAL (not colored) emissive
+// floor, so the surface can never crush all the way to zero regardless of
+// shadow/AO/tone-mapping, plus a lightened base color — both purely additive
+// to the diffuse/specular response, so the tower roof's already-fixed
+// grazing-angle specular behavior (roughness/metalness/envMapIntensity,
+// untouched here) isn't affected.
+// Camera/massing pass, screenshot-verified fix: the high (1.4) emissive
+// floor that fixed the earlier "crushes to pure black" bug had a side
+// effect the brief flagged directly — such a strong constant self-emissive
+// flattens real shading/contact-shadow contrast, so the panel read as a
+// uniform flat grey-taupe rather than a rich dark graphite. Darkened the
+// base color further and roughly halved the emissive floor (1.4 -> 0.75) —
+// still enough to keep the panel from crushing to zero in this scene's
+// deepest shadow corners (the original bug), but low enough that real
+// shading variation shows through instead of one flat tone.
+export const panelCharcoalMaterial = new THREE.MeshStandardMaterial({
+  color: '#332F2A',
+  map: steelColorMap,
+  normalMap: steelNormalMap,
+  roughnessMap: steelRoughnessMap,
+  metalnessMap: steelMetalnessMap,
+  roughness: 0.8,
+  metalness: 0.3,
+  envMapIntensity: METAL_ENV_INTENSITY * 0.3,
+  emissive: '#332F2A',
+  emissiveIntensity: 0.75,
+})
+
+// Warm timber-slat accent (vertical entrance screen) — flat PBR color, no
+// texture: a single restrained wood tone reused across every instanced slat
+// is cheap and reads fine at this model's scale/distance; a real wood-grain
+// texture would need its own CC0 set for one small accent, out of
+// proportion to what it adds here.
+export const timberMaterial = new THREE.MeshStandardMaterial({
+  color: '#8B6A4A',
+  roughness: 0.72,
+  metalness: 0.04,
+})
+
+// Light concrete paving for the entrance plaza/walkway — distinct from
+// `groundMaterial` (the yard slab beyond the paving) so the paved area
+// reads as a distinct finish, not a seamless extension of bare ground.
+// Reuses the same concrete texture set, lighter/warmer tint + less rough
+// (a trafficked paving finish is smoother than raw poured concrete).
+const plazaColorMap = cloneMapWithRepeat(concreteColorMap, [10, 10])
+const plazaNormalMap = cloneMapWithRepeat(concreteNormalMap, [10, 10])
+const plazaRoughnessMap = cloneMapWithRepeat(concreteRoughnessMap, [10, 10])
+export const plazaMaterial = new THREE.MeshStandardMaterial({
+  color: '#C7C2B8',
+  map: plazaColorMap,
+  normalMap: plazaNormalMap,
+  roughnessMap: plazaRoughnessMap,
+  roughness: 0.85,
+  metalness: 0.02,
+  envMapIntensity: CONCRETE_ENV_INTENSITY,
+})
+
+// Flat, untextured landscape greens — cheap on purpose (a handful of
+// low-poly shrubs/lawn strips, not a vegetation system). Darkened/
+// desaturated in the reference-fidelity pass (screenshot-verified: the
+// previous, more saturated tones read as bright cartoonish "lollipop" green
+// under this scene's key light, wrong for a restrained dusk backdrop).
+export const lawnMaterial = new THREE.MeshStandardMaterial({ color: '#3D4832', roughness: 0.95, metalness: 0 })
+export const foliageMaterial = new THREE.MeshStandardMaterial({ color: '#333D2A', roughness: 0.95, metalness: 0 })
+export const planterMaterial = new THREE.MeshStandardMaterial({
+  color: '#B9B4AA',
+  map: concreteColorMap,
+  normalMap: concreteNormalMap,
+  roughnessMap: concreteRoughnessMap,
+  roughness: 0.9,
+  metalness: 0.03,
+  envMapIntensity: CONCRETE_ENV_INTENSITY,
+})
+
+// Warm exterior-light glow (bollards, canopy underlight) — a small constant
+// emissive, deliberately not the brand ember-red so "red" in the scene stays
+// reserved for firestop/hotspot meaning per the existing palette convention.
+export const warmGlowMaterial = new THREE.MeshStandardMaterial({
+  color: '#3A2E20',
+  emissive: '#FFCB8A',
+  emissiveIntensity: 1.1,
+  roughness: 0.5,
+  metalness: 0,
+})
+
+// Bollard lamp head (SiteEnvironment.jsx) — much higher emissive intensity
+// than `warmGlowMaterial` below (which is tuned for small background
+// canopy/downlight fixture glints, not a light source meant to read as
+// clearly "on" at this camera distance); screenshot-verified fix for
+// bollards that previously read as bare grey caps with no visible glow.
+export const bollardLampMaterial = new THREE.MeshStandardMaterial({
+  color: '#FFDA9E',
+  emissive: '#FFB65E',
+  emissiveIntensity: 2.6,
+  roughness: 0.4,
+  metalness: 0,
+})
+
 export const concreteDarkMaterial = new THREE.MeshStandardMaterial({
   color: '#9A9C9F',
   map: concreteColorMap,
@@ -212,15 +347,31 @@ export const galvanizedMaterial = new THREE.MeshStandardMaterial({
 // the same lighting. Shares the same painted-steel texture set as
 // `steelMaterial` (both are "painted metal" finishes), differentiated by
 // tint/roughness only.
+// Darkened toward near-black (reference's black metal window frames) —
+// still not pure #000, keeping a faint readable tint under the key light
+// instead of crushing to a silhouette.
+// Camera/massing pass, screenshot-verified fix — actual root cause found by
+// isolating it (a flat-color test material on the same meshes rendered
+// correctly; only reintroducing the shared steel texture set reintroduced
+// the bug): every thin frame member (window mullions, door frame, entrance
+// canopy, curtain-wall mullions/transoms) is exactly the case this file's
+// own file-level comment already flags as a known limitation — box UVs are
+// 0..1 per FACE regardless of that face's real size, so a thin trim member
+// stretches the ENTIRE `steel-painted` color/roughness/metalness texture
+// across a sliver of screen space. Wherever that texture has a bright
+// highlight/scratch (inevitable in any photographed metal texture), a thin
+// member shows it as a solid bright/mirror-sharp streak covering most or
+// all of its face, not a small proportionate fleck the way it reads on a
+// large panel. Rather than keep fighting that with roughness/metalness
+// tuning (which only dims the SAME broken sampling, not fix it), frame trim
+// drops the texture maps entirely and goes back to a flat matte color —
+// standard for painted aluminum trim at this scale anyway, and immune to
+// this whole class of artifact by construction.
 export const framingMaterial = new THREE.MeshStandardMaterial({
-  color: '#5B5F65',
-  map: steelColorMap,
-  normalMap: steelNormalMap,
-  roughnessMap: steelRoughnessMap,
-  metalnessMap: steelMetalnessMap,
-  roughness: 0.4,
-  metalness: 0.7,
-  envMapIntensity: METAL_ENV_INTENSITY,
+  color: '#1E1F22',
+  roughness: 0.62,
+  metalness: 0.25,
+  envMapIntensity: 0.25,
 })
 
 export const hardwareMaterial = new THREE.MeshStandardMaterial({
@@ -234,41 +385,317 @@ export const hardwareMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: METAL_ENV_INTENSITY,
 })
 
-// Subtle blue-green tint (real low-iron/coated glass is never perfectly
-// clear-white) plus a touch more metalness for crisper `Environment`
-// reflections on the curtain wall. No texture map — see the file-level note
-// on why glass is out of scope for Increment A's texture pass. Highest
-// `envMapIntensity` of any material in the scene — a curtain wall's entire
-// visual identity is its reflection, so this needs to read clearly while
-// `opacity`/`transparent` still keep it genuinely see-through.
+// Neutral warm-grey tint (reference-fidelity pass: the previous '#E1EBEC'
+// carried a faint blue-cyan cast that reads as a real material property up
+// close but conflicts with the brief's explicit "NO BLUE anywhere" rule —
+// swapped for a warm-neutral tint instead, still light enough to read as
+// glass, not tinted plastic) plus a touch more metalness for crisper
+// `Environment` reflections on the curtain wall. No texture map — see the
+// file-level note on why glass is out of scope for Increment A's texture
+// pass. Highest `envMapIntensity` of any material in the scene — a curtain
+// wall's entire visual identity is its reflection, so this needs to read
+// clearly while `opacity`/`transparent` still keep it genuinely see-through.
+// A slightly stronger warm emissive floor (`emissive`/`emissiveIntensity`
+// below, bumped for the reference pass) reads as a plausible lit-interior
+// glimpse behind the glass at dusk (brief: "warm interior illumination")
+// without needing any actual interior geometry/lighting — cheap and
+// scene-wide since every glazing surface (curtain wall + entrance door +
+// the new facade windows) shares this one material.
+// Screenshot-verified bug fix: opacity 0.26 read as a near-solid grey
+// surface from outside (the stairwell glazing looked like solid wall, not
+// glass with visible stairs behind it) — lowered so the scene's own
+// geometry behind the glass (the stair, the office interiors) actually
+// shows through, while the emissive floor still keeps it reading as glass
+// rather than an empty hole.
 export const glazingMaterial = new THREE.MeshStandardMaterial({
-  color: '#E1EBEC',
+  color: '#EAE6DC',
   transparent: true,
-  opacity: 0.24,
+  opacity: 0.16,
   roughness: 0.08,
   metalness: 0.18,
   envMapIntensity: 1.1,
+  emissive: '#4A3620',
+  emissiveIntensity: 0.16,
   side: THREE.DoubleSide,
 })
 
-// Slightly darker than the building's own concrete so the two read as
-// distinct surfaces instead of blending together under the same bright key
-// light — the yard slab, not an extension of the walls. Reuses the same
-// concrete texture set as the building's own concrete, cloned with a much
-// larger `repeat` since this plane (24x24) is many times the size of the
-// building's own concrete surfaces.
-const groundColorMap = cloneMapWithRepeat(concreteColorMap, [18, 18])
+// --- Reference-inspired camera/massing pass: curtain-wall stairwell glazing
+// + stair-tread materials ---
+// Distinct from the shared `glazingMaterial` (facade windows/entrance door)
+// on purpose: screenshot verification of this pass showed the stairwell bay
+// reading as a blown-out bright-white wall, overpowering the front facade
+// the brief wants as the dominant surface. Two contributing causes, both
+// fixed here rather than by resizing the (engineering-tied, unchangeable)
+// glazing bay itself:
+//   1. This large glazed surface was sharing `glazingMaterial`'s opacity/
+//      envMapIntensity, tuned for small windows/doors, not a full-height
+//      curtain wall — at that scale the same settings read far brighter.
+//   2. The stair treads visible through the glass (`steelMaterial`,
+//      metalness 0.85) caught a strong specular highlight from the key
+//      light and, magnified by Bloom's luminance threshold, read as a
+//      bright zig-zag through the glazing rather than a legible stair.
+// Both get their own slightly darker/less-reflective material so the bay
+// stays a legible secondary facade (stairs still visible) instead of the
+// visual focal point.
+export const curtainWallGlassMaterial = new THREE.MeshStandardMaterial({
+  color: '#B2ACA0',
+  transparent: true,
+  opacity: 0.22,
+  roughness: 0.22,
+  metalness: 0.1,
+  envMapIntensity: 0.32,
+  emissive: '#3A2C1C',
+  emissiveIntensity: 0.14,
+  side: THREE.DoubleSide,
+})
+
+export const stairTreadMaterial = new THREE.MeshStandardMaterial({
+  color: '#5B5E62',
+  roughness: 0.65,
+  metalness: 0.45,
+  envMapIntensity: METAL_ENV_INTENSITY * 0.4,
+})
+
+// Normal/roughness grain reused from the same CC0 concrete set as the
+// building's own concrete, cloned with a much larger `repeat` since this
+// plane (24x24) is many times the size of the building's own concrete
+// surfaces — these two still just provide fine micro-surface bump/roughness
+// variation; the macro slab-joint pattern below is a separate procedural
+// color map (see `groundPavingColorMap`), deliberately at a different,
+// coarser repeat than this micro grain (real paving grain doesn't align to
+// the joint grid).
 const groundNormalMap = cloneMapWithRepeat(concreteNormalMap, [18, 18])
 const groundRoughnessMap = cloneMapWithRepeat(concreteRoughnessMap, [18, 18])
 
+// --- Environment pass: procedural large-slab architectural paving ---
+// Replaces the photographic concrete color map on the main ground plane
+// (previously `groundColorMap`, a straight clone of the building's own small-
+// scale concrete photo at repeat [18,18], which read as bare, featureless
+// asphalt/parking lot at this plane's real size — no slab joints, no sense
+// of it being laid/installed paving). Painted once, at module load, into a
+// single small tileable canvas rather than per-line mesh geometry (per the
+// brief: individual joint-line meshes would be wasteful at this plane's
+// scale, unlike the small entrance plaza in SiteEnvironment.jsx, which is
+// cheap enough for a handful of literal joint-line meshes).
+//
+// One canvas tile = a 4x4 sub-grid of individual paving slabs, each with its
+// own small baked tonal offset (so neighbouring slabs visibly differ, per
+// the brief's "subtle tonal variation between slabs" — a single flat tile
+// repeated with NO internal variation would read as a checkerboard once
+// tiled). `GROUND_PAVING_REPEAT` then tiles that 4x4-slab tile a further
+// 3x3 times across the 24x24 plane, for 12x12 = 144 total slabs at roughly
+// 2 world units (~large-format paver scale) each — few enough repeats of
+// the *same* 16-slab pattern that it doesn't read as an obvious stamped
+// repeat at this scene's camera distances/framing, while staying a single
+// cheap texture (no per-slab geometry).
+const GROUND_PAVING_TILE_PX = 512
+const GROUND_PAVING_GRID = 4
+const GROUND_PAVING_REPEAT = [3, 3]
+
+function createGroundPavingTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = GROUND_PAVING_TILE_PX
+  canvas.height = GROUND_PAVING_TILE_PX
+  const ctx = canvas.getContext('2d')
+  const cell = GROUND_PAVING_TILE_PX / GROUND_PAVING_GRID
+  const jointWidth = Math.max(2, Math.round(cell * 0.035))
+
+  // Small seeded PRNG (mulberry32) — deterministic slab-to-slab variation
+  // instead of reshuffling on every reload.
+  let seed = 0x9f2c1a7
+  function rng() {
+    seed |= 0
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+
+  // Warm dark graphite base — a mid-tone here, since `groundMaterial.color`
+  // below multiplies this map down to the final dark tone (same "photo/
+  // canvas map x tint color" convention every other material in this file
+  // uses), rather than baking the final darkness directly into the canvas.
+  const baseL = 150
+
+  for (let gy = 0; gy < GROUND_PAVING_GRID; gy++) {
+    for (let gx = 0; gx < GROUND_PAVING_GRID; gx++) {
+      const x0 = gx * cell
+      const y0 = gy * cell
+      const offset = (rng() - 0.5) * 26 // per-slab tonal variance
+      const l = Math.round(baseL + offset)
+      ctx.fillStyle = `rgb(${l}, ${l - 3}, ${l - 8})`
+      ctx.fillRect(x0, y0, cell, cell)
+
+      // Sparse fine speckle noise within the slab — subtle aggregate/stone
+      // grain visible even from a near-overhead camera angle where the
+      // normal map's own bump lighting contributes little.
+      const speckleCount = 26
+      for (let i = 0; i < speckleCount; i++) {
+        const sx = x0 + rng() * cell
+        const sy = y0 + rng() * cell
+        const sl = l + (rng() - 0.5) * 22
+        ctx.fillStyle = `rgba(${sl}, ${sl - 3}, ${sl - 8}, 0.35)`
+        ctx.fillRect(sx, sy, 1.6, 1.6)
+      }
+
+      // Recessed joint groove along this slab's own top/left edges — drawn
+      // per-slab (not as one grid overlay) so it also lands correctly at
+      // the tile's own repeat boundary once `wrapS`/`wrapT` tiles it.
+      const jointL = l - 34
+      ctx.fillStyle = `rgb(${jointL}, ${jointL - 3}, ${jointL - 6})`
+      ctx.fillRect(x0, y0, cell, jointWidth)
+      ctx.fillRect(x0, y0, jointWidth, cell)
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  texture.repeat.set(GROUND_PAVING_REPEAT[0], GROUND_PAVING_REPEAT[1])
+  texture.anisotropy = 8
+  return texture
+}
+
+const groundPavingColorMap = createGroundPavingTexture()
+
+// Warm dark graphite/stone-concrete architectural paving — replaces the old
+// bare-asphalt-reading photographic map (see `groundPavingColorMap` above)
+// while staying matte (high roughness, near-zero metalness/env reflection,
+// per the brief's explicit "no glossiness") and visibly darker/duller than
+// `plazaMaterial` (the lighter entrance paving), preserving the intended
+// dark-site -> lighter-entrance -> building tonal hierarchy.
 export const groundMaterial = new THREE.MeshStandardMaterial({
-  color: '#75777B',
-  map: groundColorMap,
+  color: '#4C4842',
+  map: groundPavingColorMap,
   normalMap: groundNormalMap,
   roughnessMap: groundRoughnessMap,
-  roughness: 0.97,
-  metalness: 0.02,
-  envMapIntensity: CONCRETE_ENV_INTENSITY,
+  roughness: 0.98,
+  metalness: 0.015,
+  envMapIntensity: CONCRETE_ENV_INTENSITY * 0.5,
+})
+
+// Entrance door glass — distinct from `glazingMaterial` (screenshot-verified
+// bug fix): the door previously reused `glazingMaterial` directly, whose
+// warm emissive floor, concentrated over the door's small/recessed area
+// with little competing reflection, read as a solid orange/wood-toned panel
+// instead of dark aluminum-framed glass. The reference's entrance is dark
+// glass in a black aluminum frame, not a warm glow — this material is
+// darker/cooler and far less emissive, reused only for the door leaf itself
+// (the surrounding frame already uses `framingMaterial`, unchanged).
+// Screenshot-verified THIRD bug fix on this material: after darkening color
+// AND raising roughness, the door still read warm/orange. Root cause was
+// neither — it's `opacity`. At 0.55-0.6 the door transmits enough of what's
+// behind it (the entrance recess, `facadeMaterial` — a light warm-beige —
+// sitting right next to the entrance's own nearby warm point light,
+// Hero3DScene.jsx) that the light recess dominates the door's read straight
+// through the "glass" regardless of the glass's own dark color/roughness.
+// Dropped opacity substantially so the door reads as a mostly-opaque dark
+// aluminum-framed panel with only a hint of transmission, and removed the
+// emissive floor entirely (redundant with the transmitted recess light and
+// was adding to the same problem).
+export const entranceGlassMaterial = new THREE.MeshStandardMaterial({
+  color: '#24262A',
+  transparent: true,
+  opacity: 0.82,
+  roughness: 0.5,
+  metalness: 0.1,
+  envMapIntensity: 0.3,
+  side: THREE.DoubleSide,
+})
+
+// --- Reference-fidelity pass: site-tree + signage materials ---
+// Flat, untextured tree trunk tone — same "cheap on purpose" reasoning as
+// `lawnMaterial`/`foliageMaterial` above (a handful of low-poly background
+// trees, not a vegetation system).
+export const barkMaterial = new THREE.MeshStandardMaterial({ color: '#3E3126', roughness: 0.95, metalness: 0 })
+// A second, slightly darker/cooler canopy tone reused alongside
+// `foliageMaterial` so a small row of trees doesn't read as identical
+// stamped-out copies. Darkened alongside `foliageMaterial` above.
+export const foliageAccentMaterial = new THREE.MeshStandardMaterial({ color: '#2C3628', roughness: 0.95, metalness: 0 })
+
+// Backlit sign panel (AR Group wall sign, ExteriorShell.jsx) — a plain dark
+// panel with a small warm/red emissive floor so it reads as backlit rather
+// than a flat printed graphic; the actual lettering is real 3D `Text`
+// geometry (drei/troika), not a texture on this panel.
+export const signPanelMaterial = new THREE.MeshStandardMaterial({
+  color: '#1C1D1F',
+  emissive: '#2A1512',
+  emissiveIntensity: 0.5,
+  roughness: 0.5,
+  metalness: 0.2,
+})
+
+// Sign lettering, drawn once to an offscreen canvas at module load rather
+// than using drei's `<Text>` (troika-three-text): troika fetches its default
+// glyph font from a remote CDN, which doesn't always resolve in time (or at
+// all) in every network environment and silently leaves the sign blank —
+// unacceptable for an always-visible wall sign. A canvas texture drawn with
+// the browser's own system sans-serif has zero network dependency.
+function createSignTexture() {
+  const canvas = document.createElement('canvas')
+  canvas.width = 640
+  canvas.height = 360
+  const ctx = canvas.getContext('2d')
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.textBaseline = 'alphabetic'
+
+  ctx.font = '700 118px Arial, sans-serif'
+  ctx.fillStyle = COLORS.ember600
+  ctx.fillText('AR', 26, 165)
+  const arWidth = ctx.measureText('AR').width
+
+  ctx.fillStyle = '#F2F0EC'
+  ctx.fillText('Group', 26 + arWidth + 8, 165)
+
+  ctx.font = '600 32px Arial, sans-serif'
+  ctx.fillStyle = '#B9B4AA'
+  let x = 28
+  for (const ch of 'CONSTRUCTION SERVICES') {
+    ctx.fillText(ch, x, 235)
+    x += ctx.measureText(ch).width + 4
+  }
+
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.colorSpace = THREE.SRGBColorSpace
+  return texture
+}
+
+export const signTextTexture = createSignTexture()
+
+// --- Camera/massing pass: cheap interior-glow "stage set" behind visible
+// glazing (facade windows + entrance door) ---
+// The brief's biggest flagged missing realism cue: convincing warm light
+// behind the glass, not a dead/empty void. Deliberately NOT a modeled
+// interior — just enough depth behind the glass to read as "there's a room
+// there": a warm-washed back wall plane, a floor plane, and a couple of
+// flat furniture-block silhouettes (see ExteriorShell.jsx's
+// `InteriorGlowRoom`). `interiorWallGlowMaterial` is unlit (`meshBasicMaterial`-
+// equivalent via near-zero roughness reliance on emissive alone would still
+// shade with directional lights; using a real emissive-heavy standard
+// material here since it still needs to receive a *little* of the scene's
+// own key light to not look like a flat sticker) and `interiorSilhouetteMaterial`
+// is a plain dark neutral so blocky "furniture" reads as a silhouette
+// against the warm wash behind it, never as its own competing detail.
+// Screenshot-verified fix: an initial 0.55 emissiveIntensity, transmitted
+// through the entrance door's semi-opaque `entranceGlassMaterial`, read as
+// a solid warm-orange panel rather than a glimpse of a lit room behind dark
+// glass — the same "door reads orange" failure mode already documented on
+// `entranceGlassMaterial` itself, just re-triggered by a bright object
+// placed close behind it instead of the glass's own old emissive floor.
+// Dropped substantially; still reads clearly through the facade windows'
+// much more transparent `glazingMaterial` (opacity 0.16).
+export const interiorWallGlowMaterial = new THREE.MeshStandardMaterial({
+  color: '#4A3620',
+  emissive: '#FFC98A',
+  emissiveIntensity: 0.2,
+  roughness: 0.9,
+  metalness: 0,
+})
+export const interiorSilhouetteMaterial = new THREE.MeshStandardMaterial({
+  color: '#1E1B17',
+  roughness: 0.85,
+  metalness: 0,
 })
 
 // Static (non-hotspot) firestop-red material for enrichment penetrations

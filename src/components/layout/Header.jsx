@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
 import Logo from '../ui/Logo'
 import LanguageSwitcher from '../ui/LanguageSwitcher'
 import { useTranslation } from '../../lib/i18n/useTranslation'
@@ -15,6 +17,10 @@ const NAV_LINKS = [
 ]
 
 const SCROLL_THRESHOLD = 50
+
+function isLinkActive(link, pathname) {
+  return link.to === '/' ? pathname === '/' : pathname.startsWith(link.to)
+}
 
 function NavItem({ link, isActive, label }) {
   return (
@@ -36,6 +42,19 @@ export default function Header() {
   const { t } = useTranslation('nav')
   const location = useLocation()
   const scrolled = useScrolled(SCROLL_THRESHOLD)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [lastPathname, setLastPathname] = useState(location.pathname)
+  if (location.pathname !== lastPathname) {
+    setLastPathname(location.pathname)
+    setMenuOpen(false)
+  }
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [menuOpen])
 
   return (
     <motion.header
@@ -61,20 +80,17 @@ export default function Header() {
           </motion.div>
         </Link>
 
-        <nav>
+        <nav className="hidden lg:block">
           <ul className="flex items-center gap-8">
-            {NAV_LINKS.map((link) => {
-              const isActive = link.to === '/' ? location.pathname === '/' : location.pathname.startsWith(link.to)
-              return (
-                <li key={link.to}>
-                  <NavItem link={link} isActive={isActive} label={t(link.key)} />
-                </li>
-              )
-            })}
+            {NAV_LINKS.map((link) => (
+              <li key={link.to}>
+                <NavItem link={link} isActive={isLinkActive(link, location.pathname)} label={t(link.key)} />
+              </li>
+            ))}
           </ul>
         </nav>
 
-        <div className="flex items-center gap-6">
+        <div className="hidden items-center gap-6 lg:flex">
           <div className="hidden items-center gap-3 border-r border-neutral-custom-400/20 pr-6 lg:flex">
             {socialLinks.map(({ Icon, href, label }) => (
               <a
@@ -97,7 +113,74 @@ export default function Header() {
           </Link>
           <LanguageSwitcher />
         </div>
+
+        <div className="flex items-center gap-3 lg:hidden">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label={menuOpen ? t('closeMenu') : t('openMenu')}
+            aria-expanded={menuOpen}
+            className="flex h-10 w-10 items-center justify-center text-industrial-950 transition-colors hover:text-ember-600"
+          >
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
+          </button>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="overflow-hidden border-t border-neutral-custom-400/20 bg-base-50 lg:hidden"
+          >
+            <nav className="mx-auto max-w-7xl px-6 py-6">
+              <ul className="flex flex-col">
+                {NAV_LINKS.map((link) => {
+                  const isActive = isLinkActive(link, location.pathname)
+                  return (
+                    <li key={link.to} className="border-b border-neutral-custom-400/10 last:border-0">
+                      <Link
+                        to={link.to}
+                        className={`block py-3.5 text-lg font-medium transition-colors ${
+                          isActive ? 'text-ember-600' : 'text-industrial-950 hover:text-ember-600'
+                        }`}
+                      >
+                        {t(link.key)}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+
+              <Link
+                to="/contact"
+                className="mt-6 block rounded-full bg-ember-600 px-5 py-3 text-center text-sm font-semibold text-base-50 transition-colors duration-300 hover:bg-ember-800"
+              >
+                {t('cta')}
+              </Link>
+
+              <div className="mt-6 flex items-center gap-5 border-t border-neutral-custom-400/20 pt-6">
+                {socialLinks.map(({ Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="text-neutral-custom-600 transition-colors hover:text-ember-600"
+                  >
+                    <Icon className="h-6 w-6" />
+                  </a>
+                ))}
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   )
 }

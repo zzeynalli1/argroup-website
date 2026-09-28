@@ -1,12 +1,12 @@
 import { Fragment } from 'react'
-import { partners } from '../../data/partners'
+import { usePartners } from '../../hooks/usePartners'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 
-function PartnerCard({ logoSrc }) {
-  return (
+function PartnerCard({ name, logoSrc, url }) {
+  const card = (
     <div className="group flex flex-col items-center">
       <div className="flex aspect-[2/1] w-36 shrink-0 items-center justify-center rounded-lg border border-neutral-custom-400/20 bg-base-50 p-3 shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 xl:w-40">
-        <img src={logoSrc} alt="Logo" className="h-full w-full object-contain" loading="lazy" />
+        <img src={logoSrc} alt={name ?? 'Logo'} className="h-full w-full object-contain" loading="lazy" />
       </div>
       <span
         aria-hidden="true"
@@ -14,10 +14,26 @@ function PartnerCard({ logoSrc }) {
       />
     </div>
   )
+
+  // No URL means non-clickable — same visual item, no link wrapper, no badge.
+  if (!url) return card
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={name ? `${name} official website` : 'Partner official website'}
+      className="block"
+    >
+      {card}
+    </a>
+  )
 }
 
 export default function PartnersSection() {
   const { t } = useTranslation('home')
+  const { partners, loading } = usePartners()
 
   return (
     <section className="bg-base-100 py-16 md:py-24">
@@ -41,18 +57,24 @@ export default function PartnersSection() {
             aria-hidden="true"
             className="absolute left-4 right-4 top-[96px] hidden h-px bg-neutral-custom-400/25 lg:block xl:top-[104px]"
           />
-          <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:gap-x-5 xl:gap-x-6">
-            {partners.map((logoSrc, index) => (
-              <Fragment key={logoSrc}>
-                <PartnerCard logoSrc={logoSrc} />
-                {index < partners.length - 1 && (
-                  <span aria-hidden="true" className="hidden self-center pb-6 font-heading text-ember-600 lg:block">
-                    •
-                  </span>
-                )}
-              </Fragment>
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex min-h-[152px] items-center justify-center">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-industrial-950/15 border-t-ember-600" />
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:gap-x-5 xl:gap-x-6">
+              {partners.map((partner, index) => (
+                <Fragment key={partner.id ?? partner.logoSrc}>
+                  <PartnerCard {...partner} />
+                  {index < partners.length - 1 && (
+                    <span aria-hidden="true" className="hidden self-center pb-6 font-heading text-ember-600 lg:block">
+                      •
+                    </span>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

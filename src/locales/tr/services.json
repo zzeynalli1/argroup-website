@@ -1,11 +1,9 @@
 {
   "hero": {
     "eyebrow": "HİZMETLERİMİZ",
-    "title": "Yangın Güvenliği için Kapsamlı Mühendislik Hizmetleri",
+    "title": "Mühendislikten\nuygulamaya kadar.",
+    "titleHighlight": "uygulamaya",
     "subtitle": "Fire Stop'tan Design Engineering'e kadar — her projede güvenilir mühendislik desteği."
-  },
-  "grid": {
-    "title": "Sunduğumuz Hizmetler"
   },
   "categories": {
     "passiveFireProtection": {
@@ -44,74 +42,180 @@
     "loadAnalysis": { "title": "Dinamik ve Statik Yük Analizi", "description": "Dayanak yapılarının yük dayanımının değerlendirilmesi" },
     "supportDesign": { "title": "Dayanak Sistemleri Tasarımı", "description": "MEP dayanak yapılarının tasarımı" },
     "vibrationSolutions": { "title": "Titreşim Analizi ve Çözümleri", "description": "Mekanik ekipmandan kaynaklanan titreşimin azaltılması" },
-    "waterproofInjection": { "title": "Su Yalıtımı Enjeksiyonu", "description": "Duvar-döşeme birleşimlerinde su geçirmezlik" }
+    "seismic": { "title": "Sismik", "description": "Binaların sismik etkilere karşı dayanıklılığının artırılmasına yönelik mühendislik çözümleri" }
   },
   "detail": {
     "fireStopSystems": {
       "lead": "Binanın yangın güvenliğini sağlamak için açıklık ve geçişleri kapatan pasif koruma sistemi.",
+      "shortIntro": "Firestop sistemleri, yangın sırasında insanların güvenli tahliyesini sağlar, yangın söndürme çalışmalarını kolaylaştırır ve alevin diğer alanlara yayılmasının önüne geçer.",
       "about": "Fire Stop sistemleri binanın yangın güvenliğini sağlar — tahliyeyi ve acil durum ekiplerinin erişimini mümkün kılar, yapısal çökme durumunda bile yangının komşu bölmelere yayılmasını önler. Temel prensip yangın kompartmanlaştırmasıdır.",
       "applications": "Yangına dayanıklı duvar ve döşemelerden geçen boru, kablo ve kanal geçişleri; yapının hareketine izin veren derz (genleşme) hatları.",
-      "technicalApproach": "Her geçiş ve derz, bölmenin bütünlüğünü koruyacak uygun fire-stop malzemeleriyle kapatılır; derzler genleşme ve büzülme sırasında da etkinliğini koruyan elastik, yangına dayanıklı malzemelerle mühürlenir."
+      "technicalApproach": "Her geçiş ve derz, bölmenin bütünlüğünü koruyacak uygun fire-stop malzemeleriyle kapatılır; derzler genleşme ve büzülme sırasında da etkinliğini koruyan elastik, yangına dayanıklı malzemelerle mühürlenir.",
+      "benefits": [
+        { "title": "Güvenli tahliye", "description": "İnsanların binayı güvenli şekilde terk etmesine imkan tanır." },
+        { "title": "Yangın söndürme imkanı", "description": "Yangın söndürme ve kurtarma çalışmalarının yürütülmesine olanak sağlar." },
+        { "title": "Yayılmanın önlenmesi", "description": "Yangının diğer bölümlere ve yakın alanlara geçmesini sınırlar." }
+      ],
+      "process": [
+        { "title": "Açık geçiş", "description": "Boru veya kablo geçişi, yangının başka bir alana yayılması için zayıf bir nokta oluşturur." },
+        { "title": "Firestop uygulaması", "description": "Geçişin çevresi uygun firestop malzemesiyle kapatılır." },
+        { "title": "Yangın etkisi", "description": "Firestop sistemi, alev ve dumanın geçişten yayılmasını sınırlar." },
+        { "title": "Koruma", "description": "Kapatılan geçiş, yangının başka bir alana yayılmasını önlemeye yardımcı olur." }
+      ]
     },
     "fireproofingSystems": {
       "lead": "Yapısal elemanları yüksek sıcaklığın etkisinden koruyan fireproofing sistemleri.",
+      "shortIntro": "Sertifikalı ve eğitimli ekibimiz, yapısal yangın koruma sistemlerinin planlanmasını ve uygulanmasını gerçekleştirir. Yangın bariyerlerinin doğru konumlarda önceden planlanması, daha etkili ve güvenli çözümlerin hazırlanmasına imkan tanır.",
       "about": "Fireproofing sistemleri, taşıyıcı çelik konstrüksiyon gibi yapısal elemanları yangının etkisinden korur. Güvenilir bir sonuç için yangın bariyerlerinin erken ve detaylı planlanması gereklidir.",
       "applications": "Taşıyıcı yapısal elemanların (kolon, kiriş vb.) yangından korunmasının gerekli olduğu bina ve tesisler.",
-      "technicalApproach": "Ekibimiz gerekli eğitim ve sertifikasyonu tamamlamıştır. Süreç ihtiyacın belirlenmesi, sistemin tasarımı ve test edilmiş, optimize edilmiş bölme sistemlerinin uygulanmasını kapsar."
+      "technicalApproach": "Ekibimiz gerekli eğitim ve sertifikasyonu tamamlamıştır. Süreç ihtiyacın belirlenmesi, sistemin tasarımı ve test edilmiş, optimize edilmiş bölme sistemlerinin uygulanmasını kapsar.",
+      "benefits": [
+        { "title": "Sertifikalı ekip", "description": "Tasarım ve uygulama çalışmaları eğitimli uzmanlar tarafından yürütülür." },
+        { "title": "Erken planlama", "description": "Yangın bariyerlerinin projenin erken aşamasında doğru şekilde yerleştirilmesi etkili planlamaya imkan tanır." },
+        { "title": "Uygun sistem seçimi", "description": "Yapı için uygun, optimize edilmiş ve test edilmiş sistemler planlanır." }
+      ],
+      "process": [
+        { "title": "Çelik konstrüksiyon", "description": "Taşıyıcı çelik eleman, yangın koruması uygulanmadan önce hazırlanır." },
+        { "title": "Fireproofing uygulaması", "description": "Çelik yüzey, yangına dayanıklı koruyucu malzeme ile kaplanır." },
+        { "title": "Yangın etkisi", "description": "Koruyucu kaplama, çelik konstrüksiyon ile alev arasında bir ısı bariyeri oluşturur." },
+        { "title": "Korunan konstrüksiyon", "description": "Fireproofing katmanı, çelik elemanın yangın etkisine karşı korunmasını sürdürür." }
+      ]
     },
     "cableProtection": {
       "lead": "Elektrik ve veri kablolarının yangın güvenliğini ve kullanım ömrünü artıran koruma.",
+      "shortIntro": "Kabloların korunması, kullanım ömürlerinin uzatılmasına ve malzeme/kaynak tüketiminin azaltılmasına yardımcı olur. AR Group, sürdürülebilirliği ve çevresel etkinin azaltılmasını hedefleyen bir yaklaşımı destekler.",
       "about": "Kablo yangın koruması, elektrik ve veri kablolarının duvar/döşeme geçişlerinde yangına karşı korunmasını sağlar, kablo malzemelerinin güvenilirliğini ve kullanım ömrünü artırır.",
       "applications": "Metalik (bakır, alüminyum) ve polimer esaslı (PVC, PE, XLPE vb.) kabloların yangına dayanıklı geçişleri.",
-      "technicalApproach": "Yaklaşımımız kablonun kullanım ömrünü uzatmaya dayanır — bu, yakma veya düzenli depolamaya kıyasla atığı ve çevresel etkiyi azaltır."
+      "technicalApproach": "Yaklaşımımız kablonun kullanım ömrünü uzatmaya dayanır — bu, yakma veya düzenli depolamaya kıyasla atığı ve çevresel etkiyi azaltır.",
+      "benefits": [
+        { "title": "Daha uzun kullanım ömrü", "description": "Kablo sistemlerinin korunması, kullanım ömürlerinin uzatılmasına yardımcı olur." },
+        { "title": "Kaynak tasarrufu", "description": "Malzemelerin daha uzun süre kullanılması ek kaynak tüketiminin azaltılmasına yardımcı olur." },
+        { "title": "Sürdürülebilir yaklaşım", "description": "Çevresel etkinin ve kaynak tüketiminin azaltılması temel yaklaşımlarımızdan biridir." }
+      ],
+      "process": [
+        { "title": "Kablo hattı", "description": "Kablo hatları metal taşıyıcı sistem üzerine yerleştirilir." },
+        { "title": "Yangın koruması", "description": "Kablo hattının çevresine yangına dayanıklı koruyucu sistem uygulanır." },
+        { "title": "Yangın etkisi", "description": "Koruyucu sistem, kablo hattını doğrudan yangın etkisinden izole eder." },
+        { "title": "Korumanın sürekliliği", "description": "Koruyucu katman, yangın süresince kablo hattının korunmasını sağlar." }
+      ]
     },
     "pullOutTest": {
       "lead": "Betonun basınç dayanımını tahribatsız şekilde değerlendiren test yöntemi.",
+      "shortIntro": "Pull-out testi, sertleşmiş betona monte edilmiş elemanın çekme kuvvetinin ölçülmesine dayanır. Belirli bir geometriye uygun test ekipmanıyla elde edilen çekme kuvvetleri, betonun basınç dayanımıyla ilişkili sonuçların değerlendirilmesine imkan tanır.",
       "about": "Pull-out test, beton yapıların basınç dayanımını tahrip etmeden değerlendiren bir yöntemdir.",
       "applications": "Beton kalitesinin ve dayanımının doğrulanmasının gerekli olduğu inşaat ve yapısal projeler.",
-      "technicalApproach": "Özel geometrili test ekipmanıyla çekme kuvveti ölçülür ve bu kuvvet betonun basınç dayanımıyla ilişkilendirilir."
+      "technicalApproach": "Özel geometrili test ekipmanıyla çekme kuvveti ölçülür ve bu kuvvet betonun basınç dayanımıyla ilişkilendirilir.",
+      "process": [
+        { "title": "Ankrajın hazırlanması", "description": "Betona monte edilen ankraj, pull-out testi için hazırlanır." },
+        { "title": "Çekme testi", "description": "Test cihazı ile ankraja kontrollü bir çekme yükü uygulanır ve gösterge ölçülür." },
+        { "title": "Sonucun değerlendirilmesi", "description": "Ölçüm sonucu kaydedilir ve ankrajın test sonucu değerlendirilir." }
+      ]
     },
     "vibrationTest": {
       "lead": "Ürünün performansını ve dayanıklılığını objektif şekilde değerlendiren mekanik titreşim testi.",
+      "shortIntro": "Titreşim testi, bir nesnenin veya ürünün mekanik titreşim koşulları altında performans ve kalitesinin objektif olarak değerlendirilmesi için kullanılan bir test yöntemidir. Ölçüm sonuçları bilimsel temellere dayalı analiz ve karşılaştırma yapılmasına imkan tanır.",
       "about": "Titreşim testi, mekanik titreşim yoluyla ürünün performansını, kalitesini ve dayanıklılığını objektif olarak değerlendirir.",
       "applications": "Titreşim etkisine maruz kalan, performans ve dayanıklılık değerlendirmesi gereken ekipman ve sistemler.",
-      "technicalApproach": "Test sırasında ürün kontrollü titreşim koşullarına maruz bırakılır ve sonuçlar performans ve dayanıklılık açısından objektif olarak değerlendirilir."
+      "technicalApproach": "Test sırasında ürün kontrollü titreşim koşullarına maruz bırakılır ve sonuçlar performans ve dayanıklılık açısından objektif olarak değerlendirilir.",
+      "process": [
+        { "title": "Ekipmanın hazırlanması", "description": "Mekanik ekipman, titreşim ölçümü için çalışır durumda hazırlanır." },
+        { "title": "Sensörlerin yerleştirilmesi", "description": "Titreşim sensörleri ekipmana bağlanır ve ölçüm verileri kaydedilir." },
+        { "title": "Titreşimin ölçülmesi", "description": "Ekipman çalışırken oluşan titreşim sinyalleri ölçülür ve izlenir." },
+        { "title": "Sonuçların analizi", "description": "Toplanan titreşim verileri analiz edilerek ekipmanın durumu değerlendirilir." }
+      ]
     },
     "concreteCutting": {
       "lead": "Elmas uçlu ekipmanla betonda hassas delme ve kesim.",
+      "shortIntro": "Betonda farklı çaplarda delik açma ve kesim işleri elmas uçlu ekipmanlarla gerçekleştirilir. Çalışma koşullarına bağlı olarak suyla 'ıslak' kesim veya endüstriyel toz toplayıcıların kullanıldığı daha temiz yöntemler uygulanabilir.",
       "about": "Delme ve beton kesim hizmetleri, elmas uçlu ekipmanla betonda çeşitli çaplarda delik açılmasını, ayrıca beton, tuğla ve fayans kesimini kapsar.",
       "applications": "Boru ve kablo geçişleri için beton, tuğla, fayans malzemelerinde hassas kesim ve delme gerektiren inşaat işleri; endüstriyel vakumlarla duvar yıkımı.",
-      "technicalApproach": "İki yöntem uygulanır: ıslak kesim (sürekli su soğutmasıyla; atık suyun toplanıp uzaklaştırılmasını gerektirir; su baskını riski nedeniyle iç mekân kapı/pencere işlerine uygun değildir) ve kuru kesim (daha yavaş, endüstriyel toz toplayıcılarla; daha yüksek maliyetli ama minimum kirlenme ve kaplama malzemelerinin korunması sağlar). Performans, alet gücüne, duvar malzemesine, kesim derinliğine ve hava koşullarına bağlıdır."
+      "technicalApproach": "İki yöntem uygulanır: ıslak kesim (sürekli su soğutmasıyla; atık suyun toplanıp uzaklaştırılmasını gerektirir; su baskını riski nedeniyle iç mekân kapı/pencere işlerine uygun değildir) ve kuru kesim (daha yavaş, endüstriyel toz toplayıcılarla; daha yüksek maliyetli ama minimum kirlenme ve kaplama malzemelerinin korunması sağlar). Performans, alet gücüne, duvar malzemesine, kesim derinliğine ve hava koşullarına bağlıdır.",
+      "benefits": [
+        { "title": "Elmas teknolojisi", "description": "Beton, tuğla ve fayanslarda hassas delme ve kesim işleri elmas uçlu ekipmanlarla gerçekleştirilir." },
+        { "title": "Islak kesim", "description": "Sürekli su beslemesi kesim alanının soğutulmasına ve atıkların yönetilmesine yardımcı olur." },
+        { "title": "Tozun azaltılması", "description": "Özel mekanizmalar ve endüstriyel toz toplayıcılar, mekânın kirlenmesini önemli ölçüde azaltmaya imkan tanır." }
+      ],
+      "process": [
+        { "title": "Çalışma alanının hazırlanması", "description": "Delme ve kesim noktaları belirlenerek çalışma alanı hazırlanır." },
+        { "title": "Elmasla delme ve kesme", "description": "Beton, elmas uçlu ekipmanla hassas şekilde delinir veya kesilir." },
+        { "title": "Toz ve su yönetimi", "description": "Çalışma sırasında oluşan su ve atıklar uygun toplama sistemleriyle yönetilir." }
+      ]
     },
     "acousticInsulation": {
       "lead": "Titreşimden kaynaklanan ses iletimini sınırlayan izolasyon.",
+      "shortIntro": "Gürültü, havada basınç dalgaları ve yapılarda titreşim yoluyla yayılır. Etkili bir akustik çözüm için ses kaynağı, iletim yolu ve gürültüden etkilenen alıcı birlikte değerlendirilmelidir.",
       "about": "Ses ve akustik izolasyon, nesnenin titreşiminden kaynaklanan ses iletimini sınırlar; hem hava yoluyla hem de yapı üzerinden iletimi dikkate alır.",
       "applications": "Ses iletiminin sınırlanmasının gerekli olduğu bina ve yapısal elemanlar (örneğin döşeme-duvar birleşimleri).",
-      "technicalApproach": "Üç kontrol stratejisi uygulanabilir: kaynak kontrolü (birincil yaklaşım), iletim yolu kontrolü ve alıcı tarafında işlem (en karmaşık ve maliyetli). Bariyer etkinliği transmission loss eğrileriyle değerlendirilir."
+      "technicalApproach": "Üç kontrol stratejisi uygulanabilir: kaynak kontrolü (birincil yaklaşım), iletim yolu kontrolü ve alıcı tarafında işlem (en karmaşık ve maliyetli). Bariyer etkinliği transmission loss eğrileriyle değerlendirilir.",
+      "benefits": [
+        { "title": "Ses kaynağı", "description": "Gürültü kontrolünde ilk olarak sorunun ortaya çıktığı kaynak değerlendirilir." },
+        { "title": "İletim yolu", "description": "Ses, hava yoluyla veya yapısal titreşim yoluyla diğer alanlara iletilebilir." },
+        { "title": "Alıcı", "description": "Çözüm hazırlanırken gürültüden etkilenen kişi, oda veya diğer alan dikkate alınır." }
+      ],
+      "process": [
+        { "title": "Gürültü ölçümü", "description": "Mekandaki gürültü seviyesi ölçülerek sorunun kaynağı belirlenir." },
+        { "title": "Akustik analiz", "description": "Ölçüm sonuçları ve mekanın özelliklerine dayanarak akustik çözüm hazırlanır." },
+        { "title": "Yalıtım sisteminin kurulumu", "description": "Uygun ses ve akustik yalıtım malzemeleri uygulanır." },
+        { "title": "Akustik konfor", "description": "Uygulanan sistem, gürültünün ve istenmeyen ses iletiminin azaltılmasına hizmet eder." }
+      ]
     },
     "loadAnalysis": {
       "lead": "Dayanak yapılarının statik ve dinamik yüklere dayanımının mühendislik değerlendirmesi.",
+      "shortIntro": "Taşıyıcı yapılar, kullanım ömrü boyunca hem statik hem de dinamik yüklere maruz kalır. Kaynaklı çelik ve modüler dayanak sistemleri için ayrıntılı yük analizi, yapı tasarımının önemli bir parçasıdır.",
       "about": "Dinamik ve statik yük analizi, dayanak yapılarının — kaynaklı çelik ve modüler bileşenlerin — tesisin tüm işletme ömrü boyunca yük dayanımını değerlendirir.",
       "applications": "Sismik kuvvetlerin dikkate alınması gereken projeler (Azerbaycan için geçerlidir) ve termal genleşme gerilimine maruz kalan boru hatları.",
-      "technicalApproach": "Analiz, düzenleyici kurumların gerekliliklerine uygun olarak yürütülür — özellikle sismik bölgelerde bu analiz zorunludur."
+      "technicalApproach": "Analiz, düzenleyici kurumların gerekliliklerine uygun olarak yürütülür — özellikle sismik bölgelerde bu analiz zorunludur.",
+      "benefits": [
+        { "title": "Statik yükler", "description": "Dayanak yapılarına etki eden statik yükler mühendislik hesaplamalarında dikkate alınır." },
+        { "title": "Dinamik yükler", "description": "Sismik etkiler gibi dinamik yüklerin dayanak yapılarına etkisi analiz edilir." },
+        { "title": "Ek etkiler", "description": "Boru hatlarının ısıl genleşmesi gibi etkiler de ek dinamik yükler oluşturabilir." }
+      ],
+      "process": [
+        { "title": "Mevcut yapı", "description": "Taşıyıcı konstrüksiyon ve ona etki eden yükler belirlenir." },
+        { "title": "Yük analizi", "description": "Yapının yük altındaki davranışı mühendislik modeli üzerinde analiz edilir." },
+        { "title": "Bağlantıların kontrolü", "description": "Taşıyıcı elemanların bağlantı ve dayanak noktaları değerlendirilir." },
+        { "title": "Projenin sonuçlandırılması", "description": "Analiz sonuçlarına dayanarak yapısal çözüm netleştirilir." }
+      ]
     },
     "supportDesign": {
       "lead": "MEP dayanak yapıları için yük hesaplamaları ve tasarımı.",
+      "shortIntro": "Giderek karmaşıklaşan MEP sistemleri, daha hassas tasarlanmış dayanak ve askı konstrüksiyonları gerektirir. AR Group'un mühendislik departmanı, yük hesaplamalarından çizimlere ve 3D modellere kadar tasarım hizmetleri sunar.",
       "about": "Support Design, MEP (mekanik/elektrik/tesisat) dayanak yapıları için yük hesaplamalarını ve mimari şartnamelere uygun tasarımı kapsar.",
       "applications": "MEP sistemleri için dayanak yapılarının tasarlanmasını ve imalat (shop) çizimlerinin hazırlanmasını gerektiren projeler.",
-      "technicalApproach": "Tasarım AutoCAD, Revit (Autodesk) ve SolidWorks yazılımlarıyla yürütülür; yük hesaplamaları mimari şartnamelere uygun hale getirilir."
+      "technicalApproach": "Tasarım AutoCAD, Revit (Autodesk) ve SolidWorks yazılımlarıyla yürütülür; yük hesaplamaları mimari şartnamelere uygun hale getirilir.",
+      "benefits": [
+        { "title": "MEP destek tasarımı", "description": "Boru, kanal ve diğer MEP tesisatları için dayanak ve askı yapıları tasarlanır." },
+        { "title": "Yük hesaplamaları", "description": "Dayanak konstrüksiyonları için gerekli ayrıntılı yük hesaplamaları ve mühendislik çalışmaları hazırlanır." },
+        { "title": "2D ve 3D tasarım", "description": "Çizimler AutoCAD ve Revit'te, 3D modeller ise SolidWorks'te hazırlanabilir." }
+      ],
+      "process": [
+        { "title": "Tasarım", "description": "MEP sistemleri için gerekli dayanak ve askı yapıları tasarlanır." },
+        { "title": "Destek sisteminin kurulumu", "description": "Boru, kanal ve diğer MEP hatları için uygun taşıyıcı konstrüksiyon oluşturulur." },
+        { "title": "3D modelleme", "description": "Destek sistemi, MEP hatlarıyla birlikte üç boyutlu ortamda modellenir." },
+        { "title": "Teknik detaylar", "description": "Profil, braket, askı ve bağlantı elemanlarının detayları hazırlanır." }
+      ]
     },
     "vibrationSolutions": {
       "lead": "Mekanik ekipmandan kaynaklanan titreşimin ölçülmesi ve azaltılması.",
+      "shortIntro": "Titreşim izolasyonu, mekanik ekipman ve makinelerin oluşturduğu titreşimin yapıya ve çevreye iletilmesini azaltmak için uygulanır. Mühendislik departmanımız titreşim seviyelerini ölçer, analiz eder ve uygun çözümler hazırlar.",
       "about": "Titreşim analizi ve çözümleri, chiller, jeneratör, motor grupları gibi mekanik ekipmandan kaynaklanan titreşimi ölçer ve azaltır.",
       "applications": "Titreşime maruz platformların ve mekanik ekipmanın bulunduğu tesisler.",
-      "technicalApproach": "Mühendislerimiz titreşime maruz platformları ölçer, analiz yazılımıyla simüle eder ve titreşimin tamamen veya kısmen giderilmesini hedefler — bu, konforu korur ve azalan bakım sıklığıyla ekipman ömrünü uzatır."
+      "technicalApproach": "Mühendislerimiz titreşime maruz platformları ölçer, analiz yazılımıyla simüle eder ve titreşimin tamamen veya kısmen giderilmesini hedefler — bu, konforu korur ve azalan bakım sıklığıyla ekipman ömrünü uzatır.",
+      "benefits": [
+        { "title": "Ölçüm", "description": "Titreşimin bulunduğu platformlarda gerekli ölçümler yapılarak titreşim seviyeleri belirlenir." },
+        { "title": "Analiz ve simülasyon", "description": "Ölçülen titreşim değerleri analiz yazılımında analiz edilir ve simüle edilir." },
+        { "title": "İzolasyon çözümü", "description": "Jeneratör, motor, chiller ve diğer titreşim yaratan ekipmanlar için titreşimin azaltılmasına yönelik uygun bir çözüm hazırlanır." }
+      ],
+      "process": [
+        { "title": "Titreşimin ölçülmesi", "description": "Titreşim seviyeleri ilgili noktalarda ölçülerek belirlenir." },
+        { "title": "Analiz ve simülasyon", "description": "Ölçüm sonuçları analiz yazılımında analiz edilir ve simüle edilir." },
+        { "title": "İzolasyon çözümü", "description": "Titreşimin tamamen veya kısmen azaltılması için uygun bir çözüm hazırlanır." }
+      ]
     },
-    "waterproofInjection": {
-      "lead": "Beton yapılarda duvar-döşeme birleşimlerini neme karşı mühürleyen enjeksiyon.",
-      "about": "Su yalıtımı enjeksiyonu, beton yapılarda duvar-döşeme birleşim noktalarında nem geçişini önler.",
-      "applications": "Beton yapılarda derz hatlarının su geçirmezliğinin sağlanması gereken projeler.",
-      "technicalApproach": "Enjeksiyon, duvar-döşeme birleşim noktalarına uygulanarak bu alanların su geçirmezliğini sağlar."
+    "seismic": {
+      "lead": "Binaların sismik etkilere karşı dayanıklılığının artırılmasına yönelik mühendislik desteği.",
+      "about": "Sismik mühendislik, bir yapının deprem sırasında oluşan kuvvetler karşısındaki davranışının değerlendirilmesini ve güçlendirilmesini kapsar.",
+      "technicalApproach": "Yaklaşım, yapının mevcut durumunun değerlendirilmesine ve tasarım sürecinde sismik kuvvetlerin dikkate alınmasına dayanır."
     }
   },
   "detailLabels": {
@@ -130,12 +234,24 @@
   },
   "categoryShell": {
     "ctaText": "Daha fazla bilgi için bizimle iletişime geçin.",
-    "ctaButton": "Bizimle İletişime Geçin",
-    "relatedLabel": "İlgili hizmetler"
+    "ctaButton": "Bizimle İletişime Geçin"
   },
   "cta": {
     "title": "Projeniz için uzman desteği alın",
     "subtitle": "Ekibimiz ihtiyaçlarınıza uygun çözümü belirlemek için sizinle iletişime geçecek.",
     "button": "Bizimle İletişime Geçin"
+  },
+  "process": {
+    "genericStages": [
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" },
+      { "title": "PLACEHOLDER", "description": "PLACEHOLDER" }
+    ]
+  },
+  "explorer": {
+    "viewFullPage": "Tam sayfayı görüntüle",
+    "close": "Kapat",
+    "selectHint": "Detayları görmek için seçin"
   }
 }

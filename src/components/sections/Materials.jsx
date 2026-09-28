@@ -1,16 +1,11 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Check } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import { materials } from '../../data/materials'
 import WhyFirestop from './WhyFirestop'
 
-const WALL_IMAGE = '/images/materials/wall-penetrations.jpg'
+const WALL_IMAGE = '/images/materials/wall-penetrations.webp'
 const WALL_IMAGE_RATIO = '2560 / 851'
-
-// Generic, honest checklist copy — no invented certificate numbers, just
-// the industry-standard categories (per CLAUDE.md: real content only).
-const CHECKLIST_KEYS = ['sealing', 'certified', 'installation']
 
 // The zoom/glow/blur hover treatment is a mouse-hover interaction; on touch
 // devices it's meaningless (and tap already drives the same activeId state
@@ -32,6 +27,10 @@ function usePointerFine() {
   return isPointerFine
 }
 
+// Technical annotation, not a marketing card: title + one concise
+// explanation for the exact penetration under the pointer, nothing else (no
+// benefit bullets, no "learn more" link — see CLAUDE.md/the brief this
+// replaced: those were generic and identical across all four penetrations).
 function ZoneCard({ material, t, onEnter, onLeave }) {
   const { left, top, width, height } = material.zone
   const isRightHalf = left + width / 2 > 55
@@ -40,29 +39,17 @@ function ZoneCard({ material, t, onEnter, onLeave }) {
     <div
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="absolute z-30 w-64 rounded-lg border border-ember-600 bg-industrial-950 p-4 text-left shadow-xl"
+      className="animate-card-in absolute z-30 w-60 rounded-md border border-white/10 bg-industrial-950/90 p-3.5 text-left shadow-lg backdrop-blur-sm"
       style={{
         top: `calc(${top + height}% + 12px)`,
         ...(isRightHalf ? { right: `${100 - (left + width)}%` } : { left: `${left}%` }),
       }}
     >
-      <p className="font-heading text-base font-bold text-base-50">{t(`materials.items.${material.key}.name`)}</p>
-
-      <ul className="mt-3 space-y-2">
-        {CHECKLIST_KEYS.map((checkKey) => (
-          <li key={checkKey} className="flex items-center gap-2 text-sm text-neutral-custom-400">
-            <Check size={16} className="shrink-0 text-ember-600" />
-            {t(`materials.checklist.${checkKey}`)}
-          </li>
-        ))}
-      </ul>
-
-      <Link
-        to={material.link}
-        className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-ember-600 transition-colors hover:text-ember-800"
-      >
-        {t('materials.detailsCta')} <span aria-hidden="true">→</span>
-      </Link>
+      <span aria-hidden="true" className="mb-2 block h-px w-8 bg-ember-600" />
+      <p className="font-heading text-sm font-semibold text-base-100">{t(`materials.items.${material.key}.title`)}</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-neutral-custom-400">
+        {t(`materials.items.${material.key}.description`)}
+      </p>
     </div>
   )
 }
@@ -119,6 +106,7 @@ export default function Materials() {
           <img
             src={WALL_IMAGE}
             alt={t('materials.titlePrefix')}
+            loading="lazy"
             className="h-full w-full object-cover object-center transition-transform duration-[400ms] ease-out"
             style={imageStyle}
           />
@@ -146,8 +134,16 @@ export default function Materials() {
           </Link>
         </div>
 
-        {/* Spotlight dimming layer — sits above the image, below the zones/card. */}
-        <div className="absolute inset-0 z-10 transition-opacity duration-300 ease-out" style={spotlightStyle} />
+        {/* Spotlight dimming layer — sits above the image, below the zones/card.
+            Purely decorative: `pointer-events-none` is required here, not
+            optional — without it this full-bleed div sits (via its z-10)
+            above the text overlay's z-auto stacking layer even at opacity:0,
+            silently swallowing clicks on the "Sistemlərə bax" CTA underneath
+            it. */}
+        <div
+          className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-300 ease-out"
+          style={spotlightStyle}
+        />
 
         {materials.map((material) => {
           const isActive = activeId === material.id
@@ -163,7 +159,7 @@ export default function Materials() {
                 onFocus={() => activate(material.id)}
                 onBlur={deactivate}
                 onClick={() => setActiveId((prev) => (prev === material.id ? null : material.id))}
-                aria-label={t(`materials.items.${material.key}.name`)}
+                aria-label={t(`materials.items.${material.key}.title`)}
                 className="absolute z-20 rounded-md"
                 style={rectStyle}
               />
