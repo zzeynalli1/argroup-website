@@ -1,18 +1,23 @@
 import { Download, FileText } from 'lucide-react'
-import { CATALOG_FILE_PATH } from '../../data/catalog'
+import { useCatalog } from '../../hooks/useCatalog'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 
 /**
  * Compact catalog download block — bordered/accented panel rather than a
  * detached generic CTA box, using the same ember-outlined icon badge as
  * AboutStats and the same button treatment as CTASection.jsx's ember
- * button. `CATALOG_FILE_PATH` (src/data/catalog.js) points at
- * public/documents/, which has no real PDF yet — the link is real
- * (`<a href download>`, not `href="#"`) and will resolve once the project
- * owner supplies the actual file.
+ * button. The PDF itself is CMS-managed (Admin → Məhsullar → Kataloq, see
+ * lib/cms/catalog.js) rather than a static file in public/ — `useCatalog`
+ * resolves the current catalog's public Storage URL, always the latest one
+ * the admin uploaded, no frontend code change needed on replace. Renders
+ * nothing at all (no broken link, no disabled button) until a catalog has
+ * actually been uploaded.
  */
 export default function CatalogDownload() {
   const { t } = useTranslation('about')
+  const { catalog, loading } = useCatalog()
+
+  if (loading || !catalog) return null
 
   return (
     <section className="bg-base-50 py-14 md:py-20">
@@ -31,8 +36,8 @@ export default function CatalogDownload() {
           </div>
 
           <a
-            href={CATALOG_FILE_PATH}
-            download
+            href={catalog.file_url}
+            download={catalog.file_name}
             className="inline-flex shrink-0 items-center gap-2 rounded-md bg-ember-600 px-6 py-3 text-sm font-semibold text-base-50 transition-colors hover:bg-ember-800"
           >
             <Download size={16} strokeWidth={2} />

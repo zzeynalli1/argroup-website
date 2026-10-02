@@ -29,13 +29,12 @@ const ZOOM_STEP = 0.85
 
 // Coarse, dependency-free "is this a phone/tablet, or a small/touch
 // viewport" check — used only to drop the most expensive post-processing
-// settings (SSAO quality, Bloom, multisampling, shadow-map size) a notch,
-// per the brief's "adaptive settings for mobile" requirement. Deliberately
-// not using GPU-benchmark detection (e.g. drei's `useDetectGPU`, which
-// fetches a benchmark table from a CDN) — that adds a network dependency
-// and latency to a marketing homepage for a call this simple heuristic
-// already answers well enough. Computed once; screen size/pointer type
-// don't change during a session in any way that matters here.
+// settings (SSAO quality, Bloom, multisampling, shadow-map size) a notch.
+// Deliberately not using GPU-benchmark detection (e.g. drei's
+// `useDetectGPU`, which fetches a benchmark table from a CDN) — that adds a
+// network dependency and latency for a call this simple heuristic already
+// answers well enough. Computed once; screen size/pointer type don't change
+// during a session in any way that matters here.
 function detectMobile() {
   if (typeof window === 'undefined') return false
   const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false
@@ -57,21 +56,15 @@ function detectPortraitAspect() {
 }
 
 // Same one-time-at-mount pattern again, gating the composition-shift from
-// Building3DSection.jsx's left text column (Fix 1/2 of the layout-refinement
-// pass): true only for viewports wide AND landscape-ish enough that shifting
-// the building right via `CameraFrameShift` below is safe. Gated on ASPECT
-// RATIO, not raw width — the constraining factor for how much of the frame
-// can be reclaimed without cropping the building's own silhouette (verified
-// with a standalone script projecting the building's bounding box, the same
-// method this file's camera presets in data/hotspots3d.js already use) is
-// how much horizontal FOV a given vertical 45deg FOV yields, which is an
+// Building3DSection.jsx's left text column: true only for viewports wide AND
+// landscape-ish enough that shifting the building right via
+// `CameraFrameShift` below is safe. Gated on ASPECT RATIO, not raw width —
+// how much horizontal FOV a given vertical 45deg FOV yields is an
 // aspect-ratio question: at aspect 1.78 (16:9) the WIDE preset has enough
-// horizontal margin to absorb the shift below with zero cropping at every
-// resolution tested; at aspect 1.33 (4:3, e.g. a 1024x768 window) the same
-// shift already clips the building's own back-right roofline corner. 1.5 is
-// the lowest tested aspect that still clears with real margin. `>= 1024`
-// keeps this aligned with the brief's own "roughly lg/xl breakpoints and up"
-// framing rather than firing for e.g. a short, wide embedded iframe.
+// horizontal margin to absorb the shift with zero cropping, but at aspect
+// 1.33 (4:3) the same shift clips the building's own back-right roofline
+// corner. 1.5 is the lowest aspect that still clears with real margin; do
+// not lower it without re-verifying against the building's bounding box.
 function detectWideLayout() {
   if (typeof window === 'undefined') return false
   return window.innerWidth >= 1024 && window.innerWidth / window.innerHeight >= 1.5
@@ -88,60 +81,44 @@ function detectReducedMotion() {
 }
 
 // How far the virtual full frame is inflated beyond the canvas's own width
-// before cropping back down to it (see `CameraFrameShift`) — tuned via the
-// same NDC bounding-box-projection method as `detectWideLayout` above
-// against 1.5 (the lowest gated aspect ratio): 1.2 leaves real margin
-// (largest tested corner at NDC 0.949, vs. the 1.0 edge) at that worst-case
-// aspect, while every wider/more common desktop aspect (1.6, 1.78) clears
-// with even more room. Do not raise this without re-running that check —
-// cropping starts around 1.26 at aspect 1.5.
+// before cropping back down to it (see `CameraFrameShift`) — tuned against
+// 1.5, the lowest gated aspect ratio (see `detectWideLayout` above): 1.2
+// leaves real margin at that worst-case aspect. Do not raise this without
+// re-verifying against the building's bounding box — cropping starts around
+// 1.26 at aspect 1.5.
 const VIEW_SHIFT_FACTOR = 1.2
 
-// Vertical gradient, dark blue-grey — a plain <color> would read as flat
-// black; this sits between industrial-950 and a lighter blue-grey stop.
-// Dusk gradient, warmed slightly at the horizon (BOTTOM) — a believable
-// dusk sky transitions from cool blue-grey overhead to a warm glow near the
+// Dusk gradient, warmed slightly at the horizon (BOTTOM) — a believable dusk
+// sky transitions from cool blue-grey overhead to a warm glow near the
 // horizon, which also gives the building's silhouette a warmer edge to
 // separate against instead of a flat cool backdrop everywhere.
-// Rebuild pass, screenshot-verified fix: the old, much darker stops
-// (#20242B / #2A2118) read as near-solid black once actually rendered —
-// one of the confirmed defects ("scene should not read as very dark
-// overall"). Lightened both stops a full step while keeping the same
-// cool-overhead / warm-horizon dusk relationship.
 const BACKDROP_TOP = '#3D4451'
 const BACKDROP_BOTTOM = '#5C4A31'
-// Bridges the warm backdrop-bottom glow and the new warm-graphite ground
-// paving tone (see `groundMaterial` in buildingMaterials.js) rather than the
-// old `#333944`, which matched only the cool sky-top stop — that mismatch is
-// what read as a visible seam at the horizon once the ground itself got
-// darker/warmer in this same pass (see fog near/far tuning below).
+// Bridges the warm backdrop-bottom glow and the warm-graphite ground paving
+// tone (see `groundMaterial` in buildingMaterials.js) so there's no visible
+// seam at the horizon.
 const FOG_COLOR = '#3B352E'
 
-// Environment pass, corrected: the previous procedural canvas-painted
-// skyline (rectangles + window-light speckle) read as primitive toy-box
-// silhouettes rather than a real city and was rejected outright — removed
-// entirely, no replacement geometry. In its place: an OPTIONAL real
-// photographic panorama, composited into the SAME small canvas texture as
-// the vertical sky gradient below (zero extra draw calls/geometry — see this
-// file's own header note), loaded manually (not via Suspense) so a missing
-// asset just falls back to the plain gradient with no error/placeholder. See
-// `PANORAMA_URL` and `GradientBackdrop` below.
+// No procedural skyline geometry is drawn here by design (per CLAUDE.md:
+// no fabricated content) — only an OPTIONAL real photographic panorama,
+// composited into the same small canvas texture as the vertical sky
+// gradient below (zero extra draw calls/geometry), loaded manually (not via
+// Suspense) so a missing asset just falls back to the plain gradient with no
+// error/placeholder. See `PANORAMA_URL` and `GradientBackdrop` below.
 const BACKDROP_CANVAS_WIDTH = 512
 const BACKDROP_CANVAS_HEIGHT = 256
 
 // Reserved path for a real dusk/blue-hour Baku skyline photo (not supplied
-// yet — see PANORAMA_* comments below). Deliberately NOT filled with any
-// procedural/placeholder image per this project's content rules (CLAUDE.md:
-// don't fabricate content that isn't real) — until a real file exists at
-// this path, `GradientBackdrop` silently renders the plain gradient only.
+// yet). Deliberately NOT filled with any procedural/placeholder image per
+// this project's content rules (CLAUDE.md: don't fabricate content that
+// isn't real) — until a real file exists at this path, `GradientBackdrop`
+// silently renders the plain gradient only.
 const PANORAMA_URL = '/images/3d/city-panorama.webp'
 // Horizon baseline as a fraction of canvas height. `scene.background`'s
 // screen-locked stretch means canvas Y maps 1:1 to SCREEN Y, not to the 3D
 // ground plane's own far edge — at this scene's camera angle the ground
 // plane visually recedes to a horizon at roughly 35-40% down the actual
-// viewport, well above the canvas's vertical midpoint. Reused from the prior
-// (now-removed) skyline pass, which verified this fraction against the real
-// on-screen horizon band.
+// viewport, well above the canvas's vertical midpoint.
 const PANORAMA_HORIZON_FRAC = 0.4
 // Where the source photo's own horizon sits, as a fraction of the SOURCE
 // IMAGE's own height (not the canvas) — this photo's sky occupies roughly
@@ -161,10 +138,9 @@ const PANORAMA_BELOW_HORIZON_FRAC = 0.16
 // leaving the skyline itself (just above the horizon) unfeathered/crisp.
 const PANORAMA_TOP_FEATHER_FRAC = 0.22
 // Compositing knobs that push the loaded photo toward "soft/hazy/subordinate
-// to the building" regardless of the real photo's own grading (brief:
-// "don't trust the source image's own grading"). Alpha < 1 lets the sky
-// gradient's own dusk tone show through/blend; filter desaturates, lowers
-// contrast, and dims.
+// to the building" regardless of the real photo's own grading. Alpha < 1
+// lets the sky gradient's own dusk tone show through/blend; filter
+// desaturates, lowers contrast, and dims.
 const PANORAMA_ALPHA = 0.85
 const PANORAMA_FILTER = 'saturate(80%) contrast(90%) brightness(92%)'
 
@@ -189,8 +165,8 @@ function paintSkyGradient(ctx, width, height) {
 // gradients (dissolving to BACKDROP_TOP at the top, to FOG_COLOR at the
 // bottom) instead of a hard ctx.clip() rectangle, so there's no visible
 // seam at either edge. Canvas X still maps 1:1 to screen-space left-right
-// (same reasoning the old skyline pass verified), so the left-dark/
-// right-bright readability ramp stays a pure 2D compositing question.
+// so the left-dark/right-bright readability ramp stays a pure 2D
+// compositing question.
 function paintPanoramaBand(ctx, image, width, height) {
   const horizonY = height * PANORAMA_HORIZON_FRAC
   const regionBottom = horizonY + height * PANORAMA_BELOW_HORIZON_FRAC
@@ -334,41 +310,32 @@ function Ground() {
   )
 }
 
-// --- Hotspot marker visual constants (marker redesign pass) ---
+// --- Hotspot marker visual constants ---
 // `MARKER_REFERENCE_DISTANCE` is roughly the WIDE default resting distance
-// (~8.7 — see hotspots3d.js) rather than the much shorter post-select
-// distance (~3-6, each hotspot's own cameraPosition-to-position distance) or
-// the much longer NARROW resting distance (~13.3): the marker's un-scaled
-// (1x) size looks right at that middle distance, and the clamp below scales
-// it up when the camera is farther away (so it doesn't shrink to invisibility
-// at the NARROW resting shot) and down when closer (so it doesn't balloon
-// once the camera flies in on select) — the same "keep roughly constant
-// screen size" job `Html`'s `distanceFactor` already does for the label,
-// applied here to the mesh-based core/rings, which don't get that for free.
-// Camera fill re-verification pass: WIDE's own resting distance moved from
-// ~8.76 to ~9.64 (see hotspots3d.js) — nudged to match so the marker's
-// baseline (1x) scale is still tuned against the distance a viewer actually
-// sees most often (the default resting shot), not a now-stale number.
+// (see hotspots3d.js) rather than the much shorter post-select distance or
+// the much longer NARROW resting distance: the marker's un-scaled (1x) size
+// looks right at that middle distance, and the clamp below scales it up when
+// the camera is farther away (so it doesn't shrink to invisibility at the
+// NARROW resting shot) and down when closer (so it doesn't balloon once the
+// camera flies in on select) — the same "keep roughly constant screen size"
+// job `Html`'s `distanceFactor` already does for the label, applied here to
+// the mesh-based core/rings, which don't get that for free. Keep this in
+// sync with hotspots3d.js's WIDE resting distance.
 const MARKER_REFERENCE_DISTANCE = 9.5
 const MARKER_MIN_DIST_SCALE = 0.68
 const MARKER_MAX_DIST_SCALE = 1.55
-// Slow breathing (idle-only "alive/interactive" cue — replaces relying on
-// the Html label's CSS `animate-ping`, which only ever fired on hover/
-// active) — period = 2*PI / speed ≈ 3.31s, inside the 3.0-3.6s target band
-// (nudged down from the previous 2.1, which at 2.99s landed just under the
-// floor). Unlike the old single `group.scale` pulse, breathing is split
-// across independently-refed elements (core emissive AND scale, main ring
-// scale, glow opacity AND scale — see the per-frame block below) instead of
-// one shared uniform scale, so the ring/glow "halo" can visibly expand more
-// than a subtler core pulse does, per the animation-refinement brief. Each
-// amount below is applied UNIDIRECTIONALLY on top of that element's own
-// rest-tier value (0 -> +amount, via a (sin+1)/2 pulse, never negative) —
-// deliberate, not an oversight: it means breathing only ever ADDS emphasis
-// on top of the already-visible rest state and never dips below it, which
-// is what naturally keeps the marker "never disappearing" without needing a
-// separate opacity floor constant on the ring/rim/glow. The core's own rest
-// baseline (`coreEmissive` below) was also raised slightly so the red dot
-// itself never reads as faint even at the bottom of its pulse.
+// Slow breathing (idle-only "alive/interactive" cue, independent of the Html
+// label's CSS `animate-ping`, which only ever fires on hover/active) —
+// period = 2*PI / speed ≈ 3.31s. Breathing is split across independently
+// refed elements (core emissive AND scale, main ring scale, glow opacity AND
+// scale — see the per-frame block below) instead of one shared uniform
+// scale, so the ring/glow "halo" can visibly expand more than the subtler
+// core pulse. Each amount below is applied UNIDIRECTIONALLY on top of that
+// element's own rest-tier value (0 -> +amount, via a (sin+1)/2 pulse, never
+// negative) — deliberate: breathing only ever ADDS emphasis on top of the
+// already-visible rest state and never dips below it, which is what keeps
+// the marker "never disappearing" without needing a separate opacity floor
+// constant on the ring/rim/glow.
 const MARKER_BREATHE_SPEED = 1.9
 const MARKER_CORE_BREATHE_AMOUNT = 0.2
 // Core scale pulse (~1.00 -> 1.10 -> 1.00) — applied to the core mesh's own
@@ -376,37 +343,30 @@ const MARKER_CORE_BREATHE_AMOUNT = 0.2
 // from the parent `visualRef` group's distance/hover/active scale, so it
 // doesn't fight either.
 const MARKER_CORE_SCALE_BREATHE_AMOUNT = 0.1
-// Core OPACITY pulse (~0.78 -> 1.00 -> 0.78) — added on top of the existing
-// emissive+scale pulse above. The core sphere previously had no
-// `transparent`/`opacity` at all (emissive intensity was its only
-// "brightness" signal); at the marker's actual ~11-22px on-screen size at
-// the default resting camera distance (see the perceptibility investigation
-// this pass grew out of), an emissive-only change reads as barely
-// perceptible, so a real, literal opacity animation is layered in as a
-// second independent channel. Safe to make transparent: `depthTest`/
-// `depthWrite` are already both false on this mesh (see below), so there's
-// no z-fighting/sorting concern to introduce.
+// Core OPACITY pulse (~0.78 -> 1.00 -> 0.78) — a second, independent
+// brightness channel on top of the emissive+scale pulse above, since
+// emissive intensity alone reads as barely perceptible at the marker's
+// actual ~11-22px on-screen size at the default resting camera distance.
+// Safe to make transparent: `depthTest`/`depthWrite` are already both false
+// on this mesh (see below), so there's no z-fighting/sorting concern.
 const MARKER_CORE_OPACITY_BREATHE_AMOUNT = 0.22
-// Main ring scale pulse — raised further (from 0.25) so the halo visibly
-// expands (~1.00 -> ~1.35 -> 1.00), one of two primary visibility fixes.
+// Main ring scale pulse — the halo visibly expands (~1.00 -> ~1.35 -> 1.00),
+// one of the two primary visibility channels (with the glow scale below).
 const MARKER_RING_BREATHE_AMOUNT = 0.35
 const MARKER_GLOW_BREATHE_AMOUNT = 0.28
-// Glow/halo billboard plane's own scale pulse (paired with the opacity
-// pulse above) — raised substantially (from 0.25 to 0.6, a ~60% peak growth
-// in the blob's diameter) because at this marker's real on-screen scale, a
-// LARGER soft glow blob is the single most perceptible lever available: a
-// few-pixel change on the small hard-edged ring/core is easy to miss, but a
-// visibly swelling, brightening soft halo reads clearly even at a glance.
-// See `glowBaseScale` below (also raised) for the blob's own rest/
-// emphasized base size this multiplies.
+// Glow/halo billboard plane's own scale pulse (paired with the opacity pulse
+// above) — at this marker's real on-screen scale, a LARGER soft glow blob is
+// the single most perceptible lever available: a few-pixel change on the
+// small hard-edged ring/core is easy to miss, but a visibly swelling,
+// brightening soft halo reads clearly even at a glance. See `glowBaseScale`
+// below for the blob's own rest/emphasized base size this multiplies.
 const MARKER_GLOW_SCALE_BREATHE_AMOUNT = 0.6
 // How fast the breathing pulse's strength eases to 0 on hover/active and
 // back to 1 once neither — an exponential `THREE.MathUtils.damp` rate
 // (per-second), not a linear lerp, so it settles smoothly rather than
-// snapping mid-cycle (a snap would show as a tiny visible jump if the pulse
-// happens to be mid-swing the instant the pointer enters). At 6/s the pulse
-// is ~95% settled within ~0.5s of a hover/select/deselect, which reads as
-// "breathing pauses right away" without an abrupt cut.
+// snapping mid-cycle. At 6/s the pulse is ~95% settled within ~0.5s of a
+// hover/select/deselect, which reads as "breathing pauses right away"
+// without an abrupt cut.
 const MARKER_BREATHE_DAMPING = 6
 const MARKER_CORE_RADIUS = 0.05
 const MARKER_RING_INNER = 0.078
@@ -418,28 +378,13 @@ const MARKER_RING_OUTER = 0.094
 const MARKER_RIM_INNER = 0.096
 const MARKER_RIM_OUTER = 0.107
 const MARKER_RIM_COLOR = '#F3EFE6'
-// Per-marker breathing-perceptibility investigation (all 10 markers checked
-// individually via screenshot pixel-diff, not just eyeballed): every marker
-// DOES animate every frame — this was never a per-instance bug (no shared
-// ref/key aliasing found, `breathePhase` is purely `hotspot.id`-derived) —
-// but the amount of VISIBLE change varies hugely by local background.
-// Markers sitting against the light concrete facade (e.g.
-// `passiveFireProtection`, `fireproofingSystems`) measured mean per-pixel
-// diff ~0.4 across a full cycle vs. ~1.7-2.1 for markers against dark
-// recessed glazing/openings (e.g. `mechanicalSupport`, `cableProtection`) —
-// same underlying animation, ~5x weaker apparent signal. Root cause: the red
-// glow blob is additively blended (`THREE.AdditiveBlending`), which by its
-// own math contributes much less visible brightening on a light background
-// than a dark one (adding red to already-bright beige barely shifts it,
-// while adding the same red to near-black glazing is dramatic) — the ring/
-// core pulse alone isn't enough to compensate since they're small and
-// hard-edged. Fix: breathe the off-white RIM too (previously static, fixed
-// opacity only) — off-white against both light concrete and dark glazing
-// reads as a real contrast delta either way (unlike the glow's additive red),
-// so it carries the "obviously animating" signal reliably regardless of
-// local background. Re-verified after: all 10 markers show comparable,
-// clearly visible per-cycle diffs (see the per-marker screenshot/diff
-// methodology this investigation used).
+// The rim also breathes its own scale + opacity: the glow blob is
+// additively blended (`THREE.AdditiveBlending`), which contributes much less
+// visible brightening against a light concrete background than a dark
+// glazing one — the ring/core pulse alone doesn't compensate since they're
+// small and hard-edged. The off-white rim reads as a real contrast delta
+// against both backgrounds, so it carries the "obviously animating" signal
+// reliably regardless of what's behind a given marker.
 const MARKER_RIM_SCALE_BREATHE_AMOUNT = 0.5
 const MARKER_RIM_OPACITY_BREATHE_AMOUNT = 0.35
 
@@ -465,10 +410,8 @@ const markerGlowTexture = createMarkerGlowTexture()
 function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, prefersReducedMotion }) {
   const { t } = useTranslation('home')
   const emphasized = isActive || isHovered
-  // A sibling hotspot is the active one — this marker dims (per the brief:
-  // "other hotspots may dim slightly but must remain visible/clickable, not
-  // disappear") but hover still overrides the dim so it stays fully readable
-  // the moment the user's pointer actually reaches it.
+  // A sibling hotspot is active — this marker dims, but hover still
+  // overrides the dim so it stays fully readable once the pointer reaches it.
   const dimmed = anyActive && !emphasized
   const visualRef = useRef(null)
   const coreMaterialRef = useRef(null)
@@ -542,11 +485,10 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
       MARKER_MIN_DIST_SCALE,
       MARKER_MAX_DIST_SCALE
     )
-    // Overall marker size stays distance-compensation + hover/active tier
-    // only — no breathing here anymore. Breathing moved to per-element
-    // treatment below (core emissive / ring scale / glow opacity) so the
-    // ring can expand more than the core, per the animation-refinement
-    // brief, instead of one shared group-scale pulse doing everything.
+    // Overall marker size is distance-compensation + hover/active tier only.
+    // Breathing is applied per-element below (core emissive / ring scale /
+    // glow opacity) instead of one shared group-scale pulse, so the ring can
+    // expand more than the core.
     group.scale.setScalar(distScale * tierScale)
 
     // Idle breathing pauses (eases to 0) the moment this marker is hovered
@@ -638,22 +580,19 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
           main ring scale, glow opacity — not to this shared group scale).
 
           Depth-test is deliberately OFF on every mesh here (plus a high,
-          fixed `renderOrder`) — this building is now a closed volume by
-          default (ExteriorShell's front/back/left/right walls only open a
-          hotspot's own reveal panel once THAT hotspot is active), so most
-          markers sit at their real system's location INSIDE the solid wall
-          mass and would otherwise be fully hidden behind opaque geometry at
-          rest (screenshot-verified: only 2 of 9 markers were visible before
-          this fix — the two whose system happens to sit at/behind existing
-          glazing). Rendering markers as an always-on-top UI layer (the same
-          convention interactive BIM/product-tour viewers use for hotspot
-          pins) is the correct fix rather than repositioning every marker to
-          an exterior-only point, which would pull several of them away from
-          the real system they're meant to indicate. `renderOrder` values are
-          staggered (glow < core < rings) purely so the three transparent
-          layers of the SAME marker composite correctly against each other
-          once depth-testing between them is gone; they still don't
-          depth-test against each other's geometry as a group. */}
+          fixed `renderOrder`) — the building is a closed volume by default
+          (ExteriorShell's walls only open a hotspot's own reveal panel once
+          THAT hotspot is active), so most markers sit at their real system's
+          location INSIDE the solid wall mass and would otherwise be fully
+          hidden behind opaque geometry at rest. Rendering markers as an
+          always-on-top UI layer (the same convention interactive BIM/
+          product-tour viewers use for hotspot pins) avoids repositioning
+          every marker to an exterior-only point, which would pull several of
+          them away from the real system they indicate. `renderOrder` values
+          are staggered (glow < core < rings) so the three transparent layers
+          of the SAME marker composite correctly against each other once
+          depth-testing between them is gone; they still don't depth-test
+          against each other's geometry as a group. */}
       <group ref={visualRef}>
         {/* Soft local glow: a camera-facing (Billboard) additive-blended
             plane using the shared radial-gradient texture above, kept small
@@ -664,16 +603,12 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
             per-marker point light (10 simultaneous lights would be a real,
             avoidable cost for a decorative effect). */}
         <Billboard renderOrder={997}>
-          {/* No declarative `scale` prop here on purpose — this mesh's
-              scale is 100% useFrame-owned (see `glowMeshRef.current.scale
-              .setScalar(...)` below), same as the core/ring meshes.
-              Previously this had BOTH a declarative `scale={glowBaseScale}`
-              prop AND the imperative per-frame update; since this component
+          {/* No declarative `scale` prop here — this mesh's scale is 100%
+              useFrame-owned (see `glowMeshRef.current.scale.setScalar(...)`
+              below), same as the core/ring meshes. A declarative scale prop
+              here would fight the imperative value, since this component
               re-renders whenever ANY sibling hotspot's hover/active state
-              changes (lifted state in the parent), the declarative prop was
-              momentarily re-applied on those re-renders, fighting the
-              imperative value until the next animation frame overwrote it
-              again. */}
+              changes (lifted state in the parent). */}
           <mesh ref={glowMeshRef}>
             <planeGeometry args={[1, 1]} />
             <meshBasicMaterial
@@ -689,9 +624,9 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
           </mesh>
         </Billboard>
 
-        {/* Solid AR-red core — now baseline-visible at rest (was only
-            reachable via hover/active before), strengthens on hover/active,
-            dims (never disappears) when a sibling hotspot is selected. */}
+        {/* Solid AR-red core — baseline-visible at rest, strengthens on
+            hover/active, dims (never disappears) when a sibling hotspot is
+            selected. */}
         <mesh ref={coreMeshRef} renderOrder={998}>
           <sphereGeometry args={[MARKER_CORE_RADIUS, 16, 16]} />
           <meshStandardMaterial
@@ -762,7 +697,7 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
 // `PerspectiveCamera.setViewOffset` (an asymmetric-frustum "lens shift") —
 // crops the frame's own already-centered composition down to a rightward
 // sub-window rather than moving the camera sideways, so there's zero added
-// perspective distortion (per the brief). This is fully orthogonal to
+// perspective distortion. This is fully orthogonal to
 // `CameraRig`'s position/target lerping and `zoomBy`'s position-along-ray
 // zoom above/below — both only ever touch `camera.position`/`controls.target`,
 // never the projection matrix, so the shift stays applied through every
@@ -925,25 +860,13 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
         onCreated={() => onReady?.()}
       >
         <GradientBackdrop />
-        {/* Near/far widened slightly (16/30 -> 15/33) alongside the FOG_COLOR
-            retune above: the darker/warmer ground paving needs a slightly
-            longer, gentler falloff to blend into the horizon without a
-            visible seam — kept cheap (no new geometry, just tuning existing
-            fog args). */}
         <fog attach="fog" args={[FOG_COLOR, 15, 33]} />
 
         {/* Restrained key/fill/rim rig. Ambient kept deliberately low — the
-            `Environment` IBL below and the post-processing SSAO now do the
-            job flat ambient used to do, so a high ambient here would just
-            wash the contrast back out. */}
-        {/* Screenshot-verified fix (reference-fidelity pass): the render read
-            flat/evenly-lit rather than dusk — ambient trimmed further and
-            the key/fill contrast pushed harder below so the sunlit side
-            reads distinctly warm and the shadow side distinctly cool. */}
-        {/* Rebuild pass, screenshot-verified fix: 0.1 combined with the old
-            near-black backdrop read as "very dark overall" (a confirmed
-            defect) — raised one step; still well below a flat/washed-out
-            level since the key/fill contrast below is unchanged. */}
+            `Environment` IBL below and the post-processing SSAO do the job
+            flat ambient would otherwise do, so a higher ambient here would
+            wash the key/fill contrast back out and read flat instead of
+            dusk. */}
         <ambientLight intensity={0.3} />
         <directionalLight
           position={[6, 7, 5.5]}
@@ -952,29 +875,14 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           castShadow
           shadow-mapSize-width={isMobile ? 1024 : 2048}
           shadow-mapSize-height={isMobile ? 1024 : 2048}
-          // Frustum derived from projecting the building's bounding box
-          // (x:-3..3, y:0..4.1 incl. rooftop rail, z:-2..2) onto this light's
-          // own local left/up axes — the projected extent is left/right
-          // ±3.46, top 5.35, bottom -2.83; the values below add a safety
-          // margin on top of that rather than guessing a round symmetric
-          // number, so nothing at the model's real edges (e.g. the rooftop
-          // rail's far corner) clips. near/far left at their original safe
-          // values since they only affect depth precision, not the map's
-          // effective resolution.
-          // Camera/massing pass: the bounding box's left edge grew from
-          // x=-3 to x=-4.3 (ExteriorShell.jsx's `LowWideWing`) — left
-          // extended by the same ~1.3 world-space delta plus margin so the
-          // wing's own shadow isn't clipped by the frustum edge.
-          // Massing re-pass (round 3): the wing's left edge grew again,
-          // -4.3 -> -6.6 — re-solved by projecting both the old and new
-          // bounding boxes onto this light's own local axes (a standalone
-          // three.js OrthographicCamera/DirectionalLight script, not
-          // eyeballed) and applying the resulting delta on top of the
-          // already-tuned values above: left delta ~-1.55 -> -6.9, top delta
-          // ~+1.1 -> 6.75 (this light isn't purely overhead, so widening X
-          // also shifts its local "top" bound slightly). Bottom/right are
-          // unaffected (the box's z/near-x extent driving those didn't
-          // change) and are left as-is.
+          // Frustum derived from projecting the building's full bounding box
+          // (including ExteriorShell.jsx's `LowWideWing`, which extends the
+          // left edge out to x=-6.6) onto this light's own local left/up
+          // axes, plus a safety margin so nothing at the model's real edges
+          // (e.g. the wing's shadow or the rooftop rail's far corner) clips.
+          // Re-derive these if the building's bounding box changes again.
+          // near/far are set at safe values since they only affect depth
+          // precision, not the map's effective resolution.
           shadow-camera-left={-6.9}
           shadow-camera-right={3.9}
           shadow-camera-top={6.75}
@@ -993,38 +901,26 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
         <directionalLight position={[-6, 3.2, -5]} intensity={0.4} color={COLORS.amber500} />
         {/* Cool fill from the opposite side — keeps the shadow side of the
             cutaway readable instead of crushed to black now that ambient is
-            low. Camera/massing pass: desaturated from a distinctly blue
-            #7C93B0 toward a neutral cool grey (brief: "no blue cast") —
-            still reads as the shadow side's cool counterpoint to the key
-            light's warm side, just without tinting the concrete/facade
-            visibly blue at this pass's much closer camera distance. */}
+            low. A neutral cool grey rather than a distinctly blue tone, so
+            it reads as the shadow side's cool counterpoint to the key
+            light's warm side without tinting the concrete/facade visibly
+            blue. */}
         <directionalLight position={[-4, 2, 6]} intensity={0.2} color="#8D9295" />
-        {/* Warm accent at the entrance canopy/windows — the brief's "warm
-            interior/entrance glow". Raised from 0.35 to push the warm-vs-cool
-            separation harder per the screenshot-verified "reads flat" fix
-            above; still low/no-shadow (see the original reasoning: an extra
-            shadow-casting light here would cost a second shadow map for a
-            small, mostly-decorative effect). */}
+        {/* Warm accent at the entrance canopy/windows. No shadow casting —
+            an extra shadow-casting light here would cost a second shadow map
+            for a small, mostly-decorative effect. */}
         <pointLight position={[-1.25, 1.35, 2.5]} intensity={0.42} distance={2.6} decay={2} color="#FFC98A" />
         {/* Second small warm point light at the AR Group sign / stairwell
             corner (right wall, ExteriorShell.jsx's `ARGroupSign`) — echoes
             the entrance's warm glow on the building's other visible face so
-            neither side of the default 3/4 view reads flat.
-            Visual-QA fix: after the sign panel was enlarged (SIGN_SCALE 1.85,
-            panel center at world x=3.1, y=1.85, z=-0.15 — see ExteriorShell.jsx),
-            this light was left sitting almost exactly on the panel's own
-            surface (x=3.1, only ~0.05-0.1 units from the face/text plane at
-            every axis). At that distance a point light's 1/distance^2 falloff
-            blows the surface out completely, and with Bloom's 0.92 luminance
-            threshold that overexposure spreads into a single glare blob that
-            fully hides the backlit-text texture behind it — confirmed via a
-            cropped screenshot showing pure glare, no legible letterforms.
-            Moved up and out into open air above/in front of the panel (clears
-            the panel's own top edge at y=2.183 with margin, offset 0.15 off
-            the wall face into open air) so it reads as a downlight grazing the
-            sign from above instead of a light embedded in its face, and
-            intensity trimmed since proximity was doing most of the previous
-            brightness. */}
+            neither side of the default 3/4 view reads flat. Positioned up
+            and out into open air above/in front of the sign panel (ExteriorShell.jsx's
+            `ARGroupSign`, center at world x=3.1, y=1.85, z=-0.15) rather than
+            on its surface — a point light sitting too close to the panel
+            overexposes it via 1/distance^2 falloff, and with Bloom's 0.92
+            luminance threshold that spreads into a glare blob that hides the
+            backlit-text texture entirely. This reads as a downlight grazing
+            the sign from above instead. */}
         <pointLight position={[3.25, 2.35, -0.15]} intensity={0.28} distance={1.8} decay={2} color="#FFC98A" />
         {/* Scoped to its own Suspense so the CDN-fetched HDRI reflections never
             block the building/hotspots from rendering — without this boundary
@@ -1071,17 +967,9 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           enableDamping
           dampingFactor={0.05}
           minDistance={3}
-          // Bumped 13 -> 14 for the massing pass, then 14 -> 17.5 for the
-          // camera fill re-verification pass (see hotspots3d.js's
-          // "Marker/fill re-verification pass" note): NARROW's own resting
-          // distance moved 13.6 -> 16.63 to actually clear a real, scripted-
-          // verified crop at the 768x1024 breakpoint, so this needs to grow
-          // by the same margin pattern to keep that new resting distance
-          // safely under the limit (16.63 under 17.5, not right at it).
-          // Massing re-pass (round 3): the wing widened again (WING_X0 -4.3
-          // -> -6.6, see ExteriorShell.jsx) so NARROW's own resting distance
-          // grew again, 16.63 -> 18 (see hotspots3d.js) — bumped once more
-          // to keep the same "not right at the limit" margin.
+          // Must stay comfortably above the NARROW camera preset's resting
+          // distance from its target (see hotspots3d.js) — not right at the
+          // limit — or OrbitControls would clamp that resting shot inward.
           maxDistance={19.5}
           maxPolarAngle={Math.PI / 2.05}
           touches={{ ONE: undefined, TWO: undefined }}
@@ -1103,8 +991,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
                           without needing per-mesh geometry changes.
               2. Bloom  — luminance-gated, tight threshold: only true bright
                           highlights (sun-hit specular on metal, the emissive
-                          hotspot markers) bloom, never a general glow — the
-                          brief's explicit "no bloom/glow overuse".
+                          hotspot markers) bloom, never a general glow.
               3. ToneMapping (AGX) — replaces the old renderer-level
                           ACESFilmic + fixed exposure (mounting this composer
                           forces `renderer.toneMapping` to `NoToneMapping`

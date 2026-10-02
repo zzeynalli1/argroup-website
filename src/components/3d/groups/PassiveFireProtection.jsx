@@ -11,12 +11,12 @@ const GROUP_ID = 'passiveFireProtection'
  * so selecting this hotspot highlights/dims the whole assembly together, not
  * just the collar.
  *
- * Visual-quality pass: each penetration is now a real local substrate
- * section (`ConcreteSection`, a genuine bored opening, not a decal) with the
- * firestop material actually occupying the annular gap (`FirestopSeal`)
- * between the pipe OD and the opening edge, plus the existing `FirestopCollar`
- * kept as the visible mounting-flange hardware in front of the fill — collar
- * = hardware, seal = the fill, per the brief. AR/ember red stays a subtle
+ * Each penetration is a real local substrate section (`ConcreteSection`, a
+ * genuine bored opening, not a decal) with the firestop material actually
+ * occupying the annular gap (`FirestopSeal`) between the pipe OD and the
+ * opening edge, plus `FirestopCollar` as the visible mounting-flange
+ * hardware in front of the fill — collar = hardware, seal = the fill.
+ * AR/ember red stays a subtle
  * emissive-on-select accent (via `useSystemMaterial`), not the dominant tone:
  * the seal's own base color is the dark firestop red, only glowing brighter
  * when this hotspot is active/hovered.

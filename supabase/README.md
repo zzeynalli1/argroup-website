@@ -41,8 +41,9 @@ per-table comments for exactly how each maps to the current `src/data/*.js`
 files.
 
 - Product **categories** are intentionally not a table — the existing
-  9-category taxonomy stays frontend-controlled; `products.category_key` is
-  constrained to those 9 keys via a `check` constraint.
+  10-category taxonomy stays frontend-controlled; `products.category_key` is
+  constrained to those 10 keys via a `check` constraint (see
+  `migrations/0005_products_additional_category.sql` for the 10th).
 - `partners` / `customers` mirror `src/data/partners.js` / `customers.js`
   (currently anonymous logo lists): `name` is nullable and CMS/admin-facing
   only for now — the public frontend is not changed to display it. `partners`

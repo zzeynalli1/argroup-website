@@ -1,5 +1,6 @@
 import { supabase } from '../supabase'
 import { slugify } from './slugify'
+import { toWebpForUpload } from './imageOptimization'
 
 const TABLE = 'partners'
 const STORAGE_BUCKET = 'media'
@@ -152,12 +153,14 @@ export async function uploadPartnerLogo(file, name) {
   const validationError = validatePartnerLogoFile(file)
   if (validationError) throw new Error(validationError)
 
-  const ext = file.name.split('.').pop().toLowerCase()
+  const optimized = await toWebpForUpload(file)
+
+  const ext = optimized.name.split('.').pop().toLowerCase()
   const base = slugify(name) || 'partner'
   const suffix = crypto.randomUUID().slice(0, 8)
   const path = `${STORAGE_FOLDER}/${base}-${suffix}.${ext}`
 
-  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
+  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, optimized, { contentType: optimized.type, upsert: false })
   if (error) throw toSafeError('uploadPartnerLogo', error)
 
   const { data } = client.storage.from(STORAGE_BUCKET).getPublicUrl(path)

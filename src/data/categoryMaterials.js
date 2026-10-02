@@ -1,11 +1,22 @@
 import { products } from './products'
 
-// Real AR Group brand/product-line names for the 3 categories the Products
+// Real AR Group brand/product-line names for the categories the Products
 // landing page expands inline (see components/sections/ExpandedProductCategory.jsx).
 // Sourced directly from data/products.js#brands (already verified — see that
 // file's header comment) so this never drifts from the single source of
 // truth; adding a material here means adding it to products.js first.
-const EXPANDABLE_CATEGORY_KEYS = ['passiveFireProtection', 'vibrationInsulation', 'soundAcoustic']
+//
+// Currently EMPTY on purpose: every category's brand names (Fire Stop/
+// Hensotherm/Hensomastik, Bivratech/Vibratech/Vibrabsorber/Vibrafoam Purasys,
+// Sylomer/Decidamp SP150/Sorbermel/Sorberbarrier/Damtec) have no real photo
+// or other verified content — rendering them would just be a no-photo
+// placeholder tile (see ui/ImagePlaceholder's "[IMAGE: ...]" text), which
+// the public site must never show as a finished product card. Re-add a
+// category key here ONLY once real photography/content exists for its
+// brand tiles; until then, categories rely solely on real CMS products
+// (see useProducts/ExpandedProductCategory's `categoryProducts`) — e.g.
+// passiveFireProtection's 4 real Proflame products already do.
+const EXPANDABLE_CATEGORY_KEYS = []
 
 function slugify(name) {
   return name

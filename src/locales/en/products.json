@@ -52,6 +52,10 @@
       "name": "The Fans",
       "description": "Fan systems for smoke extraction and air circulation in buildings and tunnels."
     },
+    "additionalProducts": {
+      "name": "Additional Products",
+      "description": "Other AR Group products that fall outside the primary category groups."
+    },
     "marineAnticorrosion": {
       "name": "Marine and Anti-Corrosion Products",
       "description": "Protective coating systems for the marine industry and aggressive environments."
@@ -68,7 +72,8 @@
   "learnMore": "Learn More",
   "materials": {
     "close": "Close",
-    "selectPrompt": "Select a product to see details."
+    "selectPrompt": "Select a product to see details.",
+    "emptyState": "No published products in this category yet."
   },
   "proflame": {
     "brand": "",

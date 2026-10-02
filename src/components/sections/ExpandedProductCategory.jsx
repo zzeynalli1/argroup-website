@@ -85,12 +85,14 @@ function ProductDetail({ material, t }) {
  * published product to will surface it here automatically, no code change.
  *
  * data/categoryMaterials.js's brand-name tiles (Fire Stop/Hensotherm/...,
- * Bivratech/..., Sylomer/...) are intentionally still LOCAL, non-CMS data —
- * they're real brand names with no other verified content yet (no photo, no
- * description, no link — see the Phase 6 migration report), so they are
- * NOT Supabase rows and are NOT merged into the CMS product list; they
- * keep rendering exactly as before, appended alongside whatever real
- * products exist for that category.
+ * Bivratech/..., Sylomer/...) are real brand names with no other verified
+ * content (no photo, no description, no link — see the Phase 6 migration
+ * report). They are intentionally kept as LOCAL, non-CMS data — NOT Supabase
+ * rows, NOT merged into the CMS product list — but its exported map is
+ * currently EMPTY for every category, precisely so none of those no-photo
+ * tiles render publicly (see that file's own comment). A category with no
+ * local tiles and no published CMS products renders the empty state below
+ * instead of an empty grid.
  */
 export default function ExpandedProductCategory({ activeCategory, onClose }) {
   const { t, locale } = useTranslation('products')
@@ -162,24 +164,35 @@ export default function ExpandedProductCategory({ activeCategory, onClose }) {
                 </button>
               </div>
 
-              <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {materials.map((material) => (
-                    <ProductItem
-                      key={material.slug}
-                      material={material}
-                      isSelected={selectedMaterial?.slug === material.slug}
-                      onSelect={() => setSelectedSlug((current) => (current === material.slug ? null : material.slug))}
-                    />
-                  ))}
+              {materials.length === 0 ? (
+                // No local material tiles (see categoryMaterials.js — empty
+                // by design) and no published CMS products for this category
+                // yet. Never render an empty grid + a "select a product"
+                // prompt with nothing to select — an honest empty state
+                // instead, reusing ProductDetail's own placeholder styling.
+                <div className="mt-8 border border-white/10 bg-industrial-950 p-10 text-center">
+                  <p className="text-sm text-neutral-custom-400">{t('materials.emptyState')}</p>
                 </div>
+              ) : (
+                <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px] lg:gap-8">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {materials.map((material) => (
+                      <ProductItem
+                        key={material.slug}
+                        material={material}
+                        isSelected={selectedMaterial?.slug === material.slug}
+                        onSelect={() => setSelectedSlug((current) => (current === material.slug ? null : material.slug))}
+                      />
+                    ))}
+                  </div>
 
-                {isProflameSelected ? (
-                  <ProflameProductDetail material={selectedMaterial} family={proflameFamily} selectedSlug={selectedSlug} onSelect={setSelectedSlug} t={t} />
-                ) : (
-                  <ProductDetail material={selectedMaterial} t={t} />
-                )}
-              </div>
+                  {isProflameSelected ? (
+                    <ProflameProductDetail material={selectedMaterial} family={proflameFamily} selectedSlug={selectedSlug} onSelect={setSelectedSlug} t={t} />
+                  ) : (
+                    <ProductDetail material={selectedMaterial} t={t} />
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </motion.section>

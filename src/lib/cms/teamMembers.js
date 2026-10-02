@@ -1,4 +1,5 @@
 import { supabase } from '../supabase'
+import { toWebpForUpload } from './imageOptimization'
 
 const TABLE = 'team_members'
 const STORAGE_BUCKET = 'media'
@@ -10,7 +11,7 @@ const FALLBACK_LOCALE = 'az'
 const COLUMNS = [
   'id', 'name',
   'position_az', 'position_en', 'position_ru', 'position_tr',
-  'photo_url', 'parent_id', 'sort_order', 'published', 'created_at', 'updated_at',
+  'photo_url', 'phone', 'email', 'category_id', 'parent_id', 'sort_order', 'published', 'created_at', 'updated_at',
 ].join(', ')
 
 // team_members_no_self_parent CHECK constraint (0001_init_schema.sql).
@@ -75,6 +76,9 @@ export function adaptTeamMemberRow(row, locale) {
     name: row.name,
     position,
     photo: row.photo_url,
+    phone: row.phone,
+    email: row.email,
+    categoryId: row.category_id,
     parentId: row.parent_id,
     sortOrder: row.sort_order,
   }
@@ -244,12 +248,14 @@ export async function uploadTeamPhoto(file, name) {
   const validationError = validateTeamPhotoFile(file)
   if (validationError) throw new Error(validationError)
 
-  const ext = file.name.split('.').pop().toLowerCase()
+  const optimized = await toWebpForUpload(file)
+
+  const ext = optimized.name.split('.').pop().toLowerCase()
   const base = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : 'member'
   const suffix = crypto.randomUUID().slice(0, 8)
   const path = `${STORAGE_FOLDER}/${base || 'member'}-${suffix}.${ext}`
 
-  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
+  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, optimized, { contentType: optimized.type, upsert: false })
   if (error) throw toSafeError('uploadTeamPhoto', error)
 
   const { data } = client.storage.from(STORAGE_BUCKET).getPublicUrl(path)

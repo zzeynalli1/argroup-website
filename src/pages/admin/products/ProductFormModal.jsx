@@ -10,7 +10,9 @@ import {
   updateProduct,
   validateProductImageFile,
 } from '../../../lib/cms/products'
+import { validateExternalUrl } from '../../../lib/cms/urlValidation'
 import { useTranslation } from '../../../lib/i18n/useTranslation'
+import ImageCropModal from '../../../components/admin/ImageCropModal'
 
 const LOCALES = ['az', 'en', 'ru', 'tr']
 const LOCALE_LABELS = { az: 'AZ', en: 'EN', ru: 'RU', tr: 'TR' }
@@ -131,6 +133,28 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
   const [imageBusyUrl, setImageBusyUrl] = useState(null)
   const [imageActionError, setImageActionError] = useState('')
 
+  // Sequential crop queue shared by all 3 image-selection entry points below
+  // (staged multi-select, live multi-add, live single-replace) — crops one
+  // file at a time against the products module's aspect-square frame, then
+  // hands the accumulated cropped Files to whichever existing staging/
+  // upload logic the caller already had.
+  const [cropQueue, setCropQueue] = useState(null) // { files, index, results, onDone } | null
+
+  function startCropQueue(files, onDone) {
+    setCropQueue({ files, index: 0, results: [], onDone })
+  }
+
+  function handleCropConfirm(croppedFile) {
+    setCropQueue((prev) => {
+      const results = [...prev.results, croppedFile]
+      if (prev.index + 1 < prev.files.length) {
+        return { ...prev, index: prev.index + 1, results }
+      }
+      prev.onDone(results)
+      return null
+    })
+  }
+
   // Create mode only: staged files, uploaded together on first save.
   const [stagedFiles, setStagedFiles] = useState([])
   const stagedPreviews = useMemo(() => stagedFiles.map((f) => URL.createObjectURL(f)), [stagedFiles])
@@ -150,15 +174,15 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
       }
     }
     setFormError('')
-    setStagedFiles((prev) => [...prev, ...files])
     event.target.value = ''
+    startCropQueue(files, (cropped) => setStagedFiles((prev) => [...prev, ...cropped]))
   }
 
   function removeStagedFile(index) {
     setStagedFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
-  async function handleAddLiveImages(event) {
+  function handleAddLiveImages(event) {
     const files = Array.from(event.target.files ?? [])
     if (files.length === 0) return
     for (const file of files) {
@@ -170,16 +194,18 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
       }
     }
     setImageActionError('')
-    setImageBusyUrl('__adding__')
-    try {
-      const updated = await addProductImages(liveProduct, files)
-      setLiveProduct(updated)
-    } catch (err) {
-      setImageActionError(err.message)
-    } finally {
-      setImageBusyUrl(null)
-      event.target.value = ''
-    }
+    event.target.value = ''
+    startCropQueue(files, async (cropped) => {
+      setImageBusyUrl('__adding__')
+      try {
+        const updated = await addProductImages(liveProduct, cropped)
+        setLiveProduct(updated)
+      } catch (err) {
+        setImageActionError(err.message)
+      } finally {
+        setImageBusyUrl(null)
+      }
+    })
   }
 
   async function handleRemoveLiveImage(url) {
@@ -195,7 +221,7 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
     }
   }
 
-  async function handleReplaceLiveImage(url, event) {
+  function handleReplaceLiveImage(url, event) {
     const file = event.target.files?.[0]
     if (!file) return
     const validationError = validateProductImageFile(file)
@@ -205,16 +231,18 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
       return
     }
     setImageActionError('')
-    setImageBusyUrl(url)
-    try {
-      const updated = await replaceProductImage(liveProduct, url, file)
-      setLiveProduct(updated)
-    } catch (err) {
-      setImageActionError(err.message)
-    } finally {
-      setImageBusyUrl(null)
-      event.target.value = ''
-    }
+    event.target.value = ''
+    startCropQueue([file], async ([croppedFile]) => {
+      setImageBusyUrl(url)
+      try {
+        const updated = await replaceProductImage(liveProduct, url, croppedFile)
+        setLiveProduct(updated)
+      } catch (err) {
+        setImageActionError(err.message)
+      } finally {
+        setImageBusyUrl(null)
+      }
+    })
   }
 
   async function handleMoveLiveImage(index, direction) {
@@ -241,6 +269,11 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
 
     if (!values.name.trim()) {
       setFormError('Ad sahəsi məcburidir.')
+      return
+    }
+    const urlError = validateExternalUrl(values.external_link)
+    if (urlError) {
+      setFormError(urlError)
       return
     }
 
@@ -398,6 +431,16 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
               </div>
             )}
           </div>
+
+          {cropQueue && (
+            <ImageCropModal
+              file={cropQueue.files[cropQueue.index]}
+              aspectRatio={1}
+              mode="crop"
+              onCancel={() => setCropQueue(null)}
+              onConfirm={handleCropConfirm}
+            />
+          )}
 
           <div className="mt-6 border-t border-industrial-950/10 pt-5">
             <div className="flex gap-1">

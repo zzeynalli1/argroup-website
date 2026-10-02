@@ -12,6 +12,8 @@
  * Kept intentionally compact (image, name, short description, brand, link)
  * — no feature list, per the approved simplification pass.
  */
+import { isHttpUrl } from '../../lib/cms/urlValidation'
+
 export default function ProflameProductDetail({ material, family, selectedSlug, onSelect, t }) {
   return (
     <div className="border border-ember-600/40 bg-industrial-950 p-5 md:p-6">
@@ -47,7 +49,7 @@ export default function ProflameProductDetail({ material, family, selectedSlug, 
           <dt className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-custom-400">{t('brandFilter.label')}</dt>
           <dd className="font-mono text-xs uppercase tracking-[0.2em] text-ember-600">{material.brand}</dd>
         </div>
-        {material.externalLink && (
+        {material.externalLink && isHttpUrl(material.externalLink) && (
           <div className="flex items-center justify-between gap-3">
             <dt className="font-mono text-xs uppercase tracking-[0.2em] text-neutral-custom-400">{t('proflame.linkLabel')}</dt>
             <dd className="min-w-0">

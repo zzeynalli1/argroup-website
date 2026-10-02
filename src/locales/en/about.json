@@ -41,7 +41,9 @@
     "sinceCaption": "Since 2018, we have been installing Fire Stop passive fire protection systems across Azerbaijan."
   },
   "leadership": {
-    "heading": "Our Team"
+    "heading": "Our Team",
+    "expand": "Show more",
+    "collapse": "Hide"
   },
   "capabilities": {
     "eyebrow": "OUR CAPABILITIES",

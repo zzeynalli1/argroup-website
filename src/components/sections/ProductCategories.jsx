@@ -1,4 +1,4 @@
-import { ArrowRight, Flame, Volume2, Waves } from 'lucide-react'
+import { ArrowRight, Flame, Package, Volume2, Waves } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import TechnicalLines from '../ui/TechnicalLines'
 import Reveal from '../ui/Reveal'
@@ -30,6 +30,13 @@ const PANELS = [
     objectPosition: 'object-[78%_center] lg:object-[68%_center]',
   },
 ]
+
+// No real photography exists for this category yet (see data/products.js's
+// own comment) — rendered as a lightweight text-only entry below the photo
+// panels instead of a placeholder photo tile, per the approved decision.
+// Drives the same activeCategory/toggle wiring as the photo panels above,
+// so it opens the same ExpandedProductCategory panel below.
+const EXTRA_CATEGORY = { key: 'additionalProducts', icon: Package }
 
 /**
  * Full-bleed architectural panel — the category photo IS the module (no
@@ -167,6 +174,43 @@ export default function ProductCategories({ activeCategory, onSelect }) {
               />
             ))}
           </div>
+        </Reveal>
+
+        <Reveal delay={0.15}>
+          <button
+            type="button"
+            onClick={() => toggle(EXTRA_CATEGORY.key)}
+            aria-pressed={activeCategory === EXTRA_CATEGORY.key}
+            className={`group mt-3 flex w-full items-center justify-between gap-4 border px-5 py-4 text-left transition-colors duration-300 md:px-6 ${
+              activeCategory === EXTRA_CATEGORY.key
+                ? 'border-ember-600 bg-industrial-950'
+                : 'border-white/10 bg-industrial-950/60 hover:border-ember-600'
+            }`}
+          >
+            <span className="flex items-center gap-3">
+              <span
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
+                  activeCategory === EXTRA_CATEGORY.key
+                    ? 'border-ember-600 text-ember-600'
+                    : 'border-white/25 text-base-50 group-hover:border-ember-600 group-hover:text-ember-600'
+                }`}
+              >
+                <EXTRA_CATEGORY.icon size={16} strokeWidth={1.5} />
+              </span>
+              <span className="font-heading text-base font-semibold text-base-50 md:text-lg">
+                {t(`items.${EXTRA_CATEGORY.key}.name`)}
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-ember-600">
+              {t('learnMore')}
+              <ArrowRight
+                size={16}
+                className={`transition-transform duration-300 ease-out group-hover:translate-x-1.5 motion-reduce:transition-none ${
+                  activeCategory === EXTRA_CATEGORY.key ? 'translate-x-1.5' : ''
+                }`}
+              />
+            </span>
+          </button>
         </Reveal>
       </div>
     </section>

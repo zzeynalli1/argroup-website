@@ -10,6 +10,7 @@ import {
   validateProjectImageFile,
 } from '../../../lib/cms/projects'
 import { slugify } from '../../../lib/cms/slugify'
+import ImageCropModal from '../../../components/admin/ImageCropModal'
 
 const LOCALES = [
   { key: 'az', label: 'AZ' },
@@ -97,6 +98,7 @@ export default function ProjectFormModal({ project, onClose, onSaved }) {
   const [slugTouched, setSlugTouched] = useState(isEdit)
   const [activeLocale, setActiveLocale] = useState('az')
   const [imageFile, setImageFile] = useState(null)
+  const [cropTarget, setCropTarget] = useState(null)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
@@ -134,7 +136,8 @@ export default function ProjectFormModal({ project, onClose, onSaved }) {
       return
     }
     setFormError('')
-    setImageFile(file)
+    setCropTarget(file)
+    event.target.value = ''
   }
 
   async function handleSubmit(event) {
@@ -346,6 +349,19 @@ export default function ProjectFormModal({ project, onClose, onSaved }) {
               </div>
             </div>
           </div>
+
+          {cropTarget && (
+            <ImageCropModal
+              file={cropTarget}
+              aspectRatio={16 / 9}
+              mode="crop"
+              onCancel={() => setCropTarget(null)}
+              onConfirm={(croppedFile) => {
+                setImageFile(croppedFile)
+                setCropTarget(null)
+              }}
+            />
+          )}
 
           <div className="mt-6 border-t border-industrial-950/10 pt-5">
             <div className="flex gap-1">

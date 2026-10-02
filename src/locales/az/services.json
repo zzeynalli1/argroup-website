@@ -214,8 +214,14 @@
     },
     "seismic": {
       "lead": "Binaların seysmik təsirlərə qarşı davamlılığının artırılmasına yönəlmiş mühəndislik dəstəyi.",
+      "shortIntro": "Boru və mühəndislik sistemlərinin seysmik hərəkətlər zamanı yerdəyişməsini məhdudlaşdırmaq üçün anker, bağlantı elementləri və seysmik halatlardan ibarət sabitləmə həlləri tətbiq edilir.",
       "about": "Seysmik mühəndislik xidməti strukturların zəlzələ zamanı yaranan qüvvələrə qarşı davranışının qiymətləndirilməsi və möhkəmləndirilməsi üzrə həlləri əhatə edir.",
       "technicalApproach": "Yanaşma strukturun mövcud vəziyyətinin qiymətləndirilməsinə və seysmik qüvvələrin layihələndirmə prosesində nəzərə alınmasına əsaslanır.",
+      "benefits": [
+        { "title": "Sistemin sabitliyi", "description": "Seysmik bağlantılar mühəndislik xətlərinin hərəkət zamanı nəzarətsiz yerdəyişməsini məhdudlaşdırmağa kömək edir." },
+        { "title": "Etibarlı bağlantı", "description": "Ankerlər, bağlantı elementləri və seysmik halatlar daşıyıcı konstruksiya ilə mühəndislik sistemi arasında etibarlı əlaqə yaradır." },
+        { "title": "Nəzarətli hərəkət", "description": "Düzgün yerləşdirilmiş və tənzimlənmiş seysmik elementlər boru sisteminin müxtəlif istiqamətlərdə hərəkətini məhdudlaşdırmağa kömək edir." }
+      ],
       "process": [
         { "title": "Ankerlərin quraşdırılması", "description": "Daşıyıcı konstruksiyada uyğun nöqtələr müəyyən edilir və seysmik sistem üçün ankerlər quraşdırılır." },
         { "title": "Bağlantı elementlərinin montajı", "description": "Seysmik halatların konstruksiyaya birləşdirilməsi üçün bağlantı elementləri ankerlərə bərkidilir." },

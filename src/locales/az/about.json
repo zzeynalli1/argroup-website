@@ -41,7 +41,9 @@
     "sinceCaption": "2018-ci ildən Azərbaycanda Fire Stop passiv yanğın qorunması sistemlərinin quraşdırılmasında fəaliyyət göstəririk."
   },
   "leadership": {
-    "heading": "Komandamız"
+    "heading": "Komandamız",
+    "expand": "Ətraflı",
+    "collapse": "Gizlət"
   },
   "capabilities": {
     "eyebrow": "İXTİSASLARIMIZ",

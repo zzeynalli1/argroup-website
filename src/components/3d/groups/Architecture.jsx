@@ -15,44 +15,34 @@ const HALF_W = 3
 
 // The curtain-wall bay fills the building's open front-right corner (see
 // Shell.jsx's right wall: solid panel runs z -1.8..0.8, nothing beyond
-// that). Previously the glazing pane was centered at z=1.65 with a 1.4
-// width (z 0.95..2.35) — 0.35 units past the building's own z=2 edge, i.e.
-// floating past the slab it should be sitting on. Tightened here to sit
-// fully within the real footprint (z 0.82..1.98), flush against the solid
-// wall's own end and inset from the slab edge.
+// that). Sits fully within the real footprint (z 0.82..1.98), flush against
+// the solid wall's own end and inset from the slab edge.
 const BAY_Z_START = 0.82
 const BAY_Z_END = 1.98
 const BAY_Y_START = 0.08
-// Massing pass: raised from 3.52 to 4.0 so this bay reads as a glazed
-// stairwell tower rising above the main roofline (parapet top 3.96 — see
-// RooftopShell.jsx's `Parapet`), matching the reference's corner stair
-// tower. Everything below (grid rows, transoms, anchor clips at y=1.2/2.4)
-// is computed off this constant or off the untouched 1.2/2.4 floor lines,
-// so raising it only stretches the top glazing row (2.4..4.0) taller — no
-// existing anchor moves. Old value (3.52) is kept here in this comment
-// since nothing else in the file reads it anymore.
+// Rises above the main roofline (parapet top 3.96 — see RooftopShell.jsx's
+// `Parapet`) so this bay reads as a glazed stairwell tower. Everything below
+// (grid rows, transoms, anchor clips at y=1.2/2.4) is computed off this
+// constant or off the untouched 1.2/2.4 floor lines, so changing it only
+// stretches the top glazing row (2.4..BAY_Y_END) taller — no existing
+// anchor moves.
 const BAY_Y_END = 4.0
-// Reference-fidelity pass: was a flat cap + low upstand lip; the reference
-// shows a small, slightly PITCHED dark enclosure capping this tower (a
-// shallow gable, not a flat roof) — rebuilt as two tilted slabs meeting at
-// a ridge instead. Base is unchanged (BAY_Y_END=4.0); apex/ridge geometry is
-// tuned so the mesh's real highest point stays at/under 4.15 — the old
-// flat-cap's max, already used to re-derive both camera presets in
-// hotspots3d.js — so no camera/hotspot re-derivation is needed here either.
-// Centerline rise base->apex. Kept intentionally short of the old flat cap's
-// 4.15 max: the slab's own half-thickness projects a little further
-// vertically at the ridge (see the inline math below), and the ridge
-// flashing bar sits on top of that — both accounted for so the mesh's real
-// highest point still lands at/under 4.15, not just this centerline number.
+// Pitched dark enclosure capping the tower — two tilted slabs meeting at a
+// ridge, rather than a flat cap. Apex/ridge geometry is tuned so the mesh's
+// real highest point stays at/under 4.15, the value both camera presets in
+// hotspots3d.js are verified against — don't raise this without
+// re-deriving those. The slab's own half-thickness projects a little
+// further vertically at the ridge (see the inline math below), and the
+// ridge flashing bar sits on top of that — both accounted for so the mesh's
+// real highest point lands at/under 4.15, not just this centerline number.
 const TOWER_RIDGE_RISE = 0.11
 const TOWER_SLAB_THK = 0.045
 
 // Perimeter posts (bay edges) + 2 interior mullions splitting the bay into
 // 3 vertical lites. The second interior mullion (z=1.66) lands right next
 // to the EngineeringTesting group's fixed curtain-wall anchor bracket at
-// x=2.95, z=1.68 (see groups/EngineeringTesting.jsx, untouched this pass) —
-// so that bracket now reads as fixed to a real mullion instead of floating
-// mid-panel.
+// x=2.95, z=1.68 (see groups/EngineeringTesting.jsx) — so that bracket reads
+// as fixed to a real mullion instead of floating mid-panel.
 const VERT_Z = [BAY_Z_START, 1.14, 1.66, BAY_Z_END]
 // Perimeter top/bottom + transoms at the two upper floor lines (y=1.2/2.4)
 // concealing the slab edges behind the glass, matching FLOOR_Y in Shell.jsx.
@@ -77,14 +67,11 @@ const RIGHT_COLUMN_Z0 = 1.66
 const RIGHT_COLUMN_Z1 = BAY_Z_END
 
 /**
- * Static envelope: curtain-wall glazing bay.
- *
- * Phase 1 rebuild: a proper stick-frame system (perimeter frame + interior
- * mullions/transoms forming a 3x3 grid, individually inset glazing lites
- * with real thickness instead of one zero-thickness rotated plane, a
- * projecting sill/flashing at the base, and small anchor clips tying the
- * interior mullions back to the floor slabs) — replaces the prior single
- * pane + 5 flat horizontal bars.
+ * Static envelope: curtain-wall glazing bay. A proper stick-frame system —
+ * perimeter frame + interior mullions/transoms forming a 3x3 grid,
+ * individually inset glazing lites with real thickness, a projecting
+ * sill/flashing at the base, and small anchor clips tying the interior
+ * mullions back to the floor slabs.
  */
 export default function Architecture({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const isFacadeEmphasized = FACADE_HOTSPOT_GROUPS.has(activeGroup) || FACADE_HOTSPOT_GROUPS.has(hoveredGroup)
@@ -241,20 +228,11 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
       {/* Small, slightly pitched dark cap over the tower's own footprint,
           raising this corner above the main roofline (parapet top 3.96 —
           RooftopShell.jsx) so it reads as a stairwell tower with its own
-          roof, matching the reference's dark gabled enclosure beside the
-          stair tower. Two tilted slabs meeting at a shared ridge point.
-          Screenshot-verified bug fix: the previous version derived each
-          slab's position from an ad-hoc offset (`halfSpan/2 +/- 0.025`)
-          plus a flat, un-rotated `+TOWER_SLAB_THK/2` nudge to the Y center —
-          that flat nudge doesn't correctly follow the slab's own rotated
-          local axes, which both lifted the whole roof off its base (the
-          visible "gap" against the wall below) and, combined with an
-          independently-eyeballed rotation angle, made the two sides read as
-          asymmetric/warped instead of a clean mirrored gable. Rebuilt below
-          from each slab's own two real endpoints (its base corner and the
-          shared ridge point) using `atan2`/distance — this is
-          geometrically guaranteed to make both slabs meet exactly at the
-          same ridge point with mirrored angles, no eyeballed offsets. */}
+          roof. Two tilted slabs meeting at a shared ridge point, each
+          derived from its own two real endpoints (its base corner and the
+          shared ridge point) via `atan2`/distance below — geometrically
+          guaranteed to make both slabs meet exactly at the same ridge point
+          with mirrored angles, rather than relying on eyeballed offsets. */}
       {(() => {
         const towerCenterX = HALF_W - 0.5
         const halfSpan = 0.5 // tower footprint half-width (1.0 total, same as before)
@@ -324,10 +302,9 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
           bay look like solid wall rather than glass with stairs behind it).
           Three short flights (one per floor gap) with a landing slab at the
           top of each, plus a simple sloped guardrail — enough real "stair"
-          silhouette to read correctly at this camera distance per the
-          brief's "doesn't need to be ornate" guidance, without pretending
-          to be a fully-detailed switchback (this bay is too shallow in X
-          for a real return flight). */}
+          silhouette to read correctly at this camera distance, without
+          pretending to be a fully-detailed switchback (this bay is too
+          shallow in X for a real return flight). */}
       {(() => {
         const stairX = HALF_W - 0.28
         const z0 = 1.0

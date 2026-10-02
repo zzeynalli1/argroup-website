@@ -7,11 +7,9 @@ import { DuctSegment, FirestopBoard } from '../buildingParts'
  * mechanical/utility room shell and its generic wall-penetration firestop
  * demo. Relocated verbatim from the old Shell.jsx.
  *
- * Note: this room was only ever visible before because the building had no
- * front wall (the permanent open-cutaway). Now that ExteriorShell closes the
- * front, this room is properly concealed by default like the rest of the
- * interior — that's the intended effect of the camera-pivot brief, not a
- * regression; no hotspot targets this room, so it stays hidden.
+ * Now that ExteriorShell closes the building's front wall, this room is
+ * properly concealed by default like the rest of the interior — intended,
+ * not a regression; no hotspot targets this room, so it stays hidden.
  */
 export default function InteriorArchitecture({ visible = true }) {
   return (

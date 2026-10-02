@@ -27,15 +27,10 @@ import { InstancedBoxes, InstancedCylinders } from '../buildingParts'
 // disc at some view angles (very low diffuse contribution outside its
 // narrow specular highlight, reflecting the dark night-sky Environment
 // preset). A small constant emissive floor keeps it reading as a lit metal
-// cap at every camera angle instead of an unintended dark hole.
-// Round-highlight fix (screenshot-verified): at the original 0.55/0.3
-// roughness/metalness, this small disc's specular response to the nearby
-// warm entrance point light produced a bright, radially-symmetric highlight
-// blob that read as a glowing BALL regardless of the flat/flush geometry it
-// actually sits on (a point-light specular lobe is round on any surface,
-// flat or curved) — confirmed by isolating this mesh and re-screenshotting.
-// Flattened toward matte (less specular energy to concentrate into a round
-// hotspot) and less metallic; emissive floor trimmed slightly to match.
+// cap at every camera angle instead of an unintended dark hole. Matte and
+// low-metalness on purpose: a glossier disc concentrates the nearby warm
+// entrance point light into a round specular highlight that reads as a
+// glowing ball rather than a flush inspection cap.
 const popCapMaterial = new THREE.MeshStandardMaterial({
   color: '#9AA0A6',
   roughness: 0.85,
@@ -96,57 +91,15 @@ function WallFiller({ orientation, rect, material }) {
 }
 
 // The permanent, always-solid part of each wall — everything except the 7
-// context-aware openings below. Back/left/right content is relocated
-// verbatim from the old Shell.jsx; front is new (this is what actually
-// closes the permanent open-cutaway).
-// Column boundaries below are wider than each system's own real footprint
-// on purpose: each opening must line up with BOTH (a) where that system
-// actually sits and (b) the point where that hotspot's fixed, unchangeable
-// `cameraPosition`-to-`position` sightline actually crosses this wall plane
-// (the two aren't always the same point once a camera looks at a shallow
-// angle) — verified per-hotspot by projecting that exact ray against the
-// z=HALF_D plane, not guessed.
-// Massing pass: the old single `-2.7..-0.45` ground-band filler now carves a
-// recessed main-entrance opening (u -1.55..-0.95, v0..1.0 — see
-// `ENTRANCE_DOOR` below) out of its left portion, and hands its rightmost
-// 0.5 units (`-0.95..-0.45`) to a dedicated dark accent pier
-// (`ACCENT_PIER_RECT`, rendered separately below with
-// `panelCharcoalMaterial` + a timber-slat overlay) instead of plain facade —
-// this is purely a material/void change within the SAME outer footprint as
-// before (still spans -2.7..-0.45, v0..2.15 in total), so none of the 7
-// PANEL_DEFS openings elsewhere on this wall (all defined by their own,
-// untouched rects) are affected.
-//
-// Reference-fidelity pass: the old single `-2.7..-1.55, v0..2.15` filler
-// (plain, blank facade — the single biggest gap against the reference,
-// which shows a real ground+first-floor window wall there) is now carved
-// into a window surround (jambs/sill/spandrel/head, still `facadeMaterial`,
-// still the exact same outer footprint) with two real recessed windows
-// filled in by `FacadeWindowUnit` below (see `WINDOW_ZONE` / `WINDOW_JAMB`).
-// Still entirely clear of every PANEL_DEFS rect (all defined independently,
-// below) and of `mechanicalSupport`'s slide panel directly above it
-// (v2.15..3.6, same u-range but non-overlapping v-range).
-//
-// Camera/massing pass ("wide/low/warm" rework): the left budget below
-// mechanicalSupport's own fixed rect (u -2.7..-0.45, v2.15..3.6 — UNCHANGED,
-// see the split-out upper-corner filler below) is re-split within its own
-// v0..2.15 band only: corner filler shrinks from a full 0.3 to 0.15 (it was
-// pure dead facade with no functional role beyond a chamfer margin), which
-// is handed to the entrance (0.6 -> 0.8 wide) — the brief's single biggest
-// front-facade complaint ("too narrow/weak"). Window zone keeps its old
-// 1.15 total width (just shifted 0.15 left to -2.85..-1.70) but gets
-// genuinely bigger GLASS via a thinner jamb (WINDOW_JAMB 0.15 -> 0.08) and
-// taller openings (spandrel gap between floors shrunk, ground window grown)
-// — "larger window openings" without needing more u-budget. The accent
-// pier is effectively unchanged in width (-0.95..-0.4 -> -0.90..-0.4, i.e.
-// 0.55 -> 0.50) since the entrance/window changes already consumed the
-// freed-up corner-filler budget; its "wider" read instead comes from a
-// substantially thicker/deeper timber screen within it (see
-// `EntranceAssembly` below) and from `panelCharcoalMaterial`'s own contrast
-// tune (buildingMaterials.js). Every boundary below is still contiguous
-// (corner -> window -> entrance -> pier, summing to the same fixed 2.6
-// units from -3 to -0.4), so nothing here can create a wall gap or overlap
-// a PANEL_DEFS rect.
+// context-aware openings below. Column boundaries are wider than each
+// system's own real footprint on purpose: each opening must line up with
+// BOTH (a) where that system actually sits and (b) the point where that
+// hotspot's fixed `cameraPosition`-to-`position` sightline crosses this wall
+// plane (the two aren't always the same point at a shallow camera angle).
+// The front wall's u-range from -3 to -0.4 is split contiguously into
+// corner filler -> window zone -> entrance -> accent pier (see the consts
+// below); together they must always sum to that fixed 2.6 units so no gap
+// or overlap with a PANEL_DEFS rect can appear.
 const WINDOW_ZONE_U0 = -2.85
 const WINDOW_ZONE_U1 = -1.7
 const WINDOW_JAMB = 0.08
@@ -159,11 +112,9 @@ const UPPER_WIN_V1 = 2.0
 const WINDOW_ZONE_V1 = 2.15
 
 const FRONT_FILLERS = [
-  // Corner filler, full height at its OLD -3..-2.7 boundary for the
-  // v2.15..WALL_TOP band (matches mechanicalSupport's own fixed rect start
-  // at u=-2.7 exactly — untouched), but narrowed to -3..-2.85 for the
-  // v0..2.15 band below it, handing that freed 0.15 to the window zone's
-  // own left jamb (see WINDOW_ZONE_U0 above).
+  // Corner filler: full height at u -3..-2.7 for the v2.15..WALL_TOP band
+  // (matches mechanicalSupport's rect start at u=-2.7), narrowed to
+  // -3..-2.85 below that, handing the rest to the window zone's left jamb.
   { u0: -3, u1: -2.7, v0: 2.15, v1: WALL_TOP },
   { u0: -3, u1: -2.85, v0: 0, v1: 2.15 },
   // Window-zone surround (jambs + sill + spandrel + head band) — the void
@@ -175,9 +126,8 @@ const FRONT_FILLERS = [
   { u0: WINDOW_U0, u1: WINDOW_U1, v0: GROUND_WIN_V1, v1: UPPER_WIN_V0 },
   { u0: WINDOW_U0, u1: WINDOW_U1, v0: UPPER_WIN_V1, v1: WINDOW_ZONE_V1 },
   { u0: -1.7, u1: -0.9, v0: 1.05, v1: 2.15 },
-  // Sliver above the accent pier (see ACCENT_PIER_RECT below, -0.9..-0.4) —
-  // only the v2.15..WALL_TOP portion is still needed here since the pier
-  // itself now covers v0..2.15 across this same u-range.
+  // Sliver above the accent pier (ACCENT_PIER_RECT below covers v0..2.15
+  // across this same u-range, so only v2.15..WALL_TOP is needed here).
   { u0: -0.45, u1: -0.4, v0: 2.15, v1: WALL_TOP },
   { u0: 0.75, u1: 0.8, v0: 0, v1: WALL_TOP },
   { u0: 0.8, u1: 2.3, v0: 0, v1: 0.3 },
@@ -185,51 +135,33 @@ const FRONT_FILLERS = [
   { u0: 2.3, u1: 3, v0: 0, v1: WALL_TOP },
 ]
 
-// Dark accent pier immediately right of the entrance (reference: a charcoal
-// panel band + timber-slat strip flanking the recessed entry) — same outer
-// footprint the old single ground-band filler used to cover at this u-range,
-// just split out to its own material instead of `facadeMaterial`.
-//
-// Reference-fidelity pass: widened from `-0.95..-0.45` to `-0.95..-0.4`
-// (absorbing the old thin filler sliver that used to sit between the pier
-// and the passiveFireProtection panel) — the reference's graphite band
-// reads as roughly 1/4-1/3 of the whole facade width, far wider than a
-// single 0.5-unit pier could ever be within this footprint's fixed hotspot
-// layout. Paired with `PFP_CHARCOAL_BANDS` below (which tints the
-// passiveFireProtection panel's own surrounding fillers, and the panel
-// itself via its PANEL_DEFS `material`, the same charcoal) this pier now
-// reads as one continuous dark cladding zone from the entrance to the
-// technical panel — u -0.95..0.75, 1.7 of the front wall's 6 units (~28%),
-// in the reference's target range — without moving any hotspot's own
-// rect/position.
+// Dark accent pier immediately right of the entrance (a charcoal panel band
+// + timber-slat strip flanking the recessed entry), rendered separately from
+// FRONT_FILLERS so it gets its own material instead of `facadeMaterial`.
+// Paired with `PFP_CHARCOAL_BANDS` below (which tints the
+// passiveFireProtection panel's surrounding fillers, and the panel itself
+// via its PANEL_DEFS `material`, the same charcoal), this pier reads as one
+// continuous dark cladding zone from the entrance to the technical panel.
 const ACCENT_PIER_RECT = { u0: -0.9, u1: -0.4, v0: 0, v1: 2.15 }
 
 // The plain facade bands immediately above/below the passiveFireProtection
 // panel (PANEL_DEFS rect u-0.4..0.75, v0.85..2.5) — rendered in
 // `panelCharcoalMaterial` instead of `facadeMaterial` so they read as part
 // of the same graphite zone the accent pier starts (see the comment above).
-// Same footprint FRONT_FILLERS used to cover at this u-range before this
-// pass; only the material changed.
 const PFP_CHARCOAL_BANDS = [
   { u0: -0.4, u1: 0.75, v0: 0, v1: 0.85 },
   { u0: -0.4, u1: 0.75, v0: 2.5, v1: WALL_TOP },
 ]
 
 // Recessed main entrance — a void in FRONT_FILLERS above (u -1.7..-0.9,
-// v0..1.05), the frame/glass/canopy filling it are all static (non-hotspot)
-// dressing, entirely clear of every PANEL_DEFS rect on this wall. Widened
-// from -1.55..-0.95 (0.6) to -1.7..-0.9 (0.8) and the recess deepened (see
-// ENTRANCE_RECESS) — the brief's top front-facade complaint ("too narrow/
-// weak, needs a deeper recess").
+// v0..1.05); the frame/glass/canopy filling it are all static (non-hotspot)
+// dressing, entirely clear of every PANEL_DEFS rect on this wall.
 const ENTRANCE_DOOR_RECT = { u0: -1.7, u1: -0.9, v0: 0, v1: 1.05 }
-const ENTRANCE_RECESS = 0.2 // how far back from the wall face (z=HALF_D) the door plane sits (was 0.14)
-const CANOPY_PROJECTION = 0.48 // how far the canopy slab projects past the wall face (was 0.4)
+const ENTRANCE_RECESS = 0.2 // how far back from the wall face (z=HALF_D) the door plane sits
+const CANOPY_PROJECTION = 0.48 // how far the canopy slab projects past the wall face
 
-// --- Reference-fidelity pass: front-facade window wall -------------------
-// Two real recessed, dark-aluminum-framed multi-pane windows (2x3 pane grid
-// each) filling the void `FRONT_FILLERS` above now carves out of the
-// window zone — matches the reference's ground-floor + first-floor office
-// windows on the light-concrete section of the front facade. Static
+// Two recessed, dark-aluminum-framed multi-pane windows (2x3 pane grid each)
+// filling the void FRONT_FILLERS carves out of the window zone. Static
 // (non-hotspot) dressing, same as the entrance/canopy below.
 const WINDOW_RECESS = 0.09
 const WINDOW_FRAME_DEPTH = 0.045
@@ -239,10 +171,9 @@ const WINDOW_GLASS_INSET = 0.025
 // Cheap "stage set" behind a piece of visible glazing — a warm-washed back
 // wall, a floor plane, and 1-2 flat furniture-block silhouettes, just deep
 // enough behind the glass (`depthZ`) to read as a real room rather than a
-// void or a flat texture (brief: "not a detailed interior, just not dead/
-// empty"). `width`/`height`/`centerU`/`centerV` describe the opening this
-// sits behind in the same wall-local (u,v) terms `rectToWorld` uses;
-// `depthZ` is the absolute world Z the back wall plane sits at (always
+// void or a flat texture. `width`/`height`/`centerU`/`centerV` describe the
+// opening this sits behind in the same wall-local (u,v) terms `rectToWorld`
+// uses; `depthZ` is the absolute world Z the back wall plane sits at (always
 // nearer to the building's own interior than the glass itself).
 function InteriorGlowRoom({ centerU, centerV, width, height, depthZ, glassZ, blocks = [] }) {
   const backWallZ = depthZ
@@ -331,11 +262,10 @@ function FacadeWindowUnit({ rect, debugColor = null }) {
         </mesh>
       ))}
 
-      {/* Cheap interior "stage set" a little further behind the glass than
-          the recess itself — a warm back wall + floor + a furniture-block
-          silhouette (see `InteriorGlowRoom` above), the brief's "not dead/
-          empty" fix. Sits behind the recessed glazing, well within the
-          building's own solid interior volume, never poking through a wall. */}
+      {/* Interior "stage set" a little further behind the glass than the
+          recess itself (see `InteriorGlowRoom` above). Sits behind the
+          recessed glazing, well within the building's own solid interior
+          volume, never poking through a wall. */}
       <InteriorGlowRoom
         centerU={cu}
         centerV={cv}
@@ -364,48 +294,20 @@ function WindowZone() {
   )
 }
 
-// --- Reference-fidelity pass: backlit "AR Group" wall sign ----------------
-// Mounted on the right wall's own solid panel (x=HALF_W face, z centered at
-// -0.15 — well inside the untouched `-1.1..0.8` RIGHT_FILLERS solid run,
-// with a comfortable margin from both the glazed stairwell bay at z
-// 0.82..1.98 and the far end of the solid run), immediately behind the
-// glazed stairwell tower — the same real relationship the reference shows
-// (sign at the corner just past the stairwell), placed on the side of that
-// solid panel that actually has room in this footprint rather than the
-// 0.02-unit sliver literally at the geometric corner. Lettering is a canvas
-// texture (`signTextTexture`, buildingMaterials.js), not drei's `<Text>` —
-// troika-three-text fetches its default glyph font from a remote CDN, which
-// screenshot verification caught intermittently failing to resolve in time
-// and leaving the sign blank (an unacceptable failure mode for an
-// always-visible wall sign); a canvas texture drawn with the browser's own
-// system font has zero network dependency and can never fail to render.
-//
-// Screenshot-verified bug fix: the previous panel (1.05 wide, centered at
-// z=0.35) spanned z -0.175..0.875 — 0.055 PAST the solid wall's own
-// z=0.8 edge and into the glazing bay's mullion zone, which is why it
-// rendered as a dark rectangle overlapping the stairwell glass with no
-// legible text (the panel/text geometry was fighting the glazing/mullion
-// meshes at that shared boundary). Shrunk and moved well clear of that
-// edge; also moved from the wall's raw exterior offset (barely proud) to
-// a slightly larger standoff so it doesn't read as fighting the wall face.
+// Backlit "AR Group" wall sign, mounted on the right wall's solid panel
+// (z centered at -0.15, inside the `-1.1..0.8` RIGHT_FILLERS solid run),
+// immediately behind the glazed stairwell tower. Lettering is a canvas
+// texture (`signTextTexture`, buildingMaterials.js) rather than drei's
+// `<Text>` — troika-three-text fetches its default glyph font from a remote
+// CDN, which can fail to resolve and leave the sign blank; a canvas texture
+// drawn with the browser's system font has no network dependency.
 const SIGN_CENTER = [HALF_W + THK / 2 + 0.02, 1.85, -0.15]
 const SIGN_ROTATION = [0, Math.PI / 2, 0]
-// Legibility pass (screenshot-verified: at SIGN_SCALE=1.35 the panel was
-// genuinely hard to read even close up, one of the confirmed defects in this
-// pass). Brief target was 2-2.5x the then-current 0.837x0.486 visible size
-// (~1.7-2.1 x 1.0-1.2), but the sign's local X axis (box arg[0]/plane
-// arg[0]) maps to world Z once rotated 90deg about Y, and this wall's own
-// solid run is only 1.9 units wide (`-1.1..0.8`, RIGHT_FILLERS' third
-// entry) before hitting the acoustic-insulation opening on one side and
-// Architecture.jsx's real glazed stairwell bay (z=0.82..1.98) on the other
-// — a full 2-2.5x jump (panel width ~1.6-2.0) would leave under 0.15 units
-// of margin to the glazing bay, right back into the exact "panel spilling
-// into the glazing/mullion zone" bug this file already fixed once (see the
-// SIGN_CENTER comment above). Landed on 1.85x (panel 1.147x0.666, text
-// 1.073x0.604) — a clearly legible ~2x jump from the old size while keeping
-// a real ~0.3-unit margin on both sides of the solid run (centered at world
-// z=-0.15: spans z -0.723..0.424, i.e. 0.377 clear of the u=-1.1 edge and
-// 0.376 clear of the glazing bay at z=0.82).
+// The sign's local X axis (box/plane arg[0]) maps to world Z once rotated
+// 90deg about Y, and this wall's solid run is only 1.9 units wide
+// (`-1.1..0.8`) before hitting the acoustic-insulation opening on one side
+// and the glazed stairwell bay (z=0.82..1.98) on the other — SIGN_SCALE must
+// keep the panel's resulting z-span (see SIGN_PANEL_W) clear of both.
 const SIGN_SCALE = 1.85
 const SIGN_PANEL_W = 0.62 * SIGN_SCALE
 const SIGN_PANEL_H = 0.36 * SIGN_SCALE
@@ -499,21 +401,15 @@ const PANEL_DEFS = [
     kind: 'pop',
     axis: [0, 0, -1],
     distance: 0.5,
-    // Reference-fidelity pass: tinted to match the surrounding charcoal
-    // cladding band (see FRONT_FILLERS' now-charcoal bands around this same
-    // rect) — reads as one continuous dark graphite zone with a flush
-    // technical access port in it, the same way the accent pier does,
-    // instead of a plain facade-colored patch. Purely a closed-state tint;
-    // the panel's own open/slide mechanism is untouched.
+    // Tinted to match the surrounding charcoal cladding band (see
+    // FRONT_FILLERS' charcoal bands around this same rect) — a closed-state
+    // tint only, the panel's own open/slide mechanism is untouched.
     material: panelCharcoalMaterial,
   },
   {
-    // Screenshot-verified fix: this panel (1.5 wide x 3.0 tall, plain
-    // `facadeMaterial`) was one of the two confirmed "large blank facade
-    // panel with no joints/rhythm/depth" defects — a single flat RoundedBox
-    // spanning most of the wall's height with nothing on it. `joints: true`
-    // adds real precast-style reveal lines (see `PanelJoints` below); purely
-    // cosmetic surface detail on the SAME opening/slide mechanism.
+    // `joints: true` adds precast-style reveal lines (see `PanelJoints`
+    // below) so this large flat panel doesn't read as blank facade; purely
+    // cosmetic surface detail on the same opening/slide mechanism.
     id: 'fireproofingSystems',
     orientation: 'front',
     rect: { u0: 0.8, u1: 2.3, v0: 0.3, v1: 3.3 },
@@ -523,10 +419,7 @@ const PANEL_DEFS = [
     joints: true,
   },
   {
-    // Second confirmed "large blank panel" defect (2.25 wide x 1.45 tall,
-    // exceeding the brief's "no flat surface > ~1/3 of the facade's visible
-    // width with nothing on it" threshold on its own). Same `PanelJoints`
-    // treatment.
+    // Same `PanelJoints` treatment as fireproofingSystems above.
     id: 'mechanicalSupport',
     orientation: 'front',
     rect: { u0: -2.7, u1: -0.45, v0: 2.15, v1: 3.6 },
@@ -586,25 +479,14 @@ const OUTWARD_Z = { front: 1, back: -1 }
 
 function PopPlug({ def, position, onRegister, material = facadeMaterial }) {
   const { size } = closedTransform(def)
-  // Capped at a fixed, plausible inspection-port size rather than always
-  // scaling with the plug's own footprint — passiveFireProtection's plug
-  // is sized to cover two different anchor points (see FRONT_FILLERS
-  // above) and is noticeably bigger than the port itself would be. Bug fix
-  // (screenshot-verified): this used to cap at 0.32, a 0.64-diameter disc —
-  // roughly the size of a manhole cover — reading as a large floating grey
-  // circle on the facade with nothing like it in the reference. A real
-  // firestop inspection port is on the order of 10-15cm; 0.09 is the right
-  // physical scale.
-  // Screenshot-verified SECOND fix: shrinking/flattening the bare disc alone
-  // (see the comment below) didn't fix the "stray ball near the entrance"
-  // read — a small isolated circle on an otherwise blank dark panel reads as
-  // a knob/button purely from its SILHOUETTE, independent of how flat or how
-  // matte its material is (confirmed: swapping in a flat unlit test material
-  // produced the identical round silhouette). The actual fix is contextual:
-  // a smaller disc set into a labeled rectangular backing plate with corner
-  // fasteners (see the assembly below) reads as "access-cover hardware",
-  // not "an unexplained round bump", the same way a real firestop
-  // inspection port is never just a bare circle in isolation.
+  // Capped at a fixed, plausible inspection-port size (a real firestop
+  // inspection port is on the order of 10-15cm) rather than scaling with the
+  // plug's own footprint — passiveFireProtection's plug is sized to cover
+  // two different anchor points (see FRONT_FILLERS above) and is noticeably
+  // bigger than the port itself would be. The disc is also set into a
+  // labeled rectangular backing plate with corner fasteners (below) rather
+  // than left as a bare circle, which otherwise reads as an unexplained
+  // round knob regardless of material flatness.
   const capRadius = Math.min(0.05, Math.min(size[0], size[1]) / 2 - 0.09)
   // The visible port cap always sits on the wall's PUBLIC-facing side,
   // independent of which way the plug itself slides (see PANEL_DEFS: both
@@ -634,20 +516,10 @@ function PopPlug({ def, position, onRegister, material = facadeMaterial }) {
       />
       {/* Metal inspection-port ACCESS PANEL on the outer face — the visual
           cue that this plug is a serviceable cored penetration, not
-          decoration.
-          Screenshot-verified bug fix (two rounds): a bare circular cap here
-          — first a 0.09-radius puck, then a flattened/matted 0.09-radius
-          disc — read as a stray pale-grey BALL floating on the facade at
-          this scene's default camera framing, right beside this hotspot's
-          own marker, looking like a second doorknob next to the real
-          entrance door (confirmed both times by isolating the mesh and
-          re-screenshotting; flattening/de-glossing it alone didn't help,
-          since an isolated circle reads as a knob from its SILHOUETTE
-          regardless of depth or material). Fixed by giving it real context
-          instead: a small rectangular galvanized backing plate with 4
-          corner fasteners and a smaller recessed disc set into it — the
-          standard look of an actual firestop inspection access panel,
-          which is never just a bare circle in isolation. */}
+          decoration. A rectangular galvanized backing plate with 4 corner
+          fasteners and a smaller recessed disc, matching the standard look
+          of a real firestop inspection access panel (a bare circular cap
+          alone reads as a floating knob, regardless of material). */}
       <group position={[0, 0, capSign * (THK / 2 + 0.006)]}>
         <RoundedBox
           args={[capRadius * 3.4, capRadius * 2.6, 0.014]}
@@ -799,60 +671,14 @@ function HingePlug({ def, position, onRegister }) {
   )
 }
 
-// --- Camera/massing pass: low wide wing ---
-// The building's own footprint (HALF_W/HALF_D) can't change, so width comes
-// from a low, single-story massing extension beyond the left wall instead
-// (brief: "reads narrow/tall/box-like... get width from added non-
-// engineering massing... matching the shell's material language"). Sits
-// entirely at x < -3 (outside HALF_W), full building depth (z -2..2, flush
-// with the front/back wall planes), capped at 1.37 total height (well under
-// every floor line) so it reads as a clearly subordinate single-story
-// element, not a second building.
-//
-// Massing re-pass (round 3): the wing was still reading as "a thin strip"
-// against the main box (old WING_X0=-4.3 -> only 1.3 units wide, ~22% of the
-// main box's own 6-unit width) — widened to WING_X0=-6.6 (3.6 units wide,
-// 60% of the main box's width), giving a total footprint 9.6 units wide
-// against the building's ~4.15 max height (ratio ~2.31:1, the "width
-// dominates height" target). See `WingBayBreak` below for the added
-// facade rhythm this width now needs (a material break + more window bays)
-// so it doesn't read as one long uninterrupted block.
-//
-// Hotspot-sightline re-check (per the brief's "verify against every
-// hotspot's cameraPosition->position ray before finalizing placement", redone
-// against the new, much wider span): every one of the 9 current hotspots was
-// checked, not just the ones previously flagged. Six never approach x<-3 at
-// all (passiveFireProtection, fireproofingSystems, acousticInsulation,
-// vibrationSolutions, drillingCutting, engineeringTesting — all have both
-// endpoints at x>=0). The three whose rays do cross x<-3:
-//   - `cableProtection` (cam [-4.5,2.2,3] -> pos [-2,1.05,-1.3]): the ray's
-//     x only ever ranges from -4.5 (at the camera) to -2 (at the target), so
-//     it's within the wing's span (-6.6..-3) only for the sub-segment
-//     t=[0,0.6] (parametrizing cam->pos as t=0..1); of that, only t=[0.233,
-//     0.6] also falls inside the wing's z-footprint (-2..2). Across that
-//     sub-range y falls from 1.93 to 1.51 — always above the wing's 1.37
-//     cap, clearing by >=0.14 at the tightest point (t=0.6, the wing's own
-//     near edge at x=-3 — unchanged by extending the FAR edge further left,
-//     since the ray never reaches past x=-4.5 anyway).
-//   - `mechanicalSupport` (cam [-3.5,4.2,4] -> pos [-1.2,2.4,-1]): the only
-//     sub-segment with x<-3 is t=[0,0.217] (x from -3.5 to -3), where z runs
-//     4.0->2.91 — always outside the wing's z<=2 footprint, so this ray
-//     never actually enters the wing's volume at all, unaffected by the
-//     width change.
-//   - `jointSealing` (cam [-6,3,1] -> pos [-3,1.8,-1.95]): x ranges -6..-3
-//     for the ENTIRE ray (t=0..1), now entirely inside the wider wing's
-//     x-span (-6.6..-3, since -6 > -6.6) for its whole length — a real
-//     change from the old wing (which only reached -4.3, so previously just
-//     the tail end of this ray crossed it). z ranges 1..-1.95, within the
-//     wing's -2..2 footprint for the whole ray too. But y ranges 3.0 down to
-//     1.8 (monotonic, minimum at the target itself) — still always >= 1.8,
-//     clearing the wing's 1.37 cap by >=0.43 at every point along the ray,
-//     camera included. No clearance problem despite now overlapping the
-//     wing's footprint for the ray's full length instead of just its tail.
-// Net result: no hotspot `position`/`cameraPosition` value needed to change
-// for the wider wing — every ray clears on height alone, and height didn't
-// change. (Re-verified with the same scripted ray-parametrization method as
-// this file's prior passes, not eyeballed.)
+// Low, single-story massing extension beyond the left wall (the building's
+// own footprint, HALF_W/HALF_D, can't change). Sits entirely at x < -3,
+// full building depth (z -2..2, flush with the front/back wall planes),
+// capped at 1.37 total height so it reads as a clearly subordinate element.
+// Every hotspot camera ray whose x-range crosses the wing's x<-3 span
+// (cableProtection, mechanicalSupport, jointSealing) stays above the wing's
+// 1.37 height cap for its entire crossing — re-check this if WING_X0,
+// `cableProtection`/`jointSealing`'s rects, or the 1.37 cap ever change.
 const WING_X0 = -6.6
 const WING_X1 = -HALF_W // -3, flush with the real left wall plane
 const WING_Z0 = -HALF_D
@@ -861,22 +687,15 @@ const WING_PLINTH_H = 0.22
 const WING_BODY_TOP = 1.22
 const WING_PARAPET_H = 0.12
 const WING_COPING_H = 0.03
-// Real highest point (parapet coping top) = 1.22 + 0.12 + 0.03 = 1.37 —
-// screenshot-verified bump from an initial 1.30 (the wing read as too low/
-// thin to register against the foreground landscaping at the new, much
-// closer default camera). Still comfortably under the tightest sightline
-// margin found above (cableProtection's ray never dips below y=1.51 while
-// crossing the wing's x-span — 0.14 of real clearance at 1.37, re-verified
-// with the same scripted projection check, not just this written note).
-// Bay break: splits the now much-wider wing into two unequal bays with a
-// visible material/plane change at the seam (a shallow-recessed vertical
-// reveal, same "proud/recessed thin strip" language as PanelJoints/the back
-// wall's own expansion joint elsewhere in this file) so a 3.6-unit-wide
-// single-story mass doesn't read as one uninterrupted block. The break sits
-// closer to the main building (a shorter "connector" bay in the darker
-// accent tone next to the tower) with a longer primary bay (lighter facade
-// tone, more windows) further out — echoes the main building's own
-// light-facade / dark-accent-pier relationship at wing scale.
+// Real highest point (parapet coping top) = 1.22 + 0.12 + 0.03 = 1.37; must
+// stay under the hotspot sightline clearance noted above WING_X0.
+// Bay break: splits the wing into two unequal bays with a visible
+// material/plane change at the seam (same "proud/recessed thin strip"
+// language as PanelJoints/the back wall's expansion joint) so the
+// 3.6-unit-wide single-story mass doesn't read as one uninterrupted block.
+// The shorter, darker "connector" bay sits next to the main building; the
+// longer, lighter primary bay sits further out — echoing the main
+// building's own light-facade/dark-accent-pier relationship at wing scale.
 const WING_BREAK_X = WING_X0 + (WING_X1 - WING_X0) * 0.62
 
 // A small recessed window unit at wing scale — same frame/glass language as
@@ -918,11 +737,9 @@ function LowWideWing() {
   const fullWidth = WING_X1 - WING_X0
   const fullCenterX = (WING_X0 + WING_X1) / 2
 
-  // 3 evenly-spaced windows across the wide outer bay (was 1 window per
-  // this whole zone before the widening) plus 1 narrower clerestory-style
-  // window in the connector bay — proportional articulation for the new
-  // width instead of stretching the old 2-window rhythm over 2.75x the
-  // span.
+  // 3 evenly-spaced windows across the wide outer bay plus 1 narrower
+  // clerestory-style window in the connector bay — proportional
+  // articulation for the wing's full width.
   const outerWinPositions = [-0.32, 0, 0.32].map((f) => outerCenterX + outerWidth * f)
 
   return (
@@ -1015,22 +832,10 @@ function EntranceAssembly() {
 
   // Timber slats overlay the accent pier's outer face — proud of the wall
   // plane by a hair so they read as an applied screen, not a texture swap.
-  // Camera/massing pass: brief flagged this as "too small/thin" (6 slats,
-  // 0.032 wide) — widened per-slat (0.046, +44%), given real proud depth
-  // (0.055, was 0.03) so each slat actually casts a visible shadow line
-  // onto the charcoal backing instead of reading as a flat painted stripe,
-  // and the zone itself widened slightly (0.35 -> 0.38) within the pier's
-  // own (now -0.9..-0.4) footprint. Count trimmed 6 -> 5 to keep a real,
-  // legible gap ratio (~39%) at the new wider slat size rather than
-  // shrinking the gaps back down.
-  // Screenshot-verified second fix: at 5 slats/0.046 wide, the gap (0.03)
-  // was narrower than the slat's own proud depth (0.055) — at this pass's
-  // ~34deg off-normal default camera azimuth, a gap has to exceed roughly
-  // `depth * tan(offAxisAngle)` (~0.037 here) to stay visually open from an
-  // oblique angle, or each slat's own side face fully occludes the gap next
-  // to it (exactly what the screenshot showed: one solid plank, no visible
-  // gaps at all). Fewer, thinner slats with a wider gap (0.06, safely past
-  // that threshold) fixes it while keeping the same overall zone width.
+  // The gap between slats must exceed roughly `slatDepth * tan(cameraOffAxisAngle)`
+  // (~0.037 at this scene's default camera azimuth) or each slat's own side
+  // face fully occludes the gap next to it from an oblique angle, making the
+  // whole screen read as one solid plank with no visible gaps.
   const slatZoneU0 = -0.88
   const slatZoneU1 = -0.5
   const slatCount = 4
@@ -1043,19 +848,17 @@ function EntranceAssembly() {
   })
 
   // Canopy/hanger/sconce anchors deliberately do NOT derive from
-  // `doorCu +/- doorWidth/2` any more (screenshot-verified bug: at this
-  // pass's widened door, that formula placed the left-side fixtures past
-  // WINDOW_U1 and back into the ground-floor window's own glass span — the
-  // exact occlusion bug already fixed once before for the old, narrower
-  // door). Explicit anchors instead, each independently checked against
-  // WINDOW_U1 (-1.78) and the pier's own right edge (-0.4):
+  // `doorCu +/- doorWidth/2` — that can place the left-side fixtures past
+  // WINDOW_U1 and into the ground-floor window's own glass span if the door
+  // is ever widened. Explicit anchors instead, each independently checked
+  // against WINDOW_U1 (-1.78) and the pier's own right edge (-0.4):
   //   - `entranceLeftClearX` sits inside the window zone's own right-hand
   //     jamb (WINDOW_U1..WINDOW_ZONE_U1, a solid 0.08-wide facade strip),
   //     comfortably clear of the actual glass.
   //   - The canopy widens asymmetrically toward the pier side (safe, static
-  //     dark cladding) rather than symmetrically around the door center,
-  //     so its wider brief-driven footprint never creeps back toward the
-  //     window no matter how the door itself is resized later.
+  //     dark cladding) rather than symmetrically around the door center, so
+  //     its footprint never creeps back toward the window if the door is
+  //     ever resized.
   const entranceLeftClearX = WINDOW_U1 + 0.04 // -1.74
   const canopyLeftX = entranceLeftClearX
   const canopyRightX = -0.62
@@ -1119,10 +922,9 @@ function EntranceAssembly() {
       />
 
       {/* Glazed double door + frame, set back at the recess plane. Uses the
-          dedicated `entranceGlassMaterial` (dark aluminum-framed glass),
-          NOT the shared `glazingMaterial` the windows use — see that
-          material's own comment for why (screenshot-verified bug fix: the
-          door used to read as a solid orange/wood panel). */}
+          dedicated `entranceGlassMaterial` (dark aluminum-framed glass), not
+          the shared `glazingMaterial` the windows use — see that material's
+          own definition in buildingMaterials.js for why. */}
       <mesh position={[doorCu, doorHeight / 2, doorPlaneZ]} material={entranceGlassMaterial} dispose={null} receiveShadow>
         <boxGeometry args={[doorWidth - 0.06, doorHeight - 0.04, 0.02]} />
       </mesh>
@@ -1152,14 +954,11 @@ function EntranceAssembly() {
 
       {/* Slim cantilevered entrance canopy + hanger rods back to the wall
           above the door — no support posts (a real slim canopy is hung/
-          cantilevered, not columned), matching the reference's entrance.
-          Screenshot-verified bug fix: was `galvanizedMaterial` (light,
-          cool-metallic), which under this scene's warm key light picked up
-          a strong warm specular and read as a light tan/beige wedge rather
-          than a flat black slab — the reference is explicitly a thin BLACK
-          canopy, so this now reuses `framingMaterial` (the same near-black
-          finish as the window/door frames), which stays dark under the same
-          lighting instead of blowing out warm. */}
+          cantilevered, not columned). Uses `framingMaterial` (near-black,
+          same finish as the window/door frames) rather than the lighter,
+          cool-metallic `galvanizedMaterial`, which picks up a strong warm
+          specular under this scene's key light and reads as a tan/beige
+          wedge instead of a flat black slab. */}
       <mesh position={[canopyCenterX, canopyY, canopyCenterZ]} material={framingMaterial} dispose={null} castShadow receiveShadow>
         <boxGeometry args={[canopyWidth, 0.04, CANOPY_PROJECTION]} />
       </mesh>
@@ -1210,10 +1009,8 @@ function EntranceAssembly() {
 }
 
 /**
- * The building's exterior envelope: back/left/right walls (relocated
- * verbatim from the old Shell.jsx) plus a new front wall that finally closes
- * the permanent open-cutaway — the building reads as a complete, realistic
- * exterior by default now (see the camera-pivot brief). Each of the 7
+ * The building's exterior envelope: back/left/right/front walls, closing the
+ * building into a complete, realistic exterior by default. Each of the 7
  * solid-wall hotspots gets its own locally-scoped opening (PANEL_DEFS above)
  * shaped/sized/animated to match what that specific system actually is,
  * driven directly off the already-threaded `activeGroup` prop — no changes

@@ -192,8 +192,7 @@ export function TrayRail({ position, rotation = [0, 0, 0], length = 1.6, materia
 }
 
 // Instanced small hardware — hanger rods, tray rungs, pipe clamps, railing
-// posts. One draw call for however many `positions` are given, per the perf
-// brief's "use instancing for repeated supports" note.
+// posts. One draw call for however many `positions` are given.
 export function InstancedBoxes({ positions, size = [0.04, 0.2, 0.04], rotation, material = hardwareMaterial }) {
   return (
     <Instances limit={positions.length} castShadow material={material} dispose={null}>
@@ -404,11 +403,10 @@ export function CableTraySupport({ position, dropHeight = 0.3, span = 0.26, mate
 }
 
 /**
- * --- Engineering-systems detail pass: new primitives -----------------------
- * Added for the 9 hotspot-reveal assemblies' visual-quality upgrade. Same
- * conventions as everything above: no boolean/CSG geometry, external/shared
- * materials always get `dispose={null}`, local (non-shared) geometry built
- * once via `useMemo` doesn't need it. `ConcreteSection`/`FirestopSeal` use
+ * Primitives for the hotspot-reveal assemblies. Same conventions as
+ * everything above: no boolean/CSG geometry, external/shared materials
+ * always get `dispose={null}`, local (non-shared) geometry built once via
+ * `useMemo` doesn't need it. `ConcreteSection`/`FirestopSeal` use
  * `THREE.ExtrudeGeometry` on a `THREE.Shape` with a hole — genuine 3D bore
  * geometry (a real annular gap/cut edge), not a boolean subtraction, using a
  * standard three.js feature (shape-with-holes extrusion) rather than a CSG
@@ -578,9 +576,8 @@ export function CableBundle({
 
 // A threaded hanger rod with a hex nut at each end (and an optional washer
 // under each nut) — the standard MEP support-rod hardware, reads convincingly
-// at this scale as a nut + washer rather than actual helical thread geometry
-// (per the brief: "don't over-engineer actual helical geometry"). Local axis
-// Y, matching every other vertical-member primitive in this file.
+// at this scale as a nut + washer rather than actual helical thread geometry.
+// Local axis Y, matching every other vertical-member primitive in this file.
 export function ThreadedRod({
   position,
   rotation = [0, 0, 0],
@@ -708,7 +705,7 @@ export function Anchor({ position, rotation = [0, 0, 0], length = 0.05, radius =
 }
 
 // A thin, soft/fibrous-looking insulation layer — a plain box (the "cheap on
-// purpose" fallback the brief explicitly allows: matte, high-roughness
+// purpose" fallback: matte, high-roughness
 // material tuning rather than a new noise-texture pipeline for one small
 // layer). Named/parametric so a wall build-up reads as a deliberate layer,
 // not an unlabeled inline mesh.

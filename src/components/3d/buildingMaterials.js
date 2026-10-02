@@ -8,7 +8,7 @@ import * as THREE from 'three'
  *   generic small hardware — these never need per-mesh variation, so a
  *   single shared instance (referenced by many meshes) is strictly better
  *   than one `<meshStandardMaterial>` per mesh (see CLAUDE.md perf note +
- *   the "reuse geometries and materials" build brief).
+ *   the "reuse geometries and materials" performance note).
  * - `useSystemMaterial()`, a hook for the ~10 hotspot-tagged "hero" system
  *   meshes (pipes, ducts, trays, collars…) that DO need per-mesh dynamic
  *   opacity when a hotspot is selected/deselected — those can't share a
@@ -20,8 +20,8 @@ import * as THREE from 'three'
  * tonal variants of industrial-800/neutral-custom-400 (not new brand
  * colors).
  *
- * --- Increment A: CC0 PBR texture foundation ---
- * Every non-glass/non-firestop material below now carries a real
+ * --- CC0 PBR texture foundation ---
+ * Every non-glass/non-firestop material below carries a real
  * photographed color/roughness/normal(/metalness) map instead of a flat
  * color — the single biggest lever for reading as an architectural render
  * instead of a Three.js primitive demo. All three texture sets are CC0
@@ -56,15 +56,15 @@ import * as THREE from 'three'
  * scene's largest/most prominent surfaces; smaller elements show a
  * plausible, still-realistic crop of the same non-repeating-pattern-
  * sensitive material rather than a per-mesh-exact physical scale, which
- * would need per-mesh UV work out of scope for this pass (candidate for a
- * later optimization/quality pass if it reads as a problem in practice).
+ * would need per-mesh UV work, a candidate for a later optimization pass if
+ * it reads as a problem in practice.
  *
  * Glass (`glazingMaterial`) intentionally has no texture map: the only CC0
  * "glass" sets available (ambientCG's "Facade00x") are full building-facade
  * photos with windows/mullions baked into the image, which would visually
  * collide with this scene's own real 3D mullion geometry (Architecture.jsx)
  * instead of adding realism. Glass gets its realism from `Environment`
- * reflections and lighting instead (Increment B), not a surface texture.
+ * reflections and lighting instead, not a surface texture.
  * `firestopStaticMaterial` also intentionally stays a flat, untextured
  * color — it's a reserved graphic signal ("red = protected penetration"),
  * not a physical surface this scene is trying to photo-match.
@@ -136,8 +136,7 @@ const galvNormalMap = loadMap('/textures/galvanized/normal.jpg', { repeat: GALV_
 const galvRoughnessMap = loadMap('/textures/galvanized/roughness.jpg', { repeat: GALV_REPEAT })
 const galvMetalnessMap = loadMap('/textures/galvanized/metalness.jpg', { repeat: GALV_REPEAT })
 
-// --- Increment B note on `envMapIntensity` ---
-// Multiplies each material's contribution from the scene's IBL
+// `envMapIntensity` multiplies each material's contribution from the scene's IBL
 // (`Environment`, see Hero3DScene.jsx) independent of its own map/roughness.
 // Concrete is overwhelmingly diffuse in real life — a low value keeps a
 // faint, plausible sheen (consistent with sealed/formed concrete) without
@@ -158,13 +157,10 @@ export const concreteMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: CONCRETE_ENV_INTENSITY,
 })
 
-// --- Massing/materials pass: reference-inspired exterior palette ---
-// Distinct from `concreteMaterial` above (kept as-is for structural
-// elements — columns/beams/slabs, which stay a neutral structural tone and
-// are mostly concealed by the envelope anyway) because the exterior
-// envelope itself needed to shift toward the reference's warmer light-grey
-// plaster/concrete finish without re-tinting every structural mesh that
-// happens to share the old material. Reuses the same CC0 concrete texture
+// Warmer light-grey plaster/concrete finish for the exterior envelope,
+// distinct from `concreteMaterial` above (kept for structural elements —
+// columns/beams/slabs, which stay a neutral structural tone and are mostly
+// concealed by the envelope anyway). Reuses the same CC0 concrete texture
 // set (no new texture load) — only `color` (a multiply tint) differs.
 export const facadeMaterial = new THREE.MeshStandardMaterial({
   color: '#D8D2C7',
@@ -176,40 +172,16 @@ export const facadeMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: CONCRETE_ENV_INTENSITY,
 })
 
-// Graphite/charcoal metal accent panel (reference's dark facade band) — a
-// visible but not-pure-black metal, distinct from `framingMaterial`
-// (window/curtain-wall frames) so the two dark tones read as different
-// products at different scales, same as real cladding systems do. Reuses
-// the painted-steel texture set already loaded for `steelMaterial`.
-// Screenshot-verified fix: the tower roof (Architecture.jsx) built from this
-// material caught a bright specular blowout at its tilted, grazing-light
-// angle and read as light grey rather than dark graphite — same root cause
-// as the entrance-glass bug above (roughness too low for a flat panel
-// facing a strong directional light). Roughness raised, envMapIntensity
-// trimmed further so the dark base color/texture actually dominates.
-// Screenshot-verified SECOND fix: on the front wall's accent-pier/
-// passiveFireProtection bay (ExteriorShell.jsx) — a mostly self-shadowed
-// corner that gets little direct key-light contribution — this material's
-// combination of a very dark base color + the scene's N8AO/contrast/AGX
-// post-processing pipeline crushed it to a literal (0,0,0) pure-black void
-// with zero readable texture, pixel-sampled and confirmed (not a geometry
-// gap: a debug unlit-material pass over every rect tiling this bay showed
-// full, seamless coverage with no gap). Same fix pattern already proven on
-// `popCapMaterial` below: a small constant NEUTRAL (not colored) emissive
-// floor, so the surface can never crush all the way to zero regardless of
-// shadow/AO/tone-mapping, plus a lightened base color — both purely additive
-// to the diffuse/specular response, so the tower roof's already-fixed
-// grazing-angle specular behavior (roughness/metalness/envMapIntensity,
-// untouched here) isn't affected.
-// Camera/massing pass, screenshot-verified fix: the high (1.4) emissive
-// floor that fixed the earlier "crushes to pure black" bug had a side
-// effect the brief flagged directly — such a strong constant self-emissive
-// flattens real shading/contact-shadow contrast, so the panel read as a
-// uniform flat grey-taupe rather than a rich dark graphite. Darkened the
-// base color further and roughly halved the emissive floor (1.4 -> 0.75) —
-// still enough to keep the panel from crushing to zero in this scene's
-// deepest shadow corners (the original bug), but low enough that real
-// shading variation shows through instead of one flat tone.
+// Graphite/charcoal metal accent panel — a visible but not-pure-black metal,
+// distinct from `framingMaterial` (window/curtain-wall frames) so the two
+// dark tones read as different products at different scales, same as real
+// cladding systems do. Reuses the painted-steel texture set already loaded
+// for `steelMaterial`. A small constant NEUTRAL (not colored) emissive floor
+// keeps this very-dark base color from crushing to a literal (0,0,0)
+// pure-black void in this scene's self-shadowed corners once N8AO/contrast/
+// AGX post-processing is applied — kept low enough that real shading/
+// contact-shadow variation still shows through rather than flattening to one
+// uniform tone.
 export const panelCharcoalMaterial = new THREE.MeshStandardMaterial({
   color: '#332F2A',
   map: steelColorMap,
@@ -254,9 +226,9 @@ export const plazaMaterial = new THREE.MeshStandardMaterial({
 
 // Flat, untextured landscape greens — cheap on purpose (a handful of
 // low-poly shrubs/lawn strips, not a vegetation system). Darkened/
-// desaturated in the reference-fidelity pass (screenshot-verified: the
-// previous, more saturated tones read as bright cartoonish "lollipop" green
-// under this scene's key light, wrong for a restrained dusk backdrop).
+// desaturated rather than a more saturated green, which reads as bright
+// cartoonish "lollipop" green under this scene's key light, wrong for a
+// restrained dusk backdrop.
 export const lawnMaterial = new THREE.MeshStandardMaterial({ color: '#3D4832', roughness: 0.95, metalness: 0 })
 export const foliageMaterial = new THREE.MeshStandardMaterial({ color: '#333D2A', roughness: 0.95, metalness: 0 })
 export const planterMaterial = new THREE.MeshStandardMaterial({
@@ -283,8 +255,7 @@ export const warmGlowMaterial = new THREE.MeshStandardMaterial({
 // Bollard lamp head (SiteEnvironment.jsx) — much higher emissive intensity
 // than `warmGlowMaterial` below (which is tuned for small background
 // canopy/downlight fixture glints, not a light source meant to read as
-// clearly "on" at this camera distance); screenshot-verified fix for
-// bollards that previously read as bare grey caps with no visible glow.
+// clearly "on" at this camera distance).
 export const bollardLampMaterial = new THREE.MeshStandardMaterial({
   color: '#FFDA9E',
   emissive: '#FFB65E',
@@ -347,26 +318,20 @@ export const galvanizedMaterial = new THREE.MeshStandardMaterial({
 // the same lighting. Shares the same painted-steel texture set as
 // `steelMaterial` (both are "painted metal" finishes), differentiated by
 // tint/roughness only.
-// Darkened toward near-black (reference's black metal window frames) —
-// still not pure #000, keeping a faint readable tint under the key light
-// instead of crushing to a silhouette.
-// Camera/massing pass, screenshot-verified fix — actual root cause found by
-// isolating it (a flat-color test material on the same meshes rendered
-// correctly; only reintroducing the shared steel texture set reintroduced
-// the bug): every thin frame member (window mullions, door frame, entrance
+// Darkened toward near-black — still not pure #000, keeping a faint
+// readable tint under the key light instead of crushing to a silhouette.
+// Deliberately has NO texture map, unlike the other metal materials in this
+// file: every thin frame member (window mullions, door frame, entrance
 // canopy, curtain-wall mullions/transoms) is exactly the case this file's
-// own file-level comment already flags as a known limitation — box UVs are
-// 0..1 per FACE regardless of that face's real size, so a thin trim member
-// stretches the ENTIRE `steel-painted` color/roughness/metalness texture
-// across a sliver of screen space. Wherever that texture has a bright
-// highlight/scratch (inevitable in any photographed metal texture), a thin
-// member shows it as a solid bright/mirror-sharp streak covering most or
-// all of its face, not a small proportionate fleck the way it reads on a
-// large panel. Rather than keep fighting that with roughness/metalness
-// tuning (which only dims the SAME broken sampling, not fix it), frame trim
-// drops the texture maps entirely and goes back to a flat matte color —
-// standard for painted aluminum trim at this scale anyway, and immune to
-// this whole class of artifact by construction.
+// own file-level comment flags as a known limitation — box UVs are 0..1 per
+// FACE regardless of that face's real size, so a thin trim member stretches
+// the ENTIRE `steel-painted` texture across a sliver of screen space.
+// Wherever that texture has a bright highlight/scratch (inevitable in any
+// photographed metal texture), a thin member shows it as a solid
+// mirror-sharp streak covering most of its face rather than a small
+// proportionate fleck. A flat matte color is immune to this artifact by
+// construction, and is standard for painted aluminum trim at this scale
+// anyway.
 export const framingMaterial = new THREE.MeshStandardMaterial({
   color: '#1E1F22',
   roughness: 0.62,
@@ -385,28 +350,20 @@ export const hardwareMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: METAL_ENV_INTENSITY,
 })
 
-// Neutral warm-grey tint (reference-fidelity pass: the previous '#E1EBEC'
-// carried a faint blue-cyan cast that reads as a real material property up
-// close but conflicts with the brief's explicit "NO BLUE anywhere" rule —
-// swapped for a warm-neutral tint instead, still light enough to read as
-// glass, not tinted plastic) plus a touch more metalness for crisper
-// `Environment` reflections on the curtain wall. No texture map — see the
-// file-level note on why glass is out of scope for Increment A's texture
+// Neutral warm-grey tint (deliberately no blue cast, which otherwise reads
+// as a real material property up close) plus a touch more metalness for
+// crisper `Environment` reflections on the curtain wall. No texture map —
+// see the file-level note on why glass is out of scope for the texture
 // pass. Highest `envMapIntensity` of any material in the scene — a curtain
 // wall's entire visual identity is its reflection, so this needs to read
 // clearly while `opacity`/`transparent` still keep it genuinely see-through.
-// A slightly stronger warm emissive floor (`emissive`/`emissiveIntensity`
-// below, bumped for the reference pass) reads as a plausible lit-interior
-// glimpse behind the glass at dusk (brief: "warm interior illumination")
-// without needing any actual interior geometry/lighting — cheap and
-// scene-wide since every glazing surface (curtain wall + entrance door +
-// the new facade windows) shares this one material.
-// Screenshot-verified bug fix: opacity 0.26 read as a near-solid grey
-// surface from outside (the stairwell glazing looked like solid wall, not
-// glass with visible stairs behind it) — lowered so the scene's own
+// A warm emissive floor (`emissive`/`emissiveIntensity` below) reads as a
+// plausible lit-interior glimpse behind the glass at dusk without needing
+// any actual interior geometry/lighting — cheap and scene-wide since every
+// glazing surface (curtain wall + entrance door + the facade windows)
+// shares this one material. Opacity is kept low enough that the scene's own
 // geometry behind the glass (the stair, the office interiors) actually
-// shows through, while the emissive floor still keeps it reading as glass
-// rather than an empty hole.
+// shows through rather than reading as a near-solid grey wall.
 export const glazingMaterial = new THREE.MeshStandardMaterial({
   color: '#EAE6DC',
   transparent: true,
@@ -419,24 +376,15 @@ export const glazingMaterial = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 })
 
-// --- Reference-inspired camera/massing pass: curtain-wall stairwell glazing
-// + stair-tread materials ---
-// Distinct from the shared `glazingMaterial` (facade windows/entrance door)
-// on purpose: screenshot verification of this pass showed the stairwell bay
-// reading as a blown-out bright-white wall, overpowering the front facade
-// the brief wants as the dominant surface. Two contributing causes, both
-// fixed here rather than by resizing the (engineering-tied, unchangeable)
-// glazing bay itself:
-//   1. This large glazed surface was sharing `glazingMaterial`'s opacity/
-//      envMapIntensity, tuned for small windows/doors, not a full-height
-//      curtain wall — at that scale the same settings read far brighter.
-//   2. The stair treads visible through the glass (`steelMaterial`,
-//      metalness 0.85) caught a strong specular highlight from the key
-//      light and, magnified by Bloom's luminance threshold, read as a
-//      bright zig-zag through the glazing rather than a legible stair.
-// Both get their own slightly darker/less-reflective material so the bay
-// stays a legible secondary facade (stairs still visible) instead of the
-// visual focal point.
+// Curtain-wall stairwell glazing + stair-tread materials, distinct from the
+// shared `glazingMaterial` (facade windows/entrance door): at full-height
+// curtain-wall scale, `glazingMaterial`'s opacity/envMapIntensity (tuned for
+// small windows/doors) reads far brighter, and the stair treads visible
+// through the glass (`steelMaterial`, metalness 0.85) catch a strong
+// specular highlight that Bloom's luminance threshold would magnify into a
+// bright zig-zag through the glazing. Both get their own darker/
+// less-reflective material so the bay stays a legible secondary facade
+// (stairs still visible) instead of the visual focal point.
 export const curtainWallGlassMaterial = new THREE.MeshStandardMaterial({
   color: '#B2ACA0',
   transparent: true,
@@ -467,22 +415,19 @@ export const stairTreadMaterial = new THREE.MeshStandardMaterial({
 const groundNormalMap = cloneMapWithRepeat(concreteNormalMap, [18, 18])
 const groundRoughnessMap = cloneMapWithRepeat(concreteRoughnessMap, [18, 18])
 
-// --- Environment pass: procedural large-slab architectural paving ---
-// Replaces the photographic concrete color map on the main ground plane
-// (previously `groundColorMap`, a straight clone of the building's own small-
-// scale concrete photo at repeat [18,18], which read as bare, featureless
-// asphalt/parking lot at this plane's real size — no slab joints, no sense
-// of it being laid/installed paving). Painted once, at module load, into a
-// single small tileable canvas rather than per-line mesh geometry (per the
-// brief: individual joint-line meshes would be wasteful at this plane's
-// scale, unlike the small entrance plaza in SiteEnvironment.jsx, which is
-// cheap enough for a handful of literal joint-line meshes).
+// Procedural large-slab architectural paving for the main ground plane — a
+// straight photographic clone of the building's own small-scale concrete
+// texture reads as bare, featureless asphalt at this plane's real size, with
+// no slab joints or sense of installed paving. Painted once, at module load,
+// into a single small tileable canvas rather than per-line mesh geometry
+// (individual joint-line meshes would be wasteful at this plane's scale,
+// unlike the small entrance plaza in SiteEnvironment.jsx, which is cheap
+// enough for a handful of literal joint-line meshes).
 //
 // One canvas tile = a 4x4 sub-grid of individual paving slabs, each with its
-// own small baked tonal offset (so neighbouring slabs visibly differ, per
-// the brief's "subtle tonal variation between slabs" — a single flat tile
-// repeated with NO internal variation would read as a checkerboard once
-// tiled). `GROUND_PAVING_REPEAT` then tiles that 4x4-slab tile a further
+// own small baked tonal offset, so neighbouring slabs visibly differ — a
+// single flat tile repeated with NO internal variation would read as a
+// checkerboard once tiled. `GROUND_PAVING_REPEAT` then tiles that 4x4-slab tile a further
 // 3x3 times across the 24x24 plane, for 12x12 = 144 total slabs at roughly
 // 2 world units (~large-format paver scale) each — few enough repeats of
 // the *same* 16-slab pattern that it doesn't read as an obvious stamped
@@ -559,12 +504,11 @@ function createGroundPavingTexture() {
 
 const groundPavingColorMap = createGroundPavingTexture()
 
-// Warm dark graphite/stone-concrete architectural paving — replaces the old
-// bare-asphalt-reading photographic map (see `groundPavingColorMap` above)
-// while staying matte (high roughness, near-zero metalness/env reflection,
-// per the brief's explicit "no glossiness") and visibly darker/duller than
-// `plazaMaterial` (the lighter entrance paving), preserving the intended
-// dark-site -> lighter-entrance -> building tonal hierarchy.
+// Warm dark graphite/stone-concrete architectural paving (see
+// `groundPavingColorMap` above), staying matte (high roughness, near-zero
+// metalness/env reflection) and visibly darker/duller than `plazaMaterial`
+// (the lighter entrance paving), preserving the intended dark-site ->
+// lighter-entrance -> building tonal hierarchy.
 export const groundMaterial = new THREE.MeshStandardMaterial({
   color: '#4C4842',
   map: groundPavingColorMap,
@@ -575,25 +519,16 @@ export const groundMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: CONCRETE_ENV_INTENSITY * 0.5,
 })
 
-// Entrance door glass — distinct from `glazingMaterial` (screenshot-verified
-// bug fix): the door previously reused `glazingMaterial` directly, whose
-// warm emissive floor, concentrated over the door's small/recessed area
-// with little competing reflection, read as a solid orange/wood-toned panel
-// instead of dark aluminum-framed glass. The reference's entrance is dark
-// glass in a black aluminum frame, not a warm glow — this material is
-// darker/cooler and far less emissive, reused only for the door leaf itself
-// (the surrounding frame already uses `framingMaterial`, unchanged).
-// Screenshot-verified THIRD bug fix on this material: after darkening color
-// AND raising roughness, the door still read warm/orange. Root cause was
-// neither — it's `opacity`. At 0.55-0.6 the door transmits enough of what's
-// behind it (the entrance recess, `facadeMaterial` — a light warm-beige —
-// sitting right next to the entrance's own nearby warm point light,
-// Hero3DScene.jsx) that the light recess dominates the door's read straight
-// through the "glass" regardless of the glass's own dark color/roughness.
-// Dropped opacity substantially so the door reads as a mostly-opaque dark
-// aluminum-framed panel with only a hint of transmission, and removed the
-// emissive floor entirely (redundant with the transmitted recess light and
-// was adding to the same problem).
+// Entrance door glass — distinct from `glazingMaterial`, which reused over
+// the door's small/recessed area would read as a solid orange/wood-toned
+// panel instead of dark aluminum-framed glass (the entrance is dark glass in
+// a black aluminum frame, not a warm glow). Darker/cooler, with no emissive
+// floor, reused only for the door leaf itself (the surrounding frame already
+// uses `framingMaterial`, unchanged). Opacity is kept high (mostly opaque,
+// only a hint of transmission) since the entrance recess right behind it
+// (`facadeMaterial`, a light warm-beige, sitting next to the entrance's own
+// warm point light in Hero3DScene.jsx) would otherwise dominate the door's
+// read straight through the glass regardless of the glass's own dark color.
 export const entranceGlassMaterial = new THREE.MeshStandardMaterial({
   color: '#24262A',
   transparent: true,
@@ -604,20 +539,20 @@ export const entranceGlassMaterial = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
 })
 
-// --- Reference-fidelity pass: site-tree + signage materials ---
 // Flat, untextured tree trunk tone — same "cheap on purpose" reasoning as
 // `lawnMaterial`/`foliageMaterial` above (a handful of low-poly background
 // trees, not a vegetation system).
 export const barkMaterial = new THREE.MeshStandardMaterial({ color: '#3E3126', roughness: 0.95, metalness: 0 })
 // A second, slightly darker/cooler canopy tone reused alongside
 // `foliageMaterial` so a small row of trees doesn't read as identical
-// stamped-out copies. Darkened alongside `foliageMaterial` above.
+// stamped-out copies.
 export const foliageAccentMaterial = new THREE.MeshStandardMaterial({ color: '#2C3628', roughness: 0.95, metalness: 0 })
 
 // Backlit sign panel (AR Group wall sign, ExteriorShell.jsx) — a plain dark
 // panel with a small warm/red emissive floor so it reads as backlit rather
-// than a flat printed graphic; the actual lettering is real 3D `Text`
-// geometry (drei/troika), not a texture on this panel.
+// than a flat printed graphic. The lettering itself is the separate
+// `signTextTexture` canvas texture below, composited on top via its own
+// plane/material in ExteriorShell.jsx.
 export const signPanelMaterial = new THREE.MeshStandardMaterial({
   color: '#1C1D1F',
   emissive: '#2A1512',
@@ -663,28 +598,21 @@ function createSignTexture() {
 
 export const signTextTexture = createSignTexture()
 
-// --- Camera/massing pass: cheap interior-glow "stage set" behind visible
-// glazing (facade windows + entrance door) ---
-// The brief's biggest flagged missing realism cue: convincing warm light
-// behind the glass, not a dead/empty void. Deliberately NOT a modeled
-// interior — just enough depth behind the glass to read as "there's a room
-// there": a warm-washed back wall plane, a floor plane, and a couple of
-// flat furniture-block silhouettes (see ExteriorShell.jsx's
-// `InteriorGlowRoom`). `interiorWallGlowMaterial` is unlit (`meshBasicMaterial`-
-// equivalent via near-zero roughness reliance on emissive alone would still
-// shade with directional lights; using a real emissive-heavy standard
-// material here since it still needs to receive a *little* of the scene's
-// own key light to not look like a flat sticker) and `interiorSilhouetteMaterial`
-// is a plain dark neutral so blocky "furniture" reads as a silhouette
-// against the warm wash behind it, never as its own competing detail.
-// Screenshot-verified fix: an initial 0.55 emissiveIntensity, transmitted
-// through the entrance door's semi-opaque `entranceGlassMaterial`, read as
-// a solid warm-orange panel rather than a glimpse of a lit room behind dark
-// glass — the same "door reads orange" failure mode already documented on
-// `entranceGlassMaterial` itself, just re-triggered by a bright object
-// placed close behind it instead of the glass's own old emissive floor.
-// Dropped substantially; still reads clearly through the facade windows'
-// much more transparent `glazingMaterial` (opacity 0.16).
+// Cheap interior-glow "stage set" behind visible glazing (facade windows +
+// entrance door) — convincing warm light behind the glass, not a dead/empty
+// void. Deliberately NOT a modeled interior — just enough depth behind the
+// glass to read as "there's a room there": a warm-washed back wall plane, a
+// floor plane, and a couple of flat furniture-block silhouettes (see
+// ExteriorShell.jsx's `InteriorGlowRoom`). `interiorWallGlowMaterial` uses a
+// real emissive-heavy standard material (not fully unlit) since it still
+// needs to receive a little of the scene's own key light to not look like a
+// flat sticker, and `interiorSilhouetteMaterial` is a plain dark neutral so
+// blocky "furniture" reads as a silhouette against the warm wash behind it.
+// `emissiveIntensity` is kept low enough that it doesn't overpower the
+// entrance door's semi-opaque `entranceGlassMaterial` in front of it (a
+// bright object close behind dark semi-opaque glass reads as a solid panel,
+// not a glimpse of a lit room) while still reading clearly through the
+// facade windows' much more transparent `glazingMaterial` (opacity 0.16).
 export const interiorWallGlowMaterial = new THREE.MeshStandardMaterial({
   color: '#4A3620',
   emissive: '#FFC98A',

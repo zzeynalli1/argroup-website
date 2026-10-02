@@ -15,20 +15,11 @@ const ROOF_SURFACE_Y = 3.68
 // growth of the building's own footprint), only adds height: top of the
 // coping sits at 4.00, comfortably under the raised stairwell-tower cap
 // (Architecture.jsx, 4.15 — see hotspots3d.js's bounding-box note) so the
-// tower still reads as rising above the main roofline like the reference.
-// Screenshot-verified fix: 0.28 tall in the SAME `facadeMaterial` as the
-// wall below it, with a coping cap on only one run, read as "no visible
-// parapet at all" — there was no contrast between the upstand and the wall
-// face beneath it from most angles. Raised slightly and given a darker,
-// thicker coping cap (still modest, not a bulky cornice) on BOTH runs
-// visible from the default 3/4 camera (front + right) so the roofline
-// actually reads as a finished edge instead of blending into the wall.
-// Screenshot-verified SECOND fix: even with a coping cap, the parapet at
-// this camera distance still read as barely-there — a thin cap alone
-// wasn't enough contrast. Raised further and the upstand itself switched to
-// `concreteDarkMaterial` (a visibly different tone from the `facadeMaterial`
-// wall directly below it) so there's a real tonal break at the roofline
-// even before the coping cap's own contrast, not just relying on the cap.
+// tower still reads as rising above the main roofline. The upstand uses
+// `concreteDarkMaterial` (visibly different from the `facadeMaterial` wall
+// directly below it) and a darker `panelCharcoalMaterial` coping cap, so
+// there's a real tonal break at the roofline rather than the parapet
+// blending into the wall face from most camera angles.
 const PARAPET_HEIGHT = 0.42
 const PARAPET_THK = 0.14
 const PARAPET_TOP = ROOF_SURFACE_Y + PARAPET_HEIGHT
@@ -133,20 +124,13 @@ function RooftopEquipmentEnclosure() {
 
 /**
  * Static rooftop context — generic access/safety infrastructure and massing,
- * not tied to any hotspot.
- *
- * Phase 1: rebuilt the existing guard rail on the `TechnicalRailing`
- * primitive — posts now have a real base-flange + anchor-bolt connection to
- * the roof deck, plus a kick plate and mid-rail alongside the top rail.
- *
- * Massing pass: added a perimeter parapet (`Parapet`) so the roofline reads
- * as a finished edge rather than a slab that just stops, and a small
- * generic, unbranded rooftop equipment enclosure (`RooftopEquipmentEnclosure`)
- * on its own railed platform for background architectural realism — see
- * that component's own comment for why it's deliberately NOT HVAC-styled and
- * not a hotspot. Both are additive around the existing rail, which is left
- * exactly where it was (still the `vibrationSolutions` hotspot's own
- * rooftop-unit platform).
+ * not tied to any hotspot. A perimeter parapet (`Parapet`) gives the
+ * roofline a finished edge, a small generic rooftop equipment enclosure
+ * (`RooftopEquipmentEnclosure`) sits on its own railed platform for
+ * background architectural realism (see that component's own comment for
+ * why it's deliberately NOT HVAC-styled and not a hotspot), and a guard rail
+ * built on the `TechnicalRailing` primitive runs around the
+ * `vibrationSolutions` hotspot's own rooftop-unit platform.
  */
 export default function RooftopShell({ visible = true }) {
   const postPositions = useMemo(

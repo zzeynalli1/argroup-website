@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Activity,
+  Anchor,
   ArrowRight,
   ArrowUpRight,
   Cable,
@@ -9,6 +10,8 @@ import {
   Droplets,
   DoorOpen,
   Flame,
+  Link2,
+  Move,
   Ruler,
   Scale,
   ShieldCheck,
@@ -27,6 +30,11 @@ import Reveal from '../ui/Reveal'
 
 const ICONS = { ShieldCheck, Flame, Cable, Ruler, Activity, Drill, Volume2, Scale, Wrench, Waves, Droplets }
 const BENEFIT_ICONS = [DoorOpen, Flame, ShieldCheck]
+// Per-service override for the same generic BENEFIT_ICONS rotation above —
+// only seismic's 3 benefits (stability/connection/controlled movement) get
+// topic-matched icons; every other service keeps the existing DoorOpen/
+// Flame/ShieldCheck default untouched.
+const SERVICE_BENEFIT_ICONS = { seismic: [Anchor, Link2, Move] }
 
 // Real content only: `t()` returns the raw dotted key string itself when a
 // key is missing from both the current locale and the az fallback (see
@@ -95,7 +103,8 @@ function ServiceExplorerPanel({ service, t, onClose, panelRef }) {
       {hasBenefits && (
         <div className="mt-8 grid grid-cols-1 gap-y-8 border-t border-white/10 pt-7 sm:grid-cols-3 sm:divide-x sm:divide-white/10">
           {benefits.map((benefit, index) => {
-            const Icon = BENEFIT_ICONS[index % BENEFIT_ICONS.length]
+            const icons = SERVICE_BENEFIT_ICONS[service.key] ?? BENEFIT_ICONS
+            const Icon = icons[index % icons.length]
             return (
               <div key={benefit.title} className="sm:px-7 sm:first:pl-0 sm:last:pr-0">
                 <Icon size={20} className="text-ember-600" />

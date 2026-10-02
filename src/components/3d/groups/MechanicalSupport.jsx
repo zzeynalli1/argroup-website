@@ -15,7 +15,7 @@ const CHANNEL_Y = DUCT_TOP + 0.021 // strut channel rests directly on the duct t
 
 /**
  * Hotspot: mechanicalSupport — the most technically detailed reveal by
- * design (see the group brief): a full trapeze-hanger assembly, not just a
+ * design: a full trapeze-hanger assembly, not just a
  * conduit with bare support boxes. Ceiling wedge anchors -> threaded hanger
  * rods (with nuts/washers) -> a horizontal strut channel resting on the
  * conduit -> a U-strap clamp wrapping the conduit from below and bolted back

@@ -24,8 +24,8 @@ const ROD_BOTTOM_Y = GAUGE_Y + 0.045 // gauge housing's own top face (0.09 tall,
  * anchor bracket at the curtain-wall connection (see
  * docs/argroup-knowledge-base.md's Pull-Out Test / Support Design / Load
  * Analysis / Design Engineering bundle this hotspot represents). The anchor
- * bracket alone read as a bare connection point, not "testing" — this pass
- * adds a small gauge/readout unit clamped to the same mullion just below the
+ * bracket alone would read as a bare connection point, not "testing" — a
+ * small gauge/readout unit is clamped to the same mullion just below the
  * anchor, connected by a short measurement rod, so the assembly reads as an
  * instrumented test setup rather than an unmonitored bracket. Kept compact
  * and vertically-oriented (see the constants above) specifically to avoid
@@ -47,8 +47,8 @@ export default function EngineeringTesting({ activeGroup = null, hoveredGroup = 
       <mesh position={[ANCHOR_X, ANCHOR_Y, ANCHOR_Z]} material={anchorMat} dispose={null} castShadow>
         <boxGeometry args={[0.12, 0.12, 0.06]} />
       </mesh>
-      {/* Bolt heads (Phase 3) — the bracket reads as fixed to the structure,
-          not a floating block. */}
+      {/* Bolt heads — the bracket reads as fixed to the structure, not a
+          floating block. */}
       <InstancedCylinders
         positions={[
           [ANCHOR_X - 0.04, ANCHOR_Y + 0.04, ANCHOR_Z],

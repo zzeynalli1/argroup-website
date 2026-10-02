@@ -1,5 +1,6 @@
 import { supabase } from '../supabase'
 import { products as categoryTaxonomy } from '../../data/products'
+import { toWebpForUpload } from './imageOptimization'
 
 const TABLE = 'products'
 const STORAGE_BUCKET = 'media'
@@ -197,12 +198,14 @@ export async function uploadProductImage(file, name) {
   const validationError = validateProductImageFile(file)
   if (validationError) throw new Error(validationError)
 
-  const ext = file.name.split('.').pop().toLowerCase()
+  const optimized = await toWebpForUpload(file)
+
+  const ext = optimized.name.split('.').pop().toLowerCase()
   const base = name ? name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : 'product'
   const suffix = crypto.randomUUID().slice(0, 8)
   const path = `${STORAGE_FOLDER}/${base || 'product'}-${suffix}.${ext}`
 
-  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
+  const { error } = await client.storage.from(STORAGE_BUCKET).upload(path, optimized, { contentType: optimized.type, upsert: false })
   if (error) throw toSafeError('uploadProductImage', error)
 
   const { data } = client.storage.from(STORAGE_BUCKET).getPublicUrl(path)

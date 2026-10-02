@@ -41,7 +41,9 @@
     "sinceCaption": "2018'den bu yana Azerbaycan genelinde Fire Stop pasif yangın koruma sistemleri kuruyoruz."
   },
   "leadership": {
-    "heading": "Ekibimiz"
+    "heading": "Ekibimiz",
+    "expand": "Detaylar",
+    "collapse": "Gizle"
   },
   "capabilities": {
     "eyebrow": "YETKİNLİKLERİMİZ",

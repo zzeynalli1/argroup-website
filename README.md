@@ -228,9 +228,12 @@ build ayarları) real bir problem aşkar olunmadıqca dəyişdirilməməlidir.
   commit tarixçəsindən də təmizlənməlidir.
 
 ### 5. HTTP təhlükəsizlik başlıqları
-Vercel-in panelində əlavə HTTP header-lər (CSP, X-Frame-Options,
-X-Content-Type-Options) konfiqurasiya edilə bilər — hazırda tətbiq
-edilməyib, gələcək təkmilləşdirmə kimi qeyd olunur.
+`vercel.json`-dakı `headers` bloku vasitəsilə tətbiq olunur: CSP,
+X-Frame-Options, X-Content-Type-Options, Referrer-Policy,
+Permissions-Policy və Strict-Transport-Security. CSP-nin icazə verdiyi
+mənbələr (Supabase layihə URL-i, Google Fonts, Google Maps embed) real
+tələblərdən çıxarılıb — yeni xarici resurs/mənbə əlavə edilərsə, CSP də
+yenilənməlidir.
 
 ### 6. Xarici linklər
 Bütün `target="_blank"` linklərdə `rel="noopener noreferrer"`

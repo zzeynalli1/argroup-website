@@ -21,20 +21,20 @@ const POST_Z = HALF_D + 0.04
 const NOSING_BOLT_COUNT = 6
 
 /**
- * The building's default presentation: the same three enclosing walls
- * (back/left/right) as the very first version of this scene, permanently
- * open on the front face — restored per the design-review rollback of the
- * closed-building "Increment C" (see ExteriorShell.jsx, now present in the
- * registry but hidden by default rather than deleted, so a future project
- * decision can re-enable a closed/reveal presentation without rebuilding
- * it). Reuses the current realistic PBR concrete material (unchanged from
- * the architectural-realism pass) — this rollback is about which geometry
- * shows, not a return to flat/prototype materials.
+ * NOT CURRENTLY USED: not imported by groups/index.js or anywhere else in
+ * the codebase. An alternate building presentation — three enclosing walls
+ * (back/left/right), permanently open on the front face, predating
+ * ExteriorShell.jsx's closed-envelope-with-reveal-panels design. Kept
+ * (rather than deleted) as a ready-made fallback in case a future design
+ * decision wants to go back to an always-open cutaway instead of
+ * ExteriorShell's per-hotspot reveal panels; re-enable it by swapping it in
+ * for `exteriorShell` in groups/index.js. Uses the same realistic PBR
+ * concrete material as the rest of the scene.
  *
- * Polish pass (post-rollback): every previously bare slab edge at the open
- * face now gets a two-layer cut-edge detail instead of just ending —
- * exactly the convention real architectural section models/drawings use to
- * show "this material was deliberately cut," not "this wall is missing":
+ * Every bare slab edge at the open face gets a two-layer cut-edge detail
+ * instead of just ending — the convention real architectural section
+ * models/drawings use to show "this material was deliberately cut," not
+ * "this wall is missing":
  *   1. a darker concrete "poche" band flush with the slab's own cut face
  *      (concreteDarkMaterial — already this scene's established language
  *      for joints/reveals, not a new color), reading as the sectioned
@@ -95,8 +95,7 @@ export default function OpenCutawayShell({ visible = true }) {
         receiveShadow
       />
 
-      {/* Vertical expansion-joint reveal on the back wall (unchanged from
-          every prior pass). */}
+      {/* Vertical expansion-joint reveal on the back wall. */}
       <mesh position={[0.9, 1.8, -1.9]} material={concreteDarkMaterial} dispose={null}>
         <boxGeometry args={[0.025, 3.6, 0.02]} />
       </mesh>

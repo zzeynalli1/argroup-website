@@ -8,14 +8,18 @@ import CustomersAdminView from './customers/CustomersAdminView'
 import AwardsAdminView from './awards/AwardsAdminView'
 import TeamAdminView from './team/TeamAdminView'
 import ProductsAdminView from './products/ProductsAdminView'
+import CatalogAdminView from './catalog/CatalogAdminView'
 import MessagesAdminView from './messages/MessagesAdminView'
 
-// Mirrors the seven CMS content areas defined in
-// supabase/migrations/0001_init_schema.sql. All seven now have real CRUD:
-// Projects (Phase 3), Brands/Partners/Customers (Phase 4), Awards/Team
-// (Phase 5), Products (Phase 6). "Mesajlar" (Phase 8.1) is the eighth,
-// standalone area for public ContactForm.jsx submissions
-// (0003_contact_messages.sql) — read/manage only, no create/edit form.
+// Mirrors the CMS content areas defined in supabase/migrations/. The
+// original seven (0001_init_schema.sql) all have real CRUD: Projects
+// (Phase 3), Brands/Partners/Customers (Phase 4), Awards/Team (Phase 5),
+// Products (Phase 6). "Mesajlar" (Phase 8.1) is a standalone area for
+// public ContactForm.jsx submissions (0003_contact_messages.sql) —
+// read/manage only, no create/edit form. "Kataloq" (0004_catalog.sql) is
+// the singleton PDF catalog — sits under the same "Məhsullar" group as the
+// Products list since it's product/company catalog content, not its own
+// top-level nav section.
 const NAV_GROUPS = [
   {
     label: null,
@@ -39,7 +43,10 @@ const NAV_GROUPS = [
   },
   {
     label: 'Məhsullar',
-    items: [{ key: 'products', label: 'Məhsullar' }],
+    items: [
+      { key: 'products', label: 'Məhsullar' },
+      { key: 'catalog', label: 'Kataloq' },
+    ],
   },
   {
     label: 'Əlaqə',
@@ -130,6 +137,8 @@ export default function AdminShell() {
             <TeamAdminView />
           ) : activeKey === 'products' ? (
             <ProductsAdminView />
+          ) : activeKey === 'catalog' ? (
+            <CatalogAdminView />
           ) : activeKey === 'messages' ? (
             <MessagesAdminView />
           ) : (

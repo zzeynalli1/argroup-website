@@ -1,12 +1,19 @@
-import { Fragment } from 'react'
+import { Fragment, useRef } from 'react'
 import { usePartners } from '../../hooks/usePartners'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import { isHttpUrl } from '../../lib/cms/urlValidation'
 
 function PartnerCard({ name, logoSrc, url }) {
   const card = (
     <div className="group flex flex-col items-center">
       <div className="flex aspect-[2/1] w-36 shrink-0 items-center justify-center rounded-lg border border-neutral-custom-400/20 bg-base-50 p-3 shadow-sm transition-transform duration-300 group-hover:-translate-y-1.5 xl:w-40">
-        <img src={logoSrc} alt={name ?? 'Logo'} className="h-full w-full object-contain" loading="lazy" />
+        <img
+          src={logoSrc}
+          alt={name ?? 'Logo'}
+          className="h-full w-full object-contain"
+          loading="lazy"
+          draggable={false}
+        />
       </div>
       <span
         aria-hidden="true"
@@ -16,7 +23,9 @@ function PartnerCard({ name, logoSrc, url }) {
   )
 
   // No URL means non-clickable — same visual item, no link wrapper, no badge.
-  if (!url) return card
+  // Also fails safe for any stored value that isn't a real http(s) URL
+  // (defense in depth — admin-form validation already rejects these).
+  if (!url || !isHttpUrl(url)) return card
 
   return (
     <a
@@ -34,6 +43,33 @@ function PartnerCard({ name, logoSrc, url }) {
 export default function PartnersSection() {
   const { t } = useTranslation('home')
   const { partners, loading } = usePartners()
+  const scrollerRef = useRef(null)
+  const dragRef = useRef({ isDown: false, startX: 0, startScrollLeft: 0, moved: false })
+
+  function handleMouseDown(event) {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+    dragRef.current = { isDown: true, startX: event.pageX, startScrollLeft: scroller.scrollLeft, moved: false }
+    scroller.style.cursor = 'grabbing'
+  }
+
+  function handleMouseMove(event) {
+    const drag = dragRef.current
+    if (!drag.isDown) return
+    const delta = event.pageX - drag.startX
+    if (Math.abs(delta) > 3) drag.moved = true
+    event.preventDefault()
+    scrollerRef.current.scrollLeft = drag.startScrollLeft - delta
+  }
+
+  function handleMouseUpOrLeave() {
+    dragRef.current.isDown = false
+    if (scrollerRef.current) scrollerRef.current.style.cursor = ''
+  }
+
+  function handleClick(event) {
+    if (dragRef.current.moved) event.preventDefault()
+  }
 
   return (
     <section className="bg-base-100 py-16 md:py-24">
@@ -68,7 +104,15 @@ export default function PartnersSection() {
                scrolls horizontally within itself (justify-start keeps every
                card reachable by scroll) instead of the whole page gaining
                a horizontal scrollbar. */
-            <div className="flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:justify-start lg:gap-x-5 lg:overflow-x-auto xl:gap-x-6">
+            <div
+              ref={scrollerRef}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUpOrLeave}
+              onMouseLeave={handleMouseUpOrLeave}
+              onClickCapture={handleClick}
+              className="no-scrollbar flex flex-wrap items-start justify-center gap-x-2 gap-y-12 lg:flex-nowrap lg:justify-start lg:gap-x-5 lg:overflow-x-auto lg:cursor-grab xl:gap-x-6"
+            >
               {partners.map((partner, index) => (
                 <Fragment key={partner.id ?? partner.logoSrc}>
                   <PartnerCard {...partner} />

@@ -1,5 +1,6 @@
 import { useBrands } from '../../hooks/useBrands'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import { isHttpUrl } from '../../lib/cms/urlValidation'
 
 function BrandCell({ name, logoSrc, url, logoScale = 1 }) {
   const cell = (
@@ -16,7 +17,9 @@ function BrandCell({ name, logoSrc, url, logoScale = 1 }) {
 
   // brand-10 (AMC Mecanocaucho) has no confirmed official site — stays a
   // plain, non-interactive cell rather than a dead/placeholder link.
-  if (!url) return cell
+  // Also fails safe for any stored value that isn't a real http(s) URL
+  // (defense in depth — admin-form validation already rejects these).
+  if (!url || !isHttpUrl(url)) return cell
 
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" aria-label={`${name} official website`} className="block">

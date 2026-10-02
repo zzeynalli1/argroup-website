@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Upload, X } from 'lucide-react'
+import { ArrowRight, Loader2, Upload, X } from 'lucide-react'
 import {
   createTeamMember,
   deleteUploadedObject,
@@ -9,6 +9,7 @@ import {
   uploadTeamPhoto,
   validateTeamPhotoFile,
 } from '../../../lib/cms/teamMembers'
+import ImageCropModal from '../../../components/admin/ImageCropModal'
 
 const LOCALES = ['az', 'en', 'ru', 'tr']
 const LOCALE_LABELS = { az: 'AZ', en: 'EN', ru: 'RU', tr: 'TR' }
@@ -22,7 +23,7 @@ function emptyLocaleValues() {
 
 function valuesFromMember(member) {
   if (!member) {
-    return { name: '', parent_id: '', sort_order: '', published: true, position: emptyLocaleValues() }
+    return { name: '', phone: '', email: '', category_id: '', parent_id: '', sort_order: '', published: true, position: emptyLocaleValues() }
   }
 
   const position = emptyLocaleValues()
@@ -32,6 +33,9 @@ function valuesFromMember(member) {
 
   return {
     name: member.name ?? '',
+    phone: member.phone ?? '',
+    email: member.email ?? '',
+    category_id: member.category_id == null ? '' : String(member.category_id),
     parent_id: member.parent_id == null ? '' : String(member.parent_id),
     sort_order: member.sort_order ?? '',
     published: member.published ?? true,
@@ -42,6 +46,9 @@ function valuesFromMember(member) {
 function buildPayload(values) {
   const payload = {
     name: values.name.trim() || null,
+    phone: values.phone.trim() || null,
+    email: values.email.trim() || null,
+    category_id: values.category_id === '' ? null : Number(values.category_id),
     parent_id: values.parent_id === '' ? null : Number(values.parent_id),
     published: values.published,
   }
@@ -54,11 +61,12 @@ function buildPayload(values) {
   return payload
 }
 
-export default function TeamMemberFormModal({ member, allMembers, onClose, onSaved }) {
+export default function TeamMemberFormModal({ member, allMembers, categories = [], onGoToCategories, onClose, onSaved }) {
   const isEdit = Boolean(member)
   const [values, setValues] = useState(() => valuesFromMember(member))
   const [activeLocale, setActiveLocale] = useState('az')
   const [photoFile, setPhotoFile] = useState(null)
+  const [cropTarget, setCropTarget] = useState(null)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
@@ -87,7 +95,8 @@ export default function TeamMemberFormModal({ member, allMembers, onClose, onSav
       return
     }
     setFormError('')
-    setPhotoFile(file)
+    setCropTarget(file)
+    event.target.value = ''
   }
 
   async function handleSubmit(event) {
@@ -152,7 +161,7 @@ export default function TeamMemberFormModal({ member, allMembers, onClose, onSav
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 py-5">
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Ad (istəyə bağlı)</label>
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Ad və soyad</label>
               <input
                 type="text"
                 value={values.name}
@@ -163,23 +172,79 @@ export default function TeamMemberFormModal({ member, allMembers, onClose, onSav
             </div>
 
             <div className="col-span-2">
-              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Rəhbər (parent)</label>
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Kateqoriya</label>
+              <p className="mb-1.5 text-xs text-neutral-custom-400">Bu əməkdaş hansı qrupa aiddir?</p>
+              {categories.length === 0 ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-dashed border-industrial-950/20 bg-industrial-950/[0.02] px-3.5 py-2.5">
+                  <span className="text-sm text-neutral-custom-600">Hələ komanda kateqoriyası yaradılmayıb.</span>
+                  {onGoToCategories && (
+                    <button
+                      type="button"
+                      onClick={onGoToCategories}
+                      className="flex shrink-0 items-center gap-1 text-xs font-semibold text-ember-600 hover:text-ember-800"
+                    >
+                      Kateqoriya yarat
+                      <ArrowRight size={12} />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <select
+                  value={values.category_id}
+                  onChange={(e) => setValues((prev) => ({ ...prev, category_id: e.target.value }))}
+                  className={FIELD_CLASSES}
+                >
+                  <option value="">— Kateqoriya seçilməyib —</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name_az}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Telefon</label>
+              <input
+                type="tel"
+                value={values.phone}
+                onChange={(e) => setValues((prev) => ({ ...prev, phone: e.target.value }))}
+                placeholder="+994 55 490 74 24"
+                className={FIELD_CLASSES}
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">E-poçt</label>
+              <input
+                type="email"
+                value={values.email}
+                onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="ad.soyad@argroup.az"
+                className={FIELD_CLASSES}
+              />
+            </div>
+
+            <div className="col-span-2">
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Kimə tabedir?</label>
+              <p className="mb-1.5 text-xs text-neutral-custom-400">İyerarxiyada əməkdaşın birbaşa tabe olduğu şəxsi seçin.</p>
               <select
                 value={values.parent_id}
                 onChange={(e) => setValues((prev) => ({ ...prev, parent_id: e.target.value }))}
                 className={FIELD_CLASSES}
               >
-                <option value="">— Kök (rəhbər yoxdur) —</option>
+                <option value="">— Heç kimə (üst səviyyə) —</option>
                 {parentOptions.map((opt) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.name || opt.position_az}
+                    {opt.name ? `${opt.name} — ${opt.position_az}` : opt.position_az}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Sıra nömrəsi (bacılar/qardaşlar arası)</label>
+              <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">Sıra nömrəsi</label>
               <input
                 type="number"
                 value={values.sort_order}
@@ -220,6 +285,19 @@ export default function TeamMemberFormModal({ member, allMembers, onClose, onSav
             </div>
           </div>
 
+          {cropTarget && (
+            <ImageCropModal
+              file={cropTarget}
+              aspectRatio={1}
+              mode="crop"
+              onCancel={() => setCropTarget(null)}
+              onConfirm={(croppedFile) => {
+                setPhotoFile(croppedFile)
+                setCropTarget(null)
+              }}
+            />
+          )}
+
           <div className="mt-6 border-t border-industrial-950/10 pt-5">
             <div className="flex gap-1">
               {LOCALES.map((locale) => (
@@ -243,6 +321,7 @@ export default function TeamMemberFormModal({ member, allMembers, onClose, onSav
               <label className="mb-1.5 block text-xs font-medium text-neutral-custom-600">
                 Vəzifə — {LOCALE_LABELS[activeLocale]} {activeLocale === 'az' && '*'}
               </label>
+              <p className="mb-1.5 text-xs text-neutral-custom-400">Bu əməkdaşın konkret vəzifəsi nədir?</p>
               <input
                 type="text"
                 value={values.position[activeLocale]}

@@ -1,9 +1,9 @@
 <!--
-  SECURITY NOTE (production): Content-Security-Policy, X-Frame-Options and
-  X-Content-Type-Options headers are NOT set here — a static <meta> tag
-  can't fully replace real HTTP headers. Configure these in the hosting
-  provider's settings (Vercel/Netlify headers config, etc.) once deployed.
-  See README.md "Təhlükəsizlik qeydləri" for details.
+  SECURITY NOTE: Content-Security-Policy, X-Frame-Options,
+  X-Content-Type-Options, Referrer-Policy, Permissions-Policy, and
+  Strict-Transport-Security are set as real HTTP response headers via
+  vercel.json (a <meta> tag can't fully replace real headers) — see that
+  file's "headers" block. See README.md "Təhlükəsizlik qeydləri" for details.
 -->
 <!doctype html>
 <html lang="en">

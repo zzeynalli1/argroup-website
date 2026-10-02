@@ -21,14 +21,12 @@ import FutureZone from './FutureZone'
  * one file + one entry here, not touching existing groups.
  *
  * `id` doubles as the group key hotspots reference via `hotspot.group` (see
- * data/hotspots3d.js). For the 9 current hotspot-driven systems, `id`
- * equals that hotspot's own id 1:1, preserving exactly which meshes
- * highlight/dim together today (see the Phase 0 note in each group file for
- * why they aren't split further). `structure`/`interiorArchitecture` replace
- * the old flat `shell` group (redistributed per the camera-pivot/building-
- * closure rework — see Structure.jsx/InteriorArchitecture.jsx). `exteriorShell`
- * is the closed building envelope (front/back/left/right walls + per-hotspot
- * reveal panels); `architecture`/`rooftopShell` are unchanged throughout.
+ * data/hotspots3d.js). For the 9 current hotspot-driven systems, `id` equals
+ * that hotspot's own id 1:1, preserving exactly which meshes highlight/dim
+ * together. `exteriorShell` is the closed building envelope (front/back/
+ * left/right walls + per-hotspot reveal panels); `structure`/
+ * `interiorArchitecture`/`architecture`/`rooftopShell` are the rest of the
+ * static envelope/structure geometry (see each file's own comment).
  *
  * Future groups render nothing yet (`FutureZone` is a no-op placeholder) —
  * they exist here so a future hotspot/layer can point at a real registry

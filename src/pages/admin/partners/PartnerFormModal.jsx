@@ -8,6 +8,8 @@ import {
   uploadPartnerLogo,
   validatePartnerLogoFile,
 } from '../../../lib/cms/partners'
+import { validateExternalUrl } from '../../../lib/cms/urlValidation'
+import ImageCropModal from '../../../components/admin/ImageCropModal'
 
 const FIELD_CLASSES =
   'w-full rounded-sm border border-industrial-950/15 bg-base-50 px-3.5 py-2.5 text-sm text-industrial-950 placeholder:text-neutral-custom-400 outline-none transition-colors focus:border-ember-600'
@@ -38,6 +40,7 @@ export default function PartnerFormModal({ partner, onClose, onSaved }) {
   const isEdit = Boolean(partner)
   const [values, setValues] = useState(() => valuesFromPartner(partner))
   const [logoFile, setLogoFile] = useState(null)
+  const [cropTarget, setCropTarget] = useState(null)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
@@ -61,7 +64,8 @@ export default function PartnerFormModal({ partner, onClose, onSaved }) {
       return
     }
     setFormError('')
-    setLogoFile(file)
+    setCropTarget(file)
+    event.target.value = ''
   }
 
   async function handleSubmit(event) {
@@ -70,6 +74,11 @@ export default function PartnerFormModal({ partner, onClose, onSaved }) {
 
     if (!isEdit && !logoFile) {
       setFormError('Loqo şəkli məcburidir.')
+      return
+    }
+    const urlError = validateExternalUrl(values.website_url)
+    if (urlError) {
+      setFormError(urlError)
       return
     }
 
@@ -181,6 +190,19 @@ export default function PartnerFormModal({ partner, onClose, onSaved }) {
               </div>
             </div>
           </div>
+
+          {cropTarget && (
+            <ImageCropModal
+              file={cropTarget}
+              aspectRatio={2 / 1}
+              mode="preview"
+              onCancel={() => setCropTarget(null)}
+              onConfirm={(confirmedFile) => {
+                setLogoFile(confirmedFile)
+                setCropTarget(null)
+              }}
+            />
+          )}
 
           {formError && <p className="mt-5 text-sm text-ember-600">{formError}</p>}
 
