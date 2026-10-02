@@ -922,17 +922,23 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
             backlit-text texture entirely. This reads as a downlight grazing
             the sign from above instead. */}
         <pointLight position={[3.25, 2.35, -0.15]} intensity={0.28} distance={1.8} decay={2} color="#FFC98A" />
-        {/* Scoped to its own Suspense so the CDN-fetched HDRI reflections never
-            block the building/hotspots from rendering — without this boundary
-            the whole R3F tree suspends (see useEnvironment -> useLoader) and
+        {/* Scoped to its own Suspense so the HDRI reflections never block the
+            building/hotspots from rendering — without this boundary the
+            whole R3F tree suspends (see useEnvironment -> useLoader) and
             nothing commits, which is why only the Html markers were visible.
-            "city" reads as a moody, window-lit night skyline (fits the dark
-            industrial backdrop) and gives metal/glass reflections actual
-            shape/variation instead of "warehouse"'s flat, uniform bright
-            dome. `environmentIntensity` keeps that IBL contribution
-            restrained so reflections read as real without blowing out. */}
+            Self-hosted (public/hdr/) rather than `preset="city"` — drei's
+            preset system fetches that exact file from a third-party CDN
+            (raw.githack.com) at runtime, which previously made the whole
+            scene (and, with no error boundary above it, the whole page)
+            fail if that host was slow/unreachable/blocked. Same HDRI drei's
+            "city" preset used — reads as a moody, window-lit night skyline
+            (fits the dark industrial backdrop) and gives metal/glass
+            reflections actual shape/variation instead of "warehouse"'s flat,
+            uniform bright dome. `environmentIntensity` keeps that IBL
+            contribution restrained so reflections read as real without
+            blowing out. */}
         <Suspense fallback={null}>
-          <Environment preset="city" environmentIntensity={0.85} />
+          <Environment files="/hdr/potsdamer_platz_1k.hdr" environmentIntensity={0.85} />
         </Suspense>
 
         <Ground />

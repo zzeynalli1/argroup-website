@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import ErrorBoundary from '../ui/ErrorBoundary'
 
 // Three.js only loads once this section is actually rendered, keeping it out
 // of the initial bundle (see CLAUDE.md perf note on the earlier 1.37MB hero).
@@ -22,7 +23,10 @@ const PLACEHOLDER_GRADIENT_BOTTOM = '#5C4A31'
 // rect + bare spinner, which read as a blank/broken panel rather than a
 // scene about to load. Crossfades into the real canvas once it mounts (see
 // `sceneReady` below) rather than being replaced by a hard cut.
-function ScenePlaceholder({ label }) {
+// `spinning=false` reuses this same panel as the ErrorBoundary fallback
+// below — a static (non-animating) label reads as "this isn't coming", not
+// as a load that's still in progress.
+function ScenePlaceholder({ label, spinning = true }) {
   return (
     <div
       className="flex h-full w-full items-end justify-center pb-16 md:items-center md:pb-0"
@@ -31,7 +35,9 @@ function ScenePlaceholder({ label }) {
       }}
     >
       <div className="flex items-center gap-3 text-neutral-custom-400">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-custom-400/30 border-t-ember-600" />
+        {spinning && (
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-neutral-custom-400/30 border-t-ember-600" />
+        )}
         <span className="text-sm">{label}</span>
       </div>
     </div>
@@ -178,19 +184,40 @@ export default function Building3DSection() {
             painted (`sceneReady`, set via the `onReady` callback below) —
             while the lazy chunk is still downloading/parsing, Suspense's
             fallback is `null` here (the placeholder above is already
-            covering that) rather than a second, redundant spinner. */}
+            covering that) rather than a second, redundant spinner.
+            ErrorBoundary is a separate layer from Suspense on purpose:
+            Suspense only catches a thrown PROMISE (the loading state);
+            a WebGL/Three.js runtime failure or a rejected asset load (e.g.
+            a loader re-throwing a failed fetch as a render-time error) is a
+            thrown ERROR, which only an error boundary catches — without one,
+            that error would unmount this whole page, not just the 3D scene. */}
         <div
           className="absolute inset-0 transition-opacity duration-700 ease-out"
           style={{ opacity: sceneReady ? 1 : 0 }}
         >
-          <Suspense fallback={null}>
-            <Hero3DScene
-              ref={sceneRef}
-              onHotspotChange={setActive}
-              active={inView}
-              onReady={() => setSceneReady(true)}
-            />
-          </Suspense>
+          <ErrorBoundary
+            // Treated the same as "ready" for crossfade/placeholder purposes
+            // below — without this, `sceneReady`/`showPlaceholder` would
+            // never flip (their only other trigger is Hero3DScene's own
+            // `onReady`, which never fires if it crashed before mounting),
+            // leaving this fallback stuck at opacity 0 behind a spinner that
+            // spins forever instead of actually showing "unavailable".
+            onError={() => setSceneReady(true)}
+            fallback={
+              <div className="absolute inset-0">
+                <ScenePlaceholder label={t('building3d.unavailable')} spinning={false} />
+              </div>
+            }
+          >
+            <Suspense fallback={null}>
+              <Hero3DScene
+                ref={sceneRef}
+                onHotspotChange={setActive}
+                active={inView}
+                onReady={() => setSceneReady(true)}
+              />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
 

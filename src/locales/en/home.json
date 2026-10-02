@@ -32,6 +32,7 @@
     "titleLine2": "you can't see.",
     "subtitle": "Explore the engineering solutions applied in construction on an interactive model.",
     "loading": "Loading...",
+    "unavailable": "The 3D model is currently unavailable.",
     "hint": "Click a red marker to explore the system",
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",

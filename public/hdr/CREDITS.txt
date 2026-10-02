@@ -1,0 +1,11 @@
+HDRI source — CC0 (public domain), no attribution required.
+
+- potsdamer_platz_1k.hdr — originally from Poly Haven (polyhaven.com),
+  obtained via @react-three/drei's own asset mirror
+  (https://github.com/pmndrs/drei-assets) — the exact file drei's
+  `<Environment preset="city">` fetches from its CDN at runtime. Self-hosted
+  here instead of fetched from that CDN so the Home page's 3D scene doesn't
+  depend on a third-party host being reachable (see
+  src/components/3d/Hero3DScene.jsx's `<Environment files={...}>` usage).
+
+Poly Haven license: CC0 1.0 Universal — https://polyhaven.com/license
