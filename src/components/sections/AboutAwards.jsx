@@ -4,7 +4,10 @@ import { useTranslation } from '../../lib/i18n/useTranslation'
 
 /** Ghost-number + title/metadata row, same large-faded-number treatment as
  * WhyFirestop.jsx's ReasonColumn — reused here as a divided list instead of
- * a 4-up grid since awards are a variable-length list, not a fixed set. */
+ * a 4-up grid since awards are a variable-length list, not a fixed set.
+ * `award.image` (admin-uploaded certificate/photo) renders as a small
+ * thumbnail next to the number when set — omitted entirely otherwise,
+ * same no-placeholder convention as the rest of the CMS-backed sections. */
 function AwardRow({ award, index }) {
   const number = String(index + 1).padStart(2, '0')
 
@@ -17,6 +20,13 @@ function AwardRow({ award, index }) {
         >
           {number}
         </span>
+        {award.image && (
+          <img
+            src={award.image}
+            alt={award.title}
+            className="h-14 w-14 shrink-0 rounded-sm border border-white/10 object-cover md:h-16 md:w-16"
+          />
+        )}
         <div>
           <h3 className="font-heading text-lg font-bold leading-snug text-base-50 md:text-xl">{award.title}</h3>
           {award.description && (
