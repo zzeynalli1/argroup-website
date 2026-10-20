@@ -224,12 +224,11 @@ export const plazaMaterial = new THREE.MeshStandardMaterial({
   envMapIntensity: CONCRETE_ENV_INTENSITY,
 })
 
-// Flat, untextured landscape greens — cheap on purpose (a handful of
-// low-poly shrubs/lawn strips, not a vegetation system). Darkened/
+// Flat, untextured landscape green — cheap on purpose (a handful of
+// low-poly background trees, not a vegetation system). Darkened/
 // desaturated rather than a more saturated green, which reads as bright
 // cartoonish "lollipop" green under this scene's key light, wrong for a
 // restrained dusk backdrop.
-export const lawnMaterial = new THREE.MeshStandardMaterial({ color: '#3D4832', roughness: 0.95, metalness: 0 })
 export const foliageMaterial = new THREE.MeshStandardMaterial({ color: '#333D2A', roughness: 0.95, metalness: 0 })
 export const planterMaterial = new THREE.MeshStandardMaterial({
   color: '#B9B4AA',
@@ -540,8 +539,8 @@ export const entranceGlassMaterial = new THREE.MeshStandardMaterial({
 })
 
 // Flat, untextured tree trunk tone — same "cheap on purpose" reasoning as
-// `lawnMaterial`/`foliageMaterial` above (a handful of low-poly background
-// trees, not a vegetation system).
+// `foliageMaterial` above (a handful of low-poly background trees, not a
+// vegetation system).
 export const barkMaterial = new THREE.MeshStandardMaterial({ color: '#3E3126', roughness: 0.95, metalness: 0 })
 // A second, slightly darker/cooler canopy tone reused alongside
 // `foliageMaterial` so a small row of trees doesn't read as identical

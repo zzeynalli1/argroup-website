@@ -15,7 +15,7 @@ const FALLBACK_LOCALE = 'az'
 // was written from, re-exported so no admin UI can ever offer/accept a value
 // the DB would reject. Category CRUD is intentionally not implemented
 // anywhere in this module.
-export const FIXED_CATEGORY_KEYS = categoryTaxonomy.map((c) => c.key)
+const FIXED_CATEGORY_KEYS = categoryTaxonomy.map((c) => c.key)
 
 // The 4 categories the public Products page actually has a showcase panel
 // for today (see components/sections/ProductCategories.jsx) — used to keep
@@ -203,7 +203,7 @@ export function validateProductImageFile(file) {
  * does NOT touch the database. Filename includes a short random suffix so
  * every upload produces a fresh, unique URL.
  */
-export async function uploadProductImage(file, name) {
+async function uploadProductImage(file, name) {
   const client = requireClient()
   const validationError = validateProductImageFile(file)
   if (validationError) throw new Error(validationError)
@@ -223,7 +223,7 @@ export async function uploadProductImage(file, name) {
 }
 
 /** Best-effort cleanup of an upload that never made it into the database. */
-export async function deleteUploadedObject(path) {
+async function deleteUploadedObject(path) {
   const client = requireClient()
   const { error } = await client.storage.from(STORAGE_BUCKET).remove([path])
   if (error) console.error('[cms/products] orphan upload cleanup failed:', error)

@@ -15,7 +15,7 @@
  * mirroring the products.js / servicesDetail.js split already used
  * elsewhere in the project.
  */
-export const serviceCategories = [
+const serviceCategories = [
   {
     id: 1,
     key: 'passiveFireProtection',
