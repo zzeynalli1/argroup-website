@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useReducedMotion } from 'framer-motion'
 import RouteTransitionOverlay from './RouteTransitionOverlay'
 import { LoadingSignalContext } from './routeLoadingSignal'
+import { HeavyContentGateContext } from './heavyContentGate'
 import { diag3d } from '../../lib/diag3d'
 
 // Minimum time to stay in the "holding" phase (planes at rest) before a
@@ -65,7 +66,31 @@ export default function RouteTransitionProvider({ children }) {
   const [instant, setInstant] = useState(false)
   const [variant, setVariant] = useState('nav')
 
+  // Gates when it's safe to start loading/mounting heavy same-viewport
+  // content (today: just Building3DSection's Hero3DScene) — see
+  // heavyContentGate.js's own comment for the full rationale. Starts
+  // already open (no gating at all) for reduced motion, admin routes, or a
+  // repeat visit this session that already played the intro once — the
+  // ONLY case this starts closed is the genuine first-ever paint this
+  // session, where the intro effect below is about to actually play it.
+  // Opened by `handleOpenAnimationComplete` the moment that intro's reveal
+  // finishes (phase -> idle), never by any other transition's reveal.
+  const [heavyContentGateOpen, setHeavyContentGateOpen] = useState(() => {
+    if (reducedMotion) return true
+    if (typeof window === 'undefined') return true
+    if (window.location.pathname.startsWith('/admin')) return true
+    try {
+      return sessionStorage.getItem(SESSION_INTRO_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+
   const phaseRef = useRef(phase)
+  const variantRef = useRef(variant)
+  useEffect(() => {
+    variantRef.current = variant
+  }, [variant])
   useEffect(() => {
     phaseRef.current = phase
     diag3d('transition phase ->', phase)
@@ -211,6 +236,16 @@ export default function RouteTransitionProvider({ children }) {
     if (phaseRef.current !== 'revealing') return
     diag3d('overlay unmount (revealing -> idle)')
     setPhase('idle')
+    // Only the intro's own reveal opens the heavy-content gate — a plain
+    // 'nav' transition's reveal finishing has no bearing on it (see
+    // `heavyContentGateOpen`'s own comment: it's only ever closed for the
+    // genuine first-paint intro case to begin with, so this is a no-op via
+    // setState-to-same-value for every other transition anyway, but the
+    // variant check keeps the intent explicit rather than relying on that).
+    if (variantRef.current === 'intro') {
+      diag3d('intro revealed — opening heavy-content gate')
+      setHeavyContentGateOpen(true)
+    }
   }, [])
 
   // Watchdogs for the two animation-callback-dependent phases — see
@@ -286,7 +321,9 @@ export default function RouteTransitionProvider({ children }) {
 
   return (
     <LoadingSignalContext.Provider value={loadingSignal}>
-      {children}
+      <HeavyContentGateContext.Provider value={heavyContentGateOpen}>
+        {children}
+      </HeavyContentGateContext.Provider>
       {active && (
         <RouteTransitionOverlay
           covered={covered}

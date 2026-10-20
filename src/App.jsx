@@ -6,6 +6,7 @@ import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
+import { useHeavyContentGate } from './components/transitions/heavyContentGate'
 import { diag3d } from './lib/diag3d'
 // Every page (including Home) is its own lazy chunk, so visiting any one
 // route never downloads JS for routes the user hasn't navigated to yet —
@@ -41,20 +42,26 @@ function RouteFallback() {
 
 // Starts downloading Hero3DScene's chunk (1.26MB raw / ~375KB gzip, by far
 // the heaviest single chunk on the site) the instant the "/" route is
-// requested, in parallel with Home's own chunk instead of waiting for it —
-// today Building3DSection's `lazy(() => import('../3d/Hero3DScene'))` only
-// fires once Home has already loaded AND mounted AND rendered down to that
-// point, a fully sequential waterfall. This fires the identical import()
-// call (same specifier, so the module cache/network request is shared, not
-// duplicated — Building3DSection's own lazy() just resolves instantly
-// against whatever this already started) as early as possible without
-// touching Home's own render path, so the two chunks overlap on the wire
-// instead of queuing one after the other. Scoped to the home route only —
-// no other route pays for any of this.
+// requested AND the heavy-content gate is open (see heavyContentGate.js) —
+// in parallel with Home's own chunk instead of waiting for it. Gated the
+// same way Building3DSection's own lazy-rendered `<Hero3DScene>` is: on a
+// fresh session (intro about to play), this fires exactly when that gate
+// opens rather than immediately, so this prefetch can't re-introduce the
+// very "3D chunk downloading/parsing competes with the intro" problem the
+// gate exists to prevent. On every other case (reduced motion, admin
+// routes, intro already shown this session) the gate is already open at
+// mount, so this fires immediately, same as before — still ahead of
+// Building3DSection's own lazy()+Suspense, which otherwise only fires once
+// Home has loaded AND mounted AND rendered down to that point, a fully
+// sequential waterfall. Needs to be a child of RouteTransitionProvider (not
+// a sibling, which is where this used to sit) to read that gate from
+// context at all. Scoped to the home route only — no other route pays for
+// any of this.
 function HeroScenePrefetch() {
   const { pathname } = useLocation()
+  const canLoadHeavyContent = useHeavyContentGate()
   useEffect(() => {
-    if (pathname !== '/') return
+    if (pathname !== '/' || !canLoadHeavyContent) return
     diag3d('3D chunk prefetch requested')
     // Fire-and-forget: Building3DSection's own lazy()+Suspense+ErrorBoundary
     // is what actually handles a real failure (shows the "unavailable"
@@ -65,7 +72,7 @@ function HeroScenePrefetch() {
     import('./components/3d/Hero3DScene')
       .then(() => diag3d('3D chunk prefetch resolved'))
       .catch((err) => diag3d('3D chunk prefetch failed (non-fatal, Building3DSection retries)', err?.message))
-  }, [pathname])
+  }, [pathname, canLoadHeavyContent])
   return null
 }
 
@@ -94,8 +101,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <HeroScenePrefetch />
       <RouteTransitionProvider>
+        <HeroScenePrefetch />
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
