@@ -758,18 +758,28 @@ function StaticShadowMap() {
   return null
 }
 
-// Fires `onReady` once the base scene has actually been forced to compile
-// (`gl.compile`) AND R3F has rendered one real frame with that compiled
-// scene — distinct from Canvas's own `onCreated` below, which only means
-// the WebGL context/THREE.Scene object exist, well before anything has
-// necessarily been drawn or any shader linked. Building3DSection holds the
-// route-transition overlay's reveal open (via `markLoading`/`markLoaded`)
-// until THIS fires, specifically so the synchronous `gl.compile` burst
-// below — confirmed via CPU profiling to be the dominant main-thread cost
-// at first paint, well above network/chunk-download time — never runs
-// concurrently with the overlay's reveal animation.
+// Fires `onReady` once the base scene has actually been compiled
+// (`gl.compileAsync`) AND R3F has rendered one real frame with that
+// compiled scene — distinct from Canvas's own `onCreated` below, which only
+// means the WebGL context/THREE.Scene object exist, well before anything
+// has necessarily been drawn or any shader linked. Building3DSection holds
+// the route-transition overlay's reveal open (via `markLoading`/
+// `markLoaded`) until THIS fires, so the scene's own first paint never
+// lands before its ~40 shader programs (scene materials + shadow depth
+// variants) are actually usable.
 //
-// `gl.compile(scene, camera)` has to run from a mounted child's effect
+// Switched from the old `gl.compile` (synchronous: kicks off
+// compile/link for every material AND blocks the main thread waiting for
+// each one, since nothing yields back to the event loop) to
+// `gl.compileAsync`, which submits the exact same compile/link work but
+// polls each program's `KHR_parallel_shader_compile` completion status
+// (non-blocking — a `setTimeout`-spaced poll, not a synchronous GPU-driver
+// stall) instead of forcing the renderer to wait on it inline. The main
+// thread stays free to paint/scroll/respond while the GPU driver compiles
+// in the background; `onReady` (and therefore the placeholder-hide) now
+// waits for that promise, not just for `gl.compile`'s call to return.
+//
+// `gl.compileAsync(scene, camera)` has to run from a mounted child's effect
 // rather than Canvas's own `onCreated` prop: by the time `onCreated` fires,
 // this Canvas's OWN JSX children (Building/Ground/lights/Hotspots below)
 // aren't guaranteed to have committed into the real THREE.Scene yet, so
@@ -778,23 +788,30 @@ function StaticShadowMap() {
 //
 // `onPostFxReady` (the heavier EffectComposer/ContactShadows pipeline —
 // see `postFxReady` below) is anchored to this SAME first-real-frame tick,
-// not to raw component mount — anchoring it to mount raced gl.compile's own
-// synchronous burst above, which can itself push the first real frame
-// noticeably later than mount on a cold GPU/driver, letting the two
-// "deferred, expensive" compiles land back-to-back instead of in sequence.
+// not to raw component mount — anchoring it to mount raced the async
+// compile above, which can itself push the first real frame noticeably
+// later than mount on a cold GPU/driver, letting the two "deferred,
+// expensive" compiles land back-to-back instead of in sequence.
 function ReadySignal({ onReady, onPostFxReady }) {
-  const { gl, scene, camera } = useThree()
-  const compiledRef = useRef(false)
+  const { gl, scene, camera, invalidate } = useThree()
+  const compileStartedRef = useRef(false)
+  const compileDoneRef = useRef(false)
   const firstFrameLoggedRef = useRef(false)
   const postFxRafsRef = useRef({ raf1: 0, raf2: 0 })
 
   useEffect(() => {
-    if (compiledRef.current) return
-    compiledRef.current = true
-    diag3d('3D shader precompile (gl.compile) starting')
-    gl.compile(scene, camera)
-    diag3d('3D shader precompile (gl.compile) done')
-  }, [gl, scene, camera])
+    if (compileStartedRef.current) return
+    compileStartedRef.current = true
+    diag3d('3D shader precompile (gl.compileAsync) starting')
+    gl.compileAsync(scene, camera).then(() => {
+      diag3d('3D shader precompile (gl.compileAsync) done')
+      compileDoneRef.current = true
+      // `frameloop="demand"` won't render the frame that notices
+      // `compileDoneRef` flipped on its own — this promise resolves outside
+      // R3F's render loop, so it has to explicitly ask for the next frame.
+      invalidate()
+    })
+  }, [gl, scene, camera, invalidate])
 
   useEffect(
     () => () => {
@@ -805,6 +822,11 @@ function ReadySignal({ onReady, onPostFxReady }) {
   )
 
   useFrame(() => {
+    // Wait for the async compile above to actually resolve before treating
+    // any rendered frame as "ready" — the compile's own `.then()` is what
+    // calls `invalidate()` to request the frame that will see this true,
+    // so no polling/re-invalidating is needed here while it's still false.
+    if (!compileDoneRef.current) return
     if (firstFrameLoggedRef.current) return
     firstFrameLoggedRef.current = true
     diag3d('3D first real frame rendered (building/lights/hotspots on screen)')
@@ -817,6 +839,37 @@ function ReadySignal({ onReady, onPostFxReady }) {
       })
     })
   })
+
+  return null
+}
+
+// One-shot diagnostic: logs `renderer.info.programs.length` — the real,
+// final count of unique compiled WebGLPrograms (scene materials + their
+// shadow-depth variants + the post-processing pipeline once mounted) — two
+// frames after `postFxReady` flips true, so EffectComposer/ContactShadows
+// have actually rendered at least once and their own on-first-use shaders
+// are counted too, not just the base scene's. Used to compare the
+// before/after program count for the gl.compileAsync + checkShaderErrors +
+// material-dedup changes in this file/buildingMaterials.js — strip once
+// that comparison is done, same as the rest of the `diag3d` call sites.
+function ProgramCountLogger({ postFxReady }) {
+  const { gl } = useThree()
+  const loggedRef = useRef(false)
+  const rafsRef = useRef({ raf1: 0, raf2: 0 })
+
+  useEffect(() => {
+    if (!postFxReady || loggedRef.current) return undefined
+    loggedRef.current = true
+    rafsRef.current.raf1 = requestAnimationFrame(() => {
+      rafsRef.current.raf2 = requestAnimationFrame(() => {
+        diag3d('3D renderer.info.programs.length', gl.info.programs?.length ?? 0)
+      })
+    })
+    return () => {
+      cancelAnimationFrame(rafsRef.current.raf1)
+      cancelAnimationFrame(rafsRef.current.raf2)
+    }
+  }, [postFxReady, gl])
 
   return null
 }
@@ -1053,7 +1106,23 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
         // the actual "real canvas has something on screen" signal for
         // Building3DSection's placeholder crossfade is `ReadySignal`'s
         // `onReady` below (first real frame, post-gl.compile).
-        onCreated={() => {
+        onCreated={({ gl: createdGl }) => {
+          // Every `WebGLProgram`'s first real use (`getUniforms`/
+          // `getAttributes`, called from `WebGLRenderer.setProgram` on the
+          // program's first bind) runs a synchronous `gl.getProgramParameter`
+          // link-status check + `getShaderInfoLog`/`getProgramInfoLog` calls
+          // when `renderer.debug.checkShaderErrors` is true (three.js's
+          // default) — exactly the kind of GPU-driver round-trip that
+          // forces the main thread to block until that program's link
+          // actually finishes, regardless of whether it was warmed up via
+          // `gl.compileAsync` first. Off in production (kept on in dev so
+          // real shader errors still surface there) removes that stall for
+          // every program — the base scene's AND the post-processing
+          // pipeline's (EffectComposer/ContactShadows below, which have no
+          // async precompile path of their own to opt out of this check).
+          if (import.meta.env.PROD) {
+            createdGl.debug.checkShaderErrors = false
+          }
           diag3d('3D Canvas onCreated (WebGL context exists, nothing drawn/compiled yet)')
         }}
       >
@@ -1064,6 +1133,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           }}
           onPostFxReady={() => setPostFxReady(true)}
         />
+        <ProgramCountLogger postFxReady={postFxReady} />
         <GradientBackdrop />
         <fog attach="fog" args={[FOG_COLOR, 15, 33]} />
 
