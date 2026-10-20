@@ -9,12 +9,22 @@ const ALLOWED_IMAGE_TYPES = ['image/webp', 'image/jpeg', 'image/png']
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024 // matches the `media` bucket's file_size_limit
 const FALLBACK_LOCALE = 'az'
 
-// The 9 fixed categories are frontend-controlled (see data/products.js's own
-// header comment) — this is the SAME source of truth the `category_key`
-// CHECK constraint in 0001_init_schema.sql was written from, re-exported so
-// the admin dropdown can never drift from what the DB actually accepts.
-// Category CRUD is intentionally not implemented anywhere in this module.
+// The 10 fixed categories are frontend-controlled (see data/products.js's
+// own header comment) — this is the SAME source of truth the `category_key`
+// CHECK constraint in 0001_init_schema.sql/0005_products_additional_category.sql
+// was written from, re-exported so no admin UI can ever offer/accept a value
+// the DB would reject. Category CRUD is intentionally not implemented
+// anywhere in this module.
 export const FIXED_CATEGORY_KEYS = categoryTaxonomy.map((c) => c.key)
+
+// The 4 categories the public Products page actually has a showcase panel
+// for today (see components/sections/ProductCategories.jsx) — used to keep
+// the admin "new product" category picker focused on what a visitor can
+// currently browse to, without touching `FIXED_CATEGORY_KEYS` itself (the
+// other 6 real categories stay valid DB values; ProductFormModal still
+// shows a product's own category correctly if it's already set to one of
+// them, it just isn't offered as a choice for a brand-new product).
+export const FEATURED_CATEGORY_KEYS = ['passiveFireProtection', 'vibrationInsulation', 'soundAcoustic', 'additionalProducts']
 
 const COLUMNS = [
   'id', 'category_key', 'name',
@@ -24,7 +34,7 @@ const COLUMNS = [
 
 function toSafeError(action, error) {
   console.error(`[cms/products] ${action} failed:`, error)
-  if (error?.code === '23514') return new Error('Yalnız mövcud 9 kateqoriyadan biri seçilə bilər.')
+  if (error?.code === '23514') return new Error('Yalnız mövcud 10 kateqoriyadan biri seçilə bilər.')
   return new Error('Əməliyyat uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.')
 }
 
@@ -35,7 +45,7 @@ function requireClient() {
 
 function assertValidCategory(category_key) {
   if (!FIXED_CATEGORY_KEYS.includes(category_key)) {
-    throw new Error('Yalnız mövcud 9 kateqoriyadan biri seçilə bilər.')
+    throw new Error('Yalnız mövcud 10 kateqoriyadan biri seçilə bilər.')
   }
 }
 

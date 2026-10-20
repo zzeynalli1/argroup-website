@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowDown, ArrowUp, Loader2, Trash2, Upload, X } from 'lucide-react'
 import {
-  FIXED_CATEGORY_KEYS,
+  FEATURED_CATEGORY_KEYS,
   addProductImages,
   createProduct,
   removeProductImage,
@@ -27,7 +27,7 @@ function emptyLocaleValues() {
 function valuesFromProduct(product) {
   if (!product) {
     return {
-      category_key: FIXED_CATEGORY_KEYS[0],
+      category_key: FEATURED_CATEGORY_KEYS[0],
       name: '',
       brand: '',
       external_link: '',
@@ -123,6 +123,16 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
   const { t } = useTranslation('products')
   const isEdit = Boolean(product)
   const [values, setValues] = useState(() => valuesFromProduct(product))
+  // New products can only be filed under a category the public Products
+  // page actually has a showcase panel for (see FEATURED_CATEGORY_KEYS'
+  // own comment). Editing a product already filed under one of the other 6
+  // real-but-not-yet-showcased categories still shows that category
+  // correctly — appended here rather than always offering all 10, so the
+  // picker doesn't dangle on an option-less value for that product.
+  const categoryOptions =
+    isEdit && product.category_key && !FEATURED_CATEGORY_KEYS.includes(product.category_key)
+      ? [...FEATURED_CATEGORY_KEYS, product.category_key]
+      : FEATURED_CATEGORY_KEYS
   const [activeLocale, setActiveLocale] = useState('az')
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
@@ -325,7 +335,7 @@ export default function ProductFormModal({ product, onClose, onSaved }) {
                 className={FIELD_CLASSES}
                 required
               >
-                {FIXED_CATEGORY_KEYS.map((key) => (
+                {categoryOptions.map((key) => (
                   <option key={key} value={key}>
                     {t(`items.${key}.name`)}
                   </option>
