@@ -48,35 +48,6 @@ export function DuctSegment({ position, rotation = [0, 0, 0], size = [1.4, 0.45,
   )
 }
 
-// Duct turn — a slightly larger box at the corner, same cheap-elbow trick as PipeElbow.
-export function DuctElbow({ position, size = 0.5, material }) {
-  return (
-    <mesh position={position} material={material} dispose={null} castShadow>
-      <boxGeometry args={[size, size, size]} />
-    </mesh>
-  )
-}
-
-// Supply/return grille face — a shallow box with a few recessed dark slats
-// to read as a louvered grille without modeling individual fins.
-export function Grille({ position, rotation = [0, 0, 0], size = [0.4, 0.4, 0.03], material }) {
-  const [w, h] = size
-  const slatCount = 4
-  return (
-    <group position={position} rotation={rotation}>
-      <mesh material={material} dispose={null} castShadow>
-        <boxGeometry args={size} />
-      </mesh>
-      {Array.from({ length: slatCount }, (_, i) => (
-        <mesh key={i} position={[0, h / 2 - ((i + 0.5) * h) / slatCount, 0.02]}>
-          <boxGeometry args={[w * 0.85, 0.015, 0.01]} />
-          <meshStandardMaterial color="#2A2C2E" roughness={0.6} metalness={0.3} />
-        </mesh>
-      ))}
-    </group>
-  )
-}
-
 // A firestop collar/sealant ring — the only geometry in the scene allowed to
 // use the dark firestop-red material, and only ever placed directly at a
 // real penetration point (wall/floor opening around a pipe). Optional

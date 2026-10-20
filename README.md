@@ -14,7 +14,7 @@ texniki bələdçidir. Admin/CMS istifadəçisi üçün bax `docs/CMS-GUIDE.md`.
 - **Tailwind CSS v4** — stil sistemi (`tailwind.config.js`-dəki tokenlər)
 - **react-three-fiber** / **drei** / **@react-three/postprocessing** /
   **three** — Ana səhifədəki interaktiv 3D bina səhnəsi
-- **framer-motion**, **gsap**, **lenis** — animasiya və smooth-scroll
+- **framer-motion** — animasiya
 - **react-router-dom** — client-side routing (SPA)
 - **Supabase** (`@supabase/supabase-js`) — CMS backend: Postgres verilənlər
   bazası, Auth (admin girişi), Storage (şəkillər)
@@ -59,7 +59,6 @@ src/
   locales/        # az/en/ru/tr — hər namespace üçün ayrı JSON
 supabase/
   migrations/     # SQL migration tarixçəsi (bax aşağıda)
-  seed/           # Tək dəfəlik məzmun köçürmə skriptləri (tarixi, təkrar işlədilməməlidir)
 docs/
   CMS-GUIDE.md          # Admin istifadəçi üçün bələdçi
   DOMAIN-CUTOVER.md     # argroup.az domen keçidi üçün DNS planı
@@ -80,19 +79,6 @@ Bunlar Supabase-in "publishable" açar cütüdür — hər cədvəl/bucket Row L
 Security (RLS) ilə qorunduğu üçün brauzer kodunda olması təhlükəsizdir.
 Real dəyərləri `.env` faylına yazın (`.env.example`-ə baxın) — **`.env`
 heç vaxt commit edilməməlidir** (artıq `.gitignore`-dadır).
-
-`supabase/seed/*.mjs` skriptləri (tarixi, tək dəfəlik məzmun köçürmələri)
-lokal olaraq bu iki dəyişəni də oxuya bilər:
-
-```
-ADMIN_EMAIL
-ADMIN_PASSWORD
-```
-
-Bunlar **yalnız** bu Node.js skriptləri üçündür (RLS-in admin yazma
-icazəsini test etmək məqsədilə) — **heç vaxt** brauzer kodunda istifadə
-olunmur, **heç vaxt** hostinq mühitinə (Vercel) əlavə edilməməlidir və
-**heç vaxt** commit edilməməlidir.
 
 `service_role` açarı və ya verilənlər bazası şifrəsi bu layihənin heç bir
 yerində saxlanılmamalıdır — nə frontend-də, nə də sənədləşdirmədə.
@@ -154,13 +140,6 @@ supabase/migrations/0003_contact_messages.sql — Əlaqə formu cədvəli + RLS
 Bu fayllar **tarixi migration qeydləridir** — production-a tətbiq
 olunduqdan sonra **təsadüfən redaktə edilməməlidir**. Sxemdə dəyişiklik
 lazımdırsa, yeni bir `0004_...sql` faylı yaradılmalıdır.
-
-`supabase/seed/*.mjs` skriptləri **tək dəfəlik** məzmun köçürmə
-alətləridir (real `src/data/*.js` fayllarından Supabase-ə köçürmək
-üçün istifadə olunub, o fayllar artıq mövcud deyil). **Bu skriptləri
-yenidən işə salmayın** — bəzi köhnə skriptlər artıq mövcud olmayan
-lokal fayllara istinad edir və işə düşməyəcək; bu, real problem deyil,
-sadəcə tarixi alətlərin öz məqsədini artıq yerinə yetirmiş olmasıdır.
 
 ## Deployment
 
