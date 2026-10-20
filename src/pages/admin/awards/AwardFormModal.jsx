@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Upload, X } from 'lucide-react'
+import { Loader2, Trash2, Upload, X } from 'lucide-react'
 import {
   LOCALES,
   createAward,
   deleteUploadedObject,
+  removeAwardImage,
   replaceAwardImage,
   updateAward,
   uploadAwardImage,
@@ -71,12 +72,13 @@ export default function AwardFormModal({ award, onClose, onSaved }) {
   const [values, setValues] = useState(() => valuesFromAward(award))
   const [activeLocale, setActiveLocale] = useState('az')
   const [imageFile, setImageFile] = useState(null)
+  const [removeImage, setRemoveImage] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
 
   const imagePreview = useMemo(
-    () => (imageFile ? URL.createObjectURL(imageFile) : (award?.image_url ?? null)),
-    [imageFile, award],
+    () => (imageFile ? URL.createObjectURL(imageFile) : removeImage ? null : (award?.image_url ?? null)),
+    [imageFile, award, removeImage],
   )
 
   useEffect(() => {
@@ -94,7 +96,13 @@ export default function AwardFormModal({ award, onClose, onSaved }) {
       return
     }
     setFormError('')
+    setRemoveImage(false)
     setImageFile(file)
+  }
+
+  function handleRemoveImage() {
+    setImageFile(null)
+    setRemoveImage(true)
   }
 
   async function handleSubmit(event) {
@@ -114,6 +122,8 @@ export default function AwardFormModal({ award, onClose, onSaved }) {
         await updateAward(award.id, payload)
         if (imageFile) {
           await replaceAwardImage(award, imageFile)
+        } else if (removeImage && award.image_url) {
+          await removeAwardImage(award)
         }
       } else {
         let image_url = null
@@ -207,6 +217,17 @@ export default function AwardFormModal({ award, onClose, onSaved }) {
                   {imageFile ? 'Şəkli dəyiş' : imagePreview ? 'Şəkli əvəz et' : 'Şəkil seç'}
                   <input type="file" accept="image/webp,image/jpeg,image/png" onChange={handleImageChange} className="hidden" />
                 </label>
+                {imagePreview && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    aria-label="Şəkli sil"
+                    className="flex items-center gap-1.5 rounded-sm border border-industrial-950/15 px-3.5 py-2 text-xs font-medium text-ember-600 transition-colors hover:border-ember-600 hover:bg-ember-600/5"
+                  >
+                    <Trash2 size={14} />
+                    Şəkli sil
+                  </button>
+                )}
               </div>
             </div>
           </div>

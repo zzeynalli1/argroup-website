@@ -219,4 +219,19 @@ export async function replaceAwardImage(award, file) {
   return updated
 }
 
+/**
+ * Clears an award's image_url (DB update first), then deletes the Storage
+ * object only if no other award still references it — same ordering as
+ * replaceAwardImage, just with no replacement upload.
+ */
+export async function removeAwardImage(award) {
+  const updated = await updateAward(award.id, { image_url: null })
+
+  if (award.image_url) {
+    await removeImageIfUnreferenced(award.image_url)
+  }
+
+  return updated
+}
+
 export { LOCALES }

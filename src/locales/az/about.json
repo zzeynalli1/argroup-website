@@ -115,7 +115,8 @@
   "awards": {
     "eyebrow": "MÜKAFATLAR",
     "title": "Mükafatlarımız",
-    "empty": "Mükafat məlumatları hazırda təsdiqlənmə mərhələsindədir və tezliklə əlavə olunacaq."
+    "empty": "Mükafat məlumatları hazırda təsdiqlənmə mərhələsindədir və tezliklə əlavə olunacaq.",
+    "close": "Bağla"
   },
   "catalog": {
     "title": "Kataloqumuz",

@@ -1,18 +1,37 @@
-import { Award } from 'lucide-react'
+import { useState } from 'react'
+import { Award, ChevronRight } from 'lucide-react'
 import { useAwards } from '../../hooks/useAwards'
 import { useTranslation } from '../../lib/i18n/useTranslation'
+import AwardDetailModal from '../ui/AwardDetailModal'
 
 /** Ghost-number + title/metadata row, same large-faded-number treatment as
  * WhyFirestop.jsx's ReasonColumn — reused here as a divided list instead of
  * a 4-up grid since awards are a variable-length list, not a fixed set.
  * `award.image` (admin-uploaded certificate/photo) renders as a small
  * thumbnail next to the number when set — omitted entirely otherwise,
- * same no-placeholder convention as the rest of the CMS-backed sections. */
-function AwardRow({ award, index }) {
+ * same no-placeholder convention as the rest of the CMS-backed sections.
+ * The whole row opens AwardDetailModal.jsx (large image + full copy) on
+ * click — same clickable-div + role="button"/onKeyDown treatment as
+ * Projects.jsx's ProjectCard, since a `<div>` (not a native `<button>`)
+ * is what keeps the existing two-column (text/metadata) row layout. */
+function AwardRow({ award, index, onOpen }) {
   const number = String(index + 1).padStart(2, '0')
 
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      onOpen(award)
+    }
+  }
+
   return (
-    <div className="flex flex-col gap-3 border-b border-white/10 py-6 last:border-b-0 sm:flex-row sm:items-start sm:justify-between sm:gap-8 md:py-8">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpen(award)}
+      onKeyDown={handleKeyDown}
+      className="group flex cursor-pointer flex-col gap-3 border-b border-white/10 py-6 last:border-b-0 sm:flex-row sm:items-start sm:justify-between sm:gap-8 md:py-8"
+    >
       <div className="flex items-start gap-4 sm:gap-5">
         <span
           aria-hidden="true"
@@ -28,22 +47,31 @@ function AwardRow({ award, index }) {
           />
         )}
         <div>
-          <h3 className="font-heading text-lg font-bold leading-snug text-base-50 md:text-xl">{award.title}</h3>
+          <h3 className="font-heading text-lg font-bold leading-snug text-base-50 transition-colors duration-200 group-hover:text-ember-600 md:text-xl">
+            {award.title}
+          </h3>
           {award.description && (
             <p className="mt-2 max-w-lg text-sm leading-relaxed text-neutral-custom-400">{award.description}</p>
           )}
         </div>
       </div>
 
-      {(award.organization || award.year) && (
-        <div className="flex shrink-0 items-center gap-3 pl-[52px] font-mono text-xs uppercase tracking-[0.15em] text-neutral-custom-400 sm:pl-0">
-          {award.organization && <span>{award.organization}</span>}
-          {award.organization && award.year && (
-            <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-neutral-custom-400/40" />
-          )}
-          {award.year && <span>{award.year}</span>}
-        </div>
-      )}
+      <div className="flex shrink-0 items-center gap-4 pl-[52px] sm:pl-0">
+        {(award.organization || award.year) && (
+          <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-[0.15em] text-neutral-custom-400">
+            {award.organization && <span>{award.organization}</span>}
+            {award.organization && award.year && (
+              <span aria-hidden="true" className="h-1 w-1 shrink-0 rounded-full bg-neutral-custom-400/40" />
+            )}
+            {award.year && <span>{award.year}</span>}
+          </div>
+        )}
+        <ChevronRight
+          size={16}
+          aria-hidden="true"
+          className="shrink-0 text-ember-600 transition-transform duration-200 ease-out group-hover:translate-x-0.5"
+        />
+      </div>
     </div>
   )
 }
@@ -66,34 +94,39 @@ function AwardRow({ award, index }) {
 export default function AboutAwards() {
   const { t, locale } = useTranslation('about')
   const { awards, loading } = useAwards(locale)
+  const [activeAward, setActiveAward] = useState(null)
 
   return (
-    <section className="relative overflow-hidden bg-industrial-800 py-14 md:py-20">
-      <div className="relative mx-auto max-w-5xl px-6">
-        <span className="mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-neutral-custom-400">
-          <span aria-hidden="true" className="h-px w-8 bg-neutral-custom-400/40" />
-          {t('awards.eyebrow')}
-        </span>
-        <h2 className="font-heading text-2xl font-bold leading-tight text-base-50 md:text-3xl">{t('awards.title')}</h2>
-        <span aria-hidden="true" className="mt-4 block h-0.5 w-10 bg-ember-600" />
+    <>
+      <section className="relative overflow-hidden bg-industrial-800 py-14 md:py-20">
+        <div className="relative mx-auto max-w-5xl px-6">
+          <span className="mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-neutral-custom-400">
+            <span aria-hidden="true" className="h-px w-8 bg-neutral-custom-400/40" />
+            {t('awards.eyebrow')}
+          </span>
+          <h2 className="font-heading text-2xl font-bold leading-tight text-base-50 md:text-3xl">{t('awards.title')}</h2>
+          <span aria-hidden="true" className="mt-4 block h-0.5 w-10 bg-ember-600" />
 
-        {loading ? (
-          <div className="mt-10 flex min-h-[120px] items-center justify-center">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/15 border-t-ember-600" />
-          </div>
-        ) : awards.length > 0 ? (
-          <div className="mt-10">
-            {awards.map((award, index) => (
-              <AwardRow key={award.id} award={award} index={index} />
-            ))}
-          </div>
-        ) : (
-          <div className="mt-10 flex items-center gap-3 border border-dashed border-white/15 px-6 py-8 text-sm text-neutral-custom-400">
-            <Award size={18} strokeWidth={1.5} className="shrink-0" />
-            {t('awards.empty')}
-          </div>
-        )}
-      </div>
-    </section>
+          {loading ? (
+            <div className="mt-10 flex min-h-[120px] items-center justify-center">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/15 border-t-ember-600" />
+            </div>
+          ) : awards.length > 0 ? (
+            <div className="mt-10">
+              {awards.map((award, index) => (
+                <AwardRow key={award.id} award={award} index={index} onOpen={setActiveAward} />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-10 flex items-center gap-3 border border-dashed border-white/15 px-6 py-8 text-sm text-neutral-custom-400">
+              <Award size={18} strokeWidth={1.5} className="shrink-0" />
+              {t('awards.empty')}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <AwardDetailModal award={activeAward} onClose={() => setActiveAward(null)} closeLabel={t('awards.close')} />
+    </>
   )
 }

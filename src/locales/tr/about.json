@@ -115,7 +115,8 @@
   "awards": {
     "eyebrow": "ÖDÜLLER",
     "title": "Ödüllerimiz",
-    "empty": "Ödül bilgileri şu anda onaylanma aşamasındadır ve yakında eklenecektir."
+    "empty": "Ödül bilgileri şu anda onaylanma aşamasındadır ve yakında eklenecektir.",
+    "close": "Kapat"
   },
   "catalog": {
     "title": "Kataloğumuz",

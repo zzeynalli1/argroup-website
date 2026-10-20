@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, Loader2, Upload, X } from 'lucide-react'
+import { ArrowRight, Loader2, Trash2, Upload, X } from 'lucide-react'
 import {
   createTeamMember,
   deleteUploadedObject,
   getValidParentOptions,
+  removeTeamPhoto,
   replaceTeamPhoto,
   updateTeamMember,
   uploadTeamPhoto,
@@ -66,6 +67,7 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
   const [values, setValues] = useState(() => valuesFromMember(member))
   const [activeLocale, setActiveLocale] = useState('az')
   const [photoFile, setPhotoFile] = useState(null)
+  const [removePhoto, setRemovePhoto] = useState(false)
   const [cropTarget, setCropTarget] = useState(null)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
@@ -76,8 +78,8 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
   )
 
   const photoPreview = useMemo(
-    () => (photoFile ? URL.createObjectURL(photoFile) : (member?.photo_url ?? null)),
-    [photoFile, member],
+    () => (photoFile ? URL.createObjectURL(photoFile) : removePhoto ? null : (member?.photo_url ?? null)),
+    [photoFile, member, removePhoto],
   )
 
   useEffect(() => {
@@ -99,6 +101,11 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
     event.target.value = ''
   }
 
+  function handleRemovePhoto() {
+    setPhotoFile(null)
+    setRemovePhoto(true)
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setFormError('')
@@ -116,6 +123,8 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
         await updateTeamMember(member.id, payload)
         if (photoFile) {
           await replaceTeamPhoto({ ...member, name: values.name }, photoFile)
+        } else if (removePhoto && member.photo_url) {
+          await removeTeamPhoto(member)
         }
       } else {
         let photo_url = null
@@ -281,6 +290,17 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
                   {photoFile ? 'Şəkli dəyiş' : photoPreview ? 'Şəkli əvəz et' : 'Şəkil seç'}
                   <input type="file" accept="image/webp,image/jpeg,image/png" onChange={handlePhotoChange} className="hidden" />
                 </label>
+                {photoPreview && (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    aria-label="Şəkli sil"
+                    className="flex items-center gap-1.5 rounded-sm border border-industrial-950/15 px-3.5 py-2 text-xs font-medium text-ember-600 transition-colors hover:border-ember-600 hover:bg-ember-600/5"
+                  >
+                    <Trash2 size={14} />
+                    Şəkli sil
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -293,6 +313,7 @@ export default function TeamMemberFormModal({ member, allMembers, categories = [
               onCancel={() => setCropTarget(null)}
               onConfirm={(croppedFile) => {
                 setPhotoFile(croppedFile)
+                setRemovePhoto(false)
                 setCropTarget(null)
               }}
             />

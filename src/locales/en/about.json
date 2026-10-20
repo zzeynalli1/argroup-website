@@ -115,7 +115,8 @@
   "awards": {
     "eyebrow": "AWARDS",
     "title": "Our Awards",
-    "empty": "Award information is currently being confirmed and will be added soon."
+    "empty": "Award information is currently being confirmed and will be added soon.",
+    "close": "Close"
   },
   "catalog": {
     "title": "Our Catalog",

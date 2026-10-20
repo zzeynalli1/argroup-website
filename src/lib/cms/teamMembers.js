@@ -291,3 +291,18 @@ export async function replaceTeamPhoto(member, file) {
 
   return updated
 }
+
+/**
+ * Clears a member's photo_url (DB update first), then deletes the Storage
+ * object only if no other member still references it — same ordering as
+ * replaceTeamPhoto/removeProductImage, just with no replacement upload.
+ */
+export async function removeTeamPhoto(member) {
+  const updated = await updateTeamMember(member.id, { photo_url: null })
+
+  if (member.photo_url) {
+    await removeImageIfUnreferenced(member.photo_url)
+  }
+
+  return updated
+}
