@@ -73,18 +73,8 @@
   "materials": {
     "close": "Kapat",
     "selectPrompt": "Detayları görmek için bir ürün seçin.",
-    "emptyState": "Bu kategoride henüz yayınlanmış ürün yok."
-  },
-  "proflame": {
-    "brand": "",
-    "description": "",
-    "linkLabel": "",
-    "products": {
-      "firestopCoating": "",
-      "firestopCollar": "",
-      "firestopWrap": "",
-      "fireResistantFoam": ""
-    }
+    "emptyState": "Bu kategoride henüz yayınlanmış ürün yok.",
+    "linkLabel": ""
   },
   "whyChoose": {
     "title": "Ürünlerimizin Avantajları",

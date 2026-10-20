@@ -6,14 +6,14 @@ import { useProducts } from '../../hooks/useProducts'
 import { categoryMaterials } from '../../data/categoryMaterials'
 import ImagePlaceholder from '../ui/ImagePlaceholder'
 import TechnicalLines from '../ui/TechnicalLines'
-import ProflameProductDetail from './ProflameProductDetail'
+import ProductDetailPanel from './ProductDetailPanel'
 
 /**
  * One product/material tile in the expanded grid. Three border states per
  * the interaction spec: steel/subtle by default, AR red on hover, and AR
  * red held persistently while `isSelected` (even after the pointer leaves).
  * `material.image` is only rendered as a real photo when `material.hasPhoto`
- * is set (currently just the 4 real Proflame product shots) — every other
+ * is set (every real CMS product, regardless of brand) — every other
  * material still falls back to ImagePlaceholder until real photography for
  * it exists.
  */
@@ -48,10 +48,16 @@ function ProductItem({ material, isSelected, onSelect }) {
 }
 
 /**
- * Right-column (desktop) / inline (mobile) detail panel for the selected
- * material. Only image + name are shown — no other per-product data
- * (type/descriptor, features, applications, documents) is verified yet, so
- * those fields are omitted entirely rather than filled with invented copy.
+ * Right-column (desktop) / inline (mobile) detail panel for a selected
+ * material that has no real CMS photo (`!material.hasPhoto` — local
+ * categoryMaterials tiles today). Only image + name are shown — no other
+ * per-product data (type/descriptor, features, applications, documents) is
+ * verified yet, so those fields are omitted entirely rather than filled
+ * with invented copy. `material.image` renders here exactly like it does
+ * on the card above and in ProductDetailPanel.jsx's own image block (same
+ * object-contain/centered treatment) — materials with genuinely no image
+ * yet omit the image area entirely rather than showing a dev-only
+ * placeholder to visitors.
  */
 function ProductDetail({ material, t }) {
   if (!material) {
@@ -64,25 +70,30 @@ function ProductDetail({ material, t }) {
 
   return (
     <div className="border border-ember-600/40 bg-industrial-950 p-6 md:p-7">
-      <ImagePlaceholder label={`${material.name} — detail`} aspect="aspect-[4/3]" tone="dark" />
+      {material.image && (
+        <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden border border-white/10 bg-industrial-900 p-5">
+          <span aria-hidden="true" className="absolute left-2 top-2 h-3 w-3 border-l border-t border-white/20" />
+          <span aria-hidden="true" className="absolute bottom-2 right-2 h-3 w-3 border-b border-r border-white/20" />
+          <img src={material.image} alt={material.name} className="max-h-full max-w-full object-contain" />
+        </div>
+      )}
       <h3 className="mt-5 font-heading text-lg font-bold text-base-50 md:text-xl">{material.name}</h3>
     </div>
   )
 }
 
 /**
- * Inline "Ətraflı" expansion for the Products landing page's 3 category
+ * Inline "Ətraflı" expansion for the Products landing page's category
  * panels (see ProductCategories.jsx, which already owns the activeCategory
  * click-to-toggle state — this component only reads it, never mutates the
  * category panels themselves). Rendered as an independent section directly
  * below the existing category showcase; renders nothing when no category is
  * active, so the approved page is visually unchanged until a panel is
- * clicked. Same component drives all 3 categories — nothing here is
+ * clicked. Same component drives every category — nothing here is
  * hardcoded per-category beyond the shared categoryMaterials lookup, plus
  * whatever real CMS products (useProducts) exist for the active category —
- * today that's only the 4 real Proflame products under passiveFireProtection,
- * but nothing here assumes that stays true: any category the admin adds a
- * published product to will surface it here automatically, no code change.
+ * any category the admin adds a published product to surfaces it here
+ * automatically, no code change.
  *
  * data/categoryMaterials.js's brand-name tiles (Fire Stop/Hensotherm/...,
  * Bivratech/..., Sylomer/...) are real brand names with no other verified
@@ -128,10 +139,15 @@ export default function ExpandedProductCategory({ activeCategory, onClose }) {
   ]
 
   const selectedMaterial = materials.find((material) => material.slug === selectedSlug) ?? null
-  // Brand-driven, not a hardcoded slug/id set — any current or future real
-  // product sharing the Proflame brand gets the shared family detail panel.
-  const isProflameSelected = selectedMaterial?.brand?.toUpperCase() === 'PROFLAME'
-  const proflameFamily = categoryProducts.filter((product) => product.brand?.toUpperCase() === 'PROFLAME')
+  // Brand-driven, not a hardcoded slug/id set — any real CMS product with a
+  // photo gets the full detail panel; its gallery is every sibling in this
+  // category sharing the same brand, or just itself when it has no brand
+  // (ProductDetailPanel hides the gallery whenever family.length <= 1).
+  const productFamily = selectedMaterial?.hasPhoto
+    ? selectedMaterial.brand
+      ? categoryProducts.filter((product) => product.brand?.toUpperCase() === selectedMaterial.brand.toUpperCase())
+      : [selectedMaterial]
+    : []
 
   return (
     <AnimatePresence initial={false}>
@@ -186,8 +202,8 @@ export default function ExpandedProductCategory({ activeCategory, onClose }) {
                     ))}
                   </div>
 
-                  {isProflameSelected ? (
-                    <ProflameProductDetail material={selectedMaterial} family={proflameFamily} selectedSlug={selectedSlug} onSelect={setSelectedSlug} t={t} />
+                  {selectedMaterial?.hasPhoto ? (
+                    <ProductDetailPanel material={selectedMaterial} family={productFamily} selectedSlug={selectedSlug} onSelect={setSelectedSlug} t={t} />
                   ) : (
                     <ProductDetail material={selectedMaterial} t={t} />
                   )}

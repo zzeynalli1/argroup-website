@@ -73,18 +73,8 @@
   "materials": {
     "close": "Close",
     "selectPrompt": "Select a product to see details.",
-    "emptyState": "No published products in this category yet."
-  },
-  "proflame": {
-    "brand": "",
-    "description": "",
-    "linkLabel": "",
-    "products": {
-      "firestopCoating": "",
-      "firestopCollar": "",
-      "firestopWrap": "",
-      "fireResistantFoam": ""
-    }
+    "emptyState": "No published products in this category yet.",
+    "linkLabel": ""
   },
   "whyChoose": {
     "title": "Why Choose Our Products",
