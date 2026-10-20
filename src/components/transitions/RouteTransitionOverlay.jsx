@@ -90,6 +90,19 @@ const PLANE_REST = { x: '0%', y: '0%', rotate: 0, scale: 1 }
  * marks their meeting line, and the real logo sits directly on the
  * graphite (no card/box) for a brief moment before the planes reconfigure
  * to open onto the destination page.
+ *
+ * `pointer-events-none` on both root containers below is load-bearing, not
+ * cosmetic: this layer has no interactive content (no buttons/links), so
+ * there's never a reason for it to intercept clicks/taps/scroll — and
+ * without it, ANY delay in its exit animation actually completing (the
+ * provider's `onOpenAnimationComplete` depends on framer-motion's
+ * `onAnimationComplete`, which runs on requestAnimationFrame and is
+ * suspended entirely by the browser in a backgrounded tab, among other
+ * possible stalls) makes the whole page unclickable for as long as that
+ * takes, which is what "the page froze" actually was — not a slow 3D
+ * scene, an input-blocking full-viewport div that outlived its own
+ * animation. See RouteTransitionProvider's phase watchdogs for the
+ * matching fix on the state-machine side (bounding how long that can be).
  */
 export default function RouteTransitionOverlay({
   covered,
@@ -106,7 +119,7 @@ export default function RouteTransitionOverlay({
 
   if (reducedMotion) {
     return (
-      <div className="fixed inset-0 z-[100]" aria-hidden="true">
+      <div className="pointer-events-none fixed inset-0 z-[100]" aria-hidden="true">
         <motion.div
           className="absolute inset-0 bg-industrial-950"
           initial={{ opacity: instant ? 1 : 0 }}
@@ -137,7 +150,7 @@ export default function RouteTransitionOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-[100] overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-[100] overflow-hidden"
       style={{ transform: 'translateZ(0)' }}
       aria-hidden="true"
     >

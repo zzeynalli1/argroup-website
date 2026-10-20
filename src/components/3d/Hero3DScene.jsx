@@ -23,6 +23,7 @@ import {
 } from '../../data/hotspots3d'
 import { COLORS, groundMaterial } from './buildingMaterials'
 import Building from './Building'
+import { diag3d } from '../../lib/diag3d'
 
 // Camera moves this much closer/farther per zoom-button click (see `zoomBy`).
 const ZOOM_STEP = 0.85
@@ -731,6 +732,95 @@ function CameraFrameShift({ active }) {
   return null
 }
 
+// The directional light's shadow map is also entirely static — same
+// reasoning as ContactShadows' `frames={1}` above: the light and the
+// building never move (only the camera orbits, and a shadow map is
+// rendered from the LIGHT's perspective, independent of the viewing
+// camera; hotspot dim/highlight only ever changes material opacity, never
+// a transform, and a transparent mesh still casts its normal shadow
+// silhouette in three.js's default shadow mapping). `autoUpdate` defaults
+// to true, re-rendering the shadow depth pass (2048px on desktop) every
+// single frame forever for a result that never changes after the first
+// one. Setting `needsUpdate` alongside `autoUpdate = false` renders it
+// exactly once more, then three.js itself clears `needsUpdate` back to
+// false — no RAF/timer needed.
+function StaticShadowMap() {
+  const { gl } = useThree()
+  useEffect(() => {
+    // The renderer is an imperative escape hatch (same convention as
+    // GradientBackdrop's `scene.background` above) — safe to mutate
+    // directly.
+    /* eslint-disable react-hooks/immutability */
+    gl.shadowMap.autoUpdate = false
+    gl.shadowMap.needsUpdate = true
+    /* eslint-enable react-hooks/immutability */
+  }, [gl])
+  return null
+}
+
+// Fires `onReady` once the base scene has actually been forced to compile
+// (`gl.compile`) AND R3F has rendered one real frame with that compiled
+// scene — distinct from Canvas's own `onCreated` below, which only means
+// the WebGL context/THREE.Scene object exist, well before anything has
+// necessarily been drawn or any shader linked. Building3DSection holds the
+// route-transition overlay's reveal open (via `markLoading`/`markLoaded`)
+// until THIS fires, specifically so the synchronous `gl.compile` burst
+// below — confirmed via CPU profiling to be the dominant main-thread cost
+// at first paint, well above network/chunk-download time — never runs
+// concurrently with the overlay's reveal animation.
+//
+// `gl.compile(scene, camera)` has to run from a mounted child's effect
+// rather than Canvas's own `onCreated` prop: by the time `onCreated` fires,
+// this Canvas's OWN JSX children (Building/Ground/lights/Hotspots below)
+// aren't guaranteed to have committed into the real THREE.Scene yet, so
+// compiling there risks compiling an empty scene (a no-op). A child
+// component's `useEffect` always runs after that commit.
+//
+// `onPostFxReady` (the heavier EffectComposer/ContactShadows pipeline —
+// see `postFxReady` below) is anchored to this SAME first-real-frame tick,
+// not to raw component mount — anchoring it to mount raced gl.compile's own
+// synchronous burst above, which can itself push the first real frame
+// noticeably later than mount on a cold GPU/driver, letting the two
+// "deferred, expensive" compiles land back-to-back instead of in sequence.
+function ReadySignal({ onReady, onPostFxReady }) {
+  const { gl, scene, camera } = useThree()
+  const compiledRef = useRef(false)
+  const firstFrameLoggedRef = useRef(false)
+  const postFxRafsRef = useRef({ raf1: 0, raf2: 0 })
+
+  useEffect(() => {
+    if (compiledRef.current) return
+    compiledRef.current = true
+    diag3d('3D shader precompile (gl.compile) starting')
+    gl.compile(scene, camera)
+    diag3d('3D shader precompile (gl.compile) done')
+  }, [gl, scene, camera])
+
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(postFxRafsRef.current.raf1)
+      cancelAnimationFrame(postFxRafsRef.current.raf2)
+    },
+    []
+  )
+
+  useFrame(() => {
+    if (firstFrameLoggedRef.current) return
+    firstFrameLoggedRef.current = true
+    diag3d('3D first real frame rendered (building/lights/hotspots on screen)')
+    onReady?.()
+
+    postFxRafsRef.current.raf1 = requestAnimationFrame(() => {
+      postFxRafsRef.current.raf2 = requestAnimationFrame(() => {
+        diag3d('3D post-processing pipeline mounting (shader compile starts now)')
+        onPostFxReady?.()
+      })
+    })
+  })
+
+  return null
+}
+
 function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef }) {
   useEffect(() => {
     const controls = orbitRef.current
@@ -785,6 +875,21 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
   const transitioningRef = useRef(false)
   const [activeKey, setActiveKey] = useState(null)
   const [hoveredKey, setHoveredKey] = useState(null)
+  // Mounting <EffectComposer> (6 post-processing shader passes: N8AO, Bloom,
+  // ToneMapping, BrightnessContrast, HueSaturation, Vignette) forces all of
+  // them to compile before the FIRST frame that includes it can render —
+  // on top of the scene's own ~25+ material shaders and shadow-depth
+  // variants, that's a large one-shot synchronous compile burden blocking
+  // the main thread right as the scene first becomes visible (confirmed via
+  // CPU profiling: this is the dominant cost in first paint, far more than
+  // network/chunk-download time). Set by `ReadySignal`'s `onPostFxReady`
+  // (two rAFs past the scene's own first real frame, not two rAFs past raw
+  // mount — see that component's own comment) so the scene's own first
+  // frame (materials/lighting/hotspots, no post-fx) reaches the screen on a
+  // much cheaper compile first, then the graded/bloomed look pops in a
+  // frame or two later once its shaders finish compiling in the background
+  // — same final visual, just staged instead of monolithic.
+  const [postFxReady, setPostFxReady] = useState(false)
 
   // Zoom now lives here instead of on the mouse wheel (see OrbitControls'
   // enableZoom={false} below) — this moves the camera along the existing
@@ -852,13 +957,24 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
         // controls edge antialiasing now, so paying for a second, unused
         // native AA context would be pure waste.
         gl={{ antialias: false, outputColorSpace: THREE.SRGBColorSpace }}
-        // Fires once, right after the WebGL context/scene is first created
-        // (well before every texture/environment map is necessarily loaded) —
-        // used purely as the "the real canvas has something on screen now"
-        // signal for Building3DSection's placeholder-to-canvas crossfade, not
-        // as a "fully loaded" signal. Doesn't affect rendering/frameloop.
-        onCreated={() => onReady?.()}
+        // Fires once, right after the WebGL context/scene object are first
+        // created — but well before this Canvas's own JSX children have
+        // necessarily committed into that scene, let alone had any shader
+        // compiled or any frame drawn. Purely a diagnostic checkpoint now;
+        // the actual "real canvas has something on screen" signal for
+        // Building3DSection's placeholder crossfade is `ReadySignal`'s
+        // `onReady` below (first real frame, post-gl.compile).
+        onCreated={() => {
+          diag3d('3D Canvas onCreated (WebGL context exists, nothing drawn/compiled yet)')
+        }}
       >
+        <ReadySignal
+          onReady={() => {
+            diag3d('3D scene onReady (first frame rendered, shaders compiled)')
+            onReady?.()
+          }}
+          onPostFxReady={() => setPostFxReady(true)}
+        />
         <GradientBackdrop />
         <fog attach="fog" args={[FOG_COLOR, 15, 33]} />
 
@@ -895,6 +1011,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           // the concrete's own chamfered faces.
           shadow-bias={-0.0015}
         />
+        <StaticShadowMap />
         {/* Warm rim/accent from the back-left, opposite the key — separates
             the building's silhouette from the dark backdrop and gives the
             concrete a warm/cool split instead of one flat white light. */}
@@ -943,14 +1060,37 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
 
         <Ground />
         <Building activeGroup={activeGroup} hoveredGroup={hoveredGroup} />
-        <ContactShadows
-          position={[0, -0.01, 0]}
-          opacity={0.6}
-          scale={14}
-          blur={2.2}
-          far={4.2}
-          resolution={isMobile ? 128 : 256}
-        />
+        {/* Deferred alongside <EffectComposer> (same `postFxReady` flag,
+            same 2-rAF delay) — ContactShadows' blur pass compiles its own 2
+            shader programs (horizontal + vertical blur) synchronously at
+            mount, same cost category as the post-processing pipeline. It's
+            a subtle, low-contrast soft shadow on the ground, not a hero
+            visual element, so skipping it for the scene's first 1-2 frames
+            is imperceptible — and it removes 2 more `gl.linkProgram` calls
+            from the critical path blocking the first visible frame.
+            Confirmed via CPU profiling (see Hero3DScene's git history /
+            PR notes) that WebGLProgram linking is the single largest
+            attributable JS cost on the first frame in a software-rendered
+            (no GPU, no KHR_parallel_shader_compile) test environment —
+            every program removed from this gate helps there and costs
+            nothing on real hardware. */}
+        {postFxReady && (
+          <ContactShadows
+            position={[0, -0.01, 0]}
+            opacity={0.6}
+            scale={14}
+            blur={2.2}
+            far={4.2}
+            resolution={isMobile ? 128 : 256}
+            // drei defaults this to Infinity — re-rendering the blur pass
+            // every single frame forever. Nothing it captures ever moves
+            // (the building is static geometry; hotspot dim/highlight only
+            // changes material opacity, never a transform), so one bake is
+            // enough — this removes a full extra render pass from every
+            // frame for the scene's entire lifetime, not just at startup.
+            frames={1}
+          />
+        )}
 
         {hotspots.map((hotspot) => (
           <Hotspot
@@ -1018,25 +1158,27 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
             mobile; N8AO's quality/resolution and Bloom (skipped entirely on
             mobile) are the two genuinely expensive settings, so those are
             what actually adapt for phones/tablets. */}
-        <EffectComposer multisampling={isMobile ? 0 : 4}>
-          <N8AO
-            aoRadius={0.45}
-            distanceFalloff={1}
-            intensity={isMobile ? 2.2 : 3.2}
-            quality={isMobile ? 'performance' : 'medium'}
-            halfRes={isMobile}
-            screenSpaceRadius
-          />
-          {isMobile ? (
-            <></>
-          ) : (
-            <Bloom luminanceThreshold={0.92} luminanceSmoothing={0.25} intensity={0.4} mipmapBlur />
-          )}
-          <ToneMapping mode={ToneMappingMode.AGX} />
-          <BrightnessContrast brightness={-0.03} contrast={0.1} />
-          <HueSaturation hue={0} saturation={-0.05} />
-          <Vignette offset={0.32} darkness={0.45} />
-        </EffectComposer>
+        {postFxReady && (
+          <EffectComposer multisampling={isMobile ? 0 : 4}>
+            <N8AO
+              aoRadius={0.45}
+              distanceFalloff={1}
+              intensity={isMobile ? 2.2 : 3.2}
+              quality={isMobile ? 'performance' : 'medium'}
+              halfRes={isMobile}
+              screenSpaceRadius
+            />
+            {isMobile ? (
+              <></>
+            ) : (
+              <Bloom luminanceThreshold={0.92} luminanceSmoothing={0.25} intensity={0.4} mipmapBlur />
+            )}
+            <ToneMapping mode={ToneMappingMode.AGX} />
+            <BrightnessContrast brightness={-0.03} contrast={0.1} />
+            <HueSaturation hue={0} saturation={-0.05} />
+            <Vignette offset={0.32} darkness={0.45} />
+          </EffectComposer>
+        )}
       </Canvas>
 
       <div className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col gap-2">

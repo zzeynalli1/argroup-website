@@ -1,13 +1,30 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import ErrorBoundary from '../ui/ErrorBoundary'
+import { LoadingSignalContext } from '../transitions/routeLoadingSignal'
+import { diag3d } from '../../lib/diag3d'
+
+// Separate, much tighter ceiling than RouteTransitionProvider's own
+// SAFETY_TIMEOUT_MS (8000ms, sized for a genuinely stalled network chunk) —
+// this one specifically bounds how long the transition overlay's reveal can
+// be held open waiting on THIS scene's heavy WebGL startup (shader compile +
+// first real frame, see Hero3DScene's `ReadySignal`). 2.5s is generous for a
+// cold GPU/driver on a slow device while still well short of reading as
+// "frozen" if the scene is unusually slow to come up — the overlay opens on
+// schedule either way, just to a canvas that keeps loading underneath it.
+const HEAVY_LOAD_MAX_WAIT_MS = 2500
 
 // Three.js only loads once this section is actually rendered, keeping it out
 // of the initial bundle (see CLAUDE.md perf note on the earlier 1.37MB hero).
-const Hero3DScene = lazy(() => import('../3d/Hero3DScene'))
+const Hero3DScene = lazy(() =>
+  import('../3d/Hero3DScene').then((mod) => {
+    diag3d('3D chunk resolved (Building3DSection lazy)')
+    return mod
+  })
+)
 
 // Deliberately duplicated (not imported) from Hero3DScene.jsx's own
 // `BACKDROP_TOP` / `BACKDROP_BOTTOM` constants — importing them would pull
@@ -113,11 +130,35 @@ export default function Building3DSection() {
   // before the section actually enters the viewport so nothing visibly
   // "wakes up" mid-scroll.
   const [inView, setInView] = useState(true)
-  // Flips true once (via Hero3DScene's `onCreated` -> `onReady`) the real
-  // canvas has actually painted something — drives the crossfade below.
-  // Deliberately never reset back to false afterward (no reason to fade the
-  // placeholder back in once the real scene is up).
+  // Separate from `inView` — a backgrounded tab (switched away from, not
+  // just scrolled past) should pause the render loop too, same reasoning:
+  // frameloop="always" keeps rendering every frame (post-processing, shadow
+  // work, the continuous hotspot-breathing animation) with nothing visible
+  // to show for it. Browsers already throttle/suspend requestAnimationFrame
+  // in hidden tabs on their own, so this isn't fixing a literal "still
+  // spinning at full rate in the background" bug — it's removing reliance
+  // on that implicit, browser-version-dependent throttling (some browsers
+  // still allow a slow residual rAF rate rather than fully stopping it) in
+  // favor of an explicit, guaranteed-zero-cost pause the instant the tab is
+  // hidden, verified via the Page Visibility API rather than assumed.
+  const [tabVisible, setTabVisible] = useState(
+    typeof document === 'undefined' || document.visibilityState !== 'hidden'
+  )
+  // Flips true once (via Hero3DScene's `ReadySignal` -> `onReady`, fired
+  // after gl.compile AND the first real rendered frame — not merely once
+  // the WebGL context exists) the real canvas has actually painted
+  // something — drives the crossfade below. Deliberately never reset back
+  // to false afterward (no reason to fade the placeholder back in once the
+  // real scene is up).
   const [sceneReady, setSceneReady] = useState(false)
+  // Flips true if the scene still isn't ready after a generous delay — on a
+  // slow connection the ~375KB gzip Hero3DScene chunk can take well beyond a
+  // normal page-load budget, and without this the placeholder shows the
+  // exact same "loading" spinner the whole time with no signal that
+  // anything's different from a fast connection. Purely cosmetic (swaps the
+  // placeholder's label); doesn't affect when the real scene actually
+  // mounts.
+  const [slowLoad, setSlowLoad] = useState(false)
   // Keeps the placeholder mounted slightly past the crossfade's own
   // transition duration so it's still there underneath during the fade
   // (rather than unmounting the instant `sceneReady` flips, which would
@@ -125,6 +166,53 @@ export default function Building3DSection() {
   // fully covered — avoids leaving an invisible `animate-spin` running
   // indefinitely underneath the opaque canvas.
   const [showPlaceholder, setShowPlaceholder] = useState(true)
+
+  // Present whenever this renders inside RouteTransitionProvider (i.e.
+  // always, on the public site) — `null` outside it (e.g. in isolation/
+  // tests), in which case the registration effect below is a no-op, same
+  // convention as `useRegisterRouteLoading`.
+  const loadingSignal = useContext(LoadingSignalContext)
+  // Guards the markLoading/markLoaded pairing below so it fires exactly
+  // once per mount regardless of which of the three release paths —
+  // Hero3DScene's onReady, the HEAVY_LOAD_MAX_WAIT_MS cap, or unmounting
+  // before either — gets there first.
+  const heavyLoadReleasedRef = useRef(false)
+  function releaseHeavyLoad() {
+    if (heavyLoadReleasedRef.current) return
+    heavyLoadReleasedRef.current = true
+    loadingSignal?.markLoaded()
+  }
+
+  useEffect(() => {
+    diag3d('Building3DSection mounted')
+  }, [])
+
+  // Registers this mount's WebGL startup (shader compile + first real
+  // frame) as a load the route-transition overlay should hold its reveal
+  // open for — not intro-specific (deliberately the same generic
+  // markLoading/markLoaded pairing RouteFallback's useRegisterRouteLoading
+  // uses for lazy route chunks in App.jsx), so a same-tab nav back to the
+  // home route gets the same protection as the first-load intro. Released
+  // by whichever of onReady (below) / the cap timer (here) fires first; see
+  // HEAVY_LOAD_MAX_WAIT_MS's own comment for why this cap is tighter than
+  // the provider's general SAFETY_TIMEOUT_MS.
+  useEffect(() => {
+    if (!loadingSignal) return undefined
+    heavyLoadReleasedRef.current = false
+    loadingSignal.markLoading()
+    diag3d('Building3DSection registered heavy 3D load with transition overlay')
+
+    const capTimer = window.setTimeout(() => {
+      if (heavyLoadReleasedRef.current) return
+      diag3d('3D heavy-load cap hit (2.5s) — releasing transition hold early')
+      releaseHeavyLoad()
+    }, HEAVY_LOAD_MAX_WAIT_MS)
+
+    return () => {
+      window.clearTimeout(capTimer)
+      releaseHeavyLoad()
+    }
+  }, [loadingSignal])
 
   useEffect(() => {
     const el = sectionRef.current
@@ -139,11 +227,29 @@ export default function Building3DSection() {
   }, [])
 
   useEffect(() => {
+    if (typeof document === 'undefined') return undefined
+    function handleVisibilityChange() {
+      setTabVisible(document.visibilityState !== 'hidden')
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
+  useEffect(() => {
     if (!sceneReady) return undefined
     // Matches the crossfade's own 700ms transition (see the canvas layer's
     // className below) plus a small margin — unmounts the placeholder only
     // once it's fully covered, never mid-fade.
     const timeout = window.setTimeout(() => setShowPlaceholder(false), 800)
+    return () => window.clearTimeout(timeout)
+  }, [sceneReady])
+
+  useEffect(() => {
+    if (sceneReady) return undefined
+    const timeout = window.setTimeout(() => {
+      diag3d('3D scene slow-load threshold hit (12s, still not ready)')
+      setSlowLoad(true)
+    }, 12000)
     return () => window.clearTimeout(timeout)
   }, [sceneReady])
 
@@ -176,7 +282,7 @@ export default function Building3DSection() {
             `showPlaceholder` above), then removed entirely. */}
         {showPlaceholder && (
           <div className="absolute inset-0">
-            <ScenePlaceholder label={t('building3d.loading')} />
+            <ScenePlaceholder label={t(slowLoad ? 'building3d.loadingSlow' : 'building3d.loading')} />
           </div>
         )}
 
@@ -202,7 +308,11 @@ export default function Building3DSection() {
             // `onReady`, which never fires if it crashed before mounting),
             // leaving this fallback stuck at opacity 0 behind a spinner that
             // spins forever instead of actually showing "unavailable".
-            onError={() => setSceneReady(true)}
+            onError={(err) => {
+              diag3d('3D scene ErrorBoundary caught (showing unavailable fallback)', err?.message)
+              setSceneReady(true)
+              releaseHeavyLoad()
+            }}
             fallback={
               <div className="absolute inset-0">
                 <ScenePlaceholder label={t('building3d.unavailable')} spinning={false} />
@@ -213,8 +323,12 @@ export default function Building3DSection() {
               <Hero3DScene
                 ref={sceneRef}
                 onHotspotChange={setActive}
-                active={inView}
-                onReady={() => setSceneReady(true)}
+                active={inView && tabVisible}
+                onReady={() => {
+                  diag3d('3D scene onReady (first frame rendered, shaders compiled)')
+                  setSceneReady(true)
+                  releaseHeavyLoad()
+                }}
               />
             </Suspense>
           </ErrorBoundary>

@@ -1,16 +1,17 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
-import Home from './pages/Home'
-
-// Home stays a static import (it's the critical-path landing route); every
-// other page is its own lazy chunk so visiting "/" never downloads JS for
-// routes the user hasn't navigated to yet.
+import { diag3d } from './lib/diag3d'
+// Every page (including Home) is its own lazy chunk, so visiting any one
+// route never downloads JS for routes the user hasn't navigated to yet —
+// this keeps non-public routes like /admin/login from paying for Home's
+// section bundle.
+const Home = lazy(() => import('./pages/Home'))
 const About = lazy(() => import('./pages/About'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage'))
 const ServiceDetailPage = lazy(() => import('./pages/ServiceDetailPage'))
@@ -38,6 +39,36 @@ function RouteFallback() {
   )
 }
 
+// Starts downloading Hero3DScene's chunk (1.26MB raw / ~375KB gzip, by far
+// the heaviest single chunk on the site) the instant the "/" route is
+// requested, in parallel with Home's own chunk instead of waiting for it —
+// today Building3DSection's `lazy(() => import('../3d/Hero3DScene'))` only
+// fires once Home has already loaded AND mounted AND rendered down to that
+// point, a fully sequential waterfall. This fires the identical import()
+// call (same specifier, so the module cache/network request is shared, not
+// duplicated — Building3DSection's own lazy() just resolves instantly
+// against whatever this already started) as early as possible without
+// touching Home's own render path, so the two chunks overlap on the wire
+// instead of queuing one after the other. Scoped to the home route only —
+// no other route pays for any of this.
+function HeroScenePrefetch() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (pathname !== '/') return
+    diag3d('3D chunk prefetch requested')
+    // Fire-and-forget: Building3DSection's own lazy()+Suspense+ErrorBoundary
+    // is what actually handles a real failure (shows the "unavailable"
+    // placeholder) once it imports the same specifier later. This call just
+    // needs to not produce an unhandled promise rejection if the network
+    // request itself fails before that — it was doing exactly that before
+    // this .catch was added.
+    import('./components/3d/Hero3DScene')
+      .then(() => diag3d('3D chunk prefetch resolved'))
+      .catch((err) => diag3d('3D chunk prefetch failed (non-fatal, Building3DSection retries)', err?.message))
+  }, [pathname])
+  return null
+}
+
 // Persistent Header/Footer around every public page — kept as its own
 // layout route so the admin routes below can render without them.
 function PublicLayout() {
@@ -63,6 +94,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <HeroScenePrefetch />
       <RouteTransitionProvider>
         <Routes>
           <Route element={<PublicLayout />}>
