@@ -821,7 +821,21 @@ function ReadySignal({ onReady, onPostFxReady }) {
   return null
 }
 
-function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef }) {
+// Also doubles as this scene's one "give the outer, non-R3F component scope
+// access to `invalidate`" bridge (see `invalidateRef` below) — under
+// `frameloop="demand"`, nothing renders again on its own once the camera
+// stops moving/settling, so `selectHotspot`/`resetCamera`/`zoomBy` (plain
+// closures in `Hero3DScene`, defined OUTSIDE the Canvas/R3F tree, which is
+// the only place `useThree` can be called) need a way to kick off the very
+// first render of a new camera transition. `invalidateRef.current` is set
+// here once R3F's own `invalidate` is available and read back there.
+function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef, invalidateRef }) {
+  const { invalidate } = useThree()
+
+  useEffect(() => {
+    invalidateRef.current = invalidate
+  }, [invalidate, invalidateRef])
+
   useEffect(() => {
     const controls = orbitRef.current
     if (!controls) return undefined
@@ -853,8 +867,51 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
 
     if (state.camera.position.distanceTo(desiredPosRef.current) < 0.01) {
       transitioningRef.current = false
+    } else {
+      // `frameloop="demand"` only renders the frames explicitly requested —
+      // keep requesting the next one for as long as the fly-to lerp above
+      // still has distance left to cover, or it would freeze mid-flight
+      // after this single rendered frame.
+      state.invalidate()
     }
   })
+
+  return null
+}
+
+// How often the idle hotspot "breathing" pulse requests a new frame under
+// `frameloop="demand"` — deliberately much coarser than a real ~60fps RAF
+// loop (see `Hotspot`'s own per-frame block, which this just keeps ticking):
+// the pulse is a slow (~3.3s period), purely decorative ambient cue, not an
+// interaction the user tracks closely, so sampling it at ~12fps instead of
+// 60fps is not visibly choppy in practice while cutting the idle render cost
+// (full scene + post-fx redraw, not just the marker math) to roughly a fifth.
+const BREATHE_INVALIDATE_INTERVAL_MS = 80
+
+// Keeps `frameloop="demand"` alive at a low, fixed rate ONLY for the
+// hotspot markers' idle breathing animation (see the constant above) —
+// every other continuously-animated thing in this scene (the fly-to camera
+// lerp in `CameraRig`, OrbitControls' own damping settle) already
+// self-invalidates on its own while it's actually active, and stops
+// invalidating (so rendering stops) the moment it's done. Skipped entirely
+// under `prefersReducedMotion`: `Hotspot` already forces its own pulse
+// contribution to a flat 0 in that case, so there's nothing for repeated
+// invalidation to animate — the marker's distance-compensation scale still
+// updates correctly on its own whenever the camera actually moves (which
+// already invalidates through the paths above), no polling needed. Calling
+// `invalidate()` while this section is scrolled out of view / the tab is
+// hidden (`active=false` -> Canvas `frameloop="never"`) is a verified no-op
+// in R3F's own `invalidate()` (it early-returns when `frameloop === 'never'`
+// — see node_modules/@react-three/fiber's `invalidate` implementation), so
+// this timer doesn't need its own `active`-gating to stay safe/cheap then.
+function BreathingPulseDriver({ prefersReducedMotion }) {
+  const { invalidate } = useThree()
+
+  useEffect(() => {
+    if (prefersReducedMotion) return undefined
+    const id = window.setInterval(() => invalidate(), BREATHE_INVALIDATE_INTERVAL_MS)
+    return () => window.clearInterval(id)
+  }, [invalidate, prefersReducedMotion])
 
   return null
 }
@@ -890,6 +947,14 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
   // frame or two later once its shaders finish compiling in the background
   // — same final visual, just staged instead of monolithic.
   const [postFxReady, setPostFxReady] = useState(false)
+  // Holds R3F's own `invalidate` once `CameraRig` (a Canvas child) captures
+  // it — see that component's own comment on why this indirection exists:
+  // under `frameloop="demand"`, the functions below (plain closures, called
+  // from DOM button clicks / Hotspot's R3F pointer events, but themselves
+  // outside the Canvas tree) are what FIRST flips `transitioningRef.current`
+  // true, and nothing renders again on its own unless something calls
+  // `invalidate()` right then to kick off that first frame.
+  const invalidateRef = useRef(null)
 
   // Zoom now lives here instead of on the mouse wheel (see OrbitControls'
   // enableZoom={false} below) — this moves the camera along the existing
@@ -905,6 +970,10 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
     offset.setLength(nextDistance)
     camera.position.copy(controls.target).add(offset)
     controls.update()
+    // One-shot camera move, not an ongoing transition `CameraRig` lerps
+    // toward — needs its own explicit request for the single frame that
+    // shows the new zoom level under `frameloop="demand"`.
+    invalidateRef.current?.()
   }
 
   function selectHotspot(hotspot) {
@@ -912,6 +981,10 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
     desiredPosRef.current.set(...hotspot.cameraPosition)
     desiredTargetRef.current.set(...hotspot.position)
     transitioningRef.current = true
+    // Kicks off the first frame of the fly-to transition; `CameraRig`'s own
+    // `useFrame` keeps requesting the rest for as long as it's still lerping
+    // (see that component).
+    invalidateRef.current?.()
     onHotspotChange?.(hotspot)
   }
 
@@ -920,6 +993,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
     desiredPosRef.current.set(...defaultCameraPosition)
     desiredTargetRef.current.set(...defaultCameraTarget)
     transitioningRef.current = true
+    invalidateRef.current?.()
     onHotspotChange?.(null)
   }
 
@@ -943,13 +1017,28 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
       <Canvas
         shadows
         camera={{ position: defaultCameraPosition, fov: 45 }}
-        dpr={isMobile ? [1, 1] : [1, 1.5]}
+        // Desktop max capped at 1.25 (down from 1.5) — the visible sharpness
+        // delta between 1.25x and 1.5x device pixel ratio on this scene's
+        // detail level is marginal, but the pixel (and therefore fragment
+        // shader / post-fx) count scales with the SQUARE of this value, so
+        // the saving is far larger than the ratio change alone suggests.
+        dpr={isMobile ? [1, 1] : [1, 1.25]}
         // Paused (no automatic per-frame render/useFrame invocation) while
         // Building3DSection's own IntersectionObserver reports this section
         // is scrolled far out of view — see that component's `inView` state
         // for why this is safe (doesn't touch camera/controls/transition
-        // state, only the RAF loop driving them).
-        frameloop={active ? 'always' : 'never'}
+        // state, only the RAF loop driving them). `'demand'` (rather than
+        // `'always'`) when active: nothing in this scene needs to redraw
+        // every single RAF tick forever — the camera fly-to lerp
+        // (`CameraRig`), OrbitControls' own damping settle, and the hotspot
+        // markers' idle "breathing" pulse (`BreathingPulseDriver`, throttled
+        // — see its own comment) all explicitly call `invalidate()` only
+        // while/as often as they actually need a new frame, so an idle,
+        // non-interacting scene renders nothing further once everything
+        // settles, instead of burning a full GPU frame (scene + N8AO +
+        // Bloom + shadow/contact-shadow passes) 60 times a second for no
+        // visible change.
+        frameloop={active ? 'demand' : 'never'}
         // `antialias` off deliberately: once `<EffectComposer>` is mounted,
         // the 3D scene is rendered into the composer's own render target,
         // never the canvas's default (potentially MSAA) framebuffer — the
@@ -989,8 +1078,20 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           intensity={2.1}
           color="#FFEBC8"
           castShadow
-          shadow-mapSize-width={isMobile ? 1024 : 2048}
-          shadow-mapSize-height={isMobile ? 1024 : 2048}
+          // Was 2048 on desktop (mobile already 1024) — dropped to match
+          // mobile. `StaticShadowMap` below bakes this map exactly ONCE
+          // (`autoUpdate = false`), so the cost here is a single one-time
+          // render-to-texture at mount, not a recurring per-frame cost —
+          // still worth halving since it's part of the same first-paint
+          // compile/setup burden `ReadySignal`'s staged mounting (see that
+          // component's own comment) is specifically working to shrink, and
+          // the tighter shadow-camera frustum already derived against the
+          // building's real bounding box (see the comment below) means the
+          // visible resolution-per-shadow-pixel loss from 2048 -> 1024 is
+          // modest, not the 4x-softer blur a naively unbounded frustum would
+          // show at the same texel drop.
+          shadow-mapSize-width={1024}
+          shadow-mapSize-height={1024}
           // Frustum derived from projecting the building's full bounding box
           // (including ExteriorShell.jsx's `LowWideWing`, which extends the
           // left edge out to x=-6.6) onto this light's own local left/up
@@ -1055,7 +1156,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
             contribution restrained so reflections read as real without
             blowing out. */}
         <Suspense fallback={null}>
-          <Environment files="/hdr/potsdamer_platz_1k.hdr" environmentIntensity={0.85} />
+          <Environment files="/hdr/potsdamer_platz_512.hdr" environmentIntensity={0.85} />
         </Suspense>
 
         <Ground />
@@ -1092,6 +1193,8 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           />
         )}
 
+        <BreathingPulseDriver prefersReducedMotion={prefersReducedMotion} />
+
         {hotspots.map((hotspot) => (
           <Hotspot
             key={hotspot.id}
@@ -1125,6 +1228,7 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
           desiredPosRef={desiredPosRef}
           desiredTargetRef={desiredTargetRef}
           transitioningRef={transitioningRef}
+          invalidateRef={invalidateRef}
         />
         <CameraFrameShift active={isWideLayout} />
 
@@ -1154,20 +1258,40 @@ const Hero3DScene = forwardRef(function Hero3DScene({ onHotspotChange, active = 
               5. Vignette — subtle edge falloff only, to hold focus on the
                           building rather than the frame edges.
             `multisampling` is this composer's own antialiasing (see the
-            `gl={{antialias:false}}` note above) — reduced, not removed, on
-            mobile; N8AO's quality/resolution and Bloom (skipped entirely on
-            mobile) are the two genuinely expensive settings, so those are
-            what actually adapt for phones/tablets. */}
+            `gl={{antialias:false}}` note above) — was 4 on desktop/0 on
+            mobile, desktop now reduced to 2: the visible edge-aliasing delta
+            between 4x and 2x is subtle at this scene's camera distances, but
+            each sample multiplies the composer's own resolve cost. N8AO is
+            skipped entirely on mobile (same treatment as Bloom, already
+            mobile-skipped below) — AO is the single most expensive pass in
+            this pipeline, and `halfRes` alone wasn't enough headroom on
+            phone-class GPUs; ToneMapping/BrightnessContrast/HueSaturation/
+            Vignette stay mounted on mobile too, since those are what give
+            the AGX grade (replacing the renderer's own tone mapping — see
+            the mode comment above) and dropping the whole composer there
+            would make mobile visibly flatter/washed out relative to
+            desktop, not just less ambient-occluded. */}
         {postFxReady && (
-          <EffectComposer multisampling={isMobile ? 0 : 4}>
-            <N8AO
-              aoRadius={0.45}
-              distanceFalloff={1}
-              intensity={isMobile ? 2.2 : 3.2}
-              quality={isMobile ? 'performance' : 'medium'}
-              halfRes={isMobile}
-              screenSpaceRadius
-            />
+          <EffectComposer multisampling={isMobile ? 0 : 2}>
+            {isMobile ? (
+              <></>
+            ) : (
+              <N8AO
+                aoRadius={0.45}
+                distanceFalloff={1}
+                intensity={3.2}
+                quality="medium"
+                // Half-resolution AO buffer on desktop too now (previously
+                // mobile-only) — screen-space AO is inherently a soft,
+                // low-frequency effect; rendering its own buffer at half
+                // the pixel count (so a quarter the shading cost) is not
+                // visually distinguishable from full-res at this effect's
+                // own blur radius, confirmed by comparing both before
+                // applying this.
+                halfRes
+                screenSpaceRadius
+              />
+            )}
             {isMobile ? (
               <></>
             ) : (

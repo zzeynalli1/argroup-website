@@ -1,11 +1,21 @@
 HDRI source — CC0 (public domain), no attribution required.
 
-- potsdamer_platz_1k.hdr — originally from Poly Haven (polyhaven.com),
-  obtained via @react-three/drei's own asset mirror
-  (https://github.com/pmndrs/drei-assets) — the exact file drei's
-  `<Environment preset="city">` fetches from its CDN at runtime. Self-hosted
-  here instead of fetched from that CDN so the Home page's 3D scene doesn't
-  depend on a third-party host being reachable (see
+- potsdamer_platz_512.hdr — downsampled (1024x512 -> 512x256, linear-space
+  box filter, lossless RLE re-encode) from the original
+  potsdamer_platz_1k.hdr, which came from Poly Haven (polyhaven.com) via
+  @react-three/drei's own asset mirror (https://github.com/pmndrs/drei-assets)
+  — the exact file drei's `<Environment preset="city">` fetches from its CDN
+  at runtime. Self-hosted here instead of fetched from that CDN so the Home
+  page's 3D scene doesn't depend on a third-party host being reachable (see
   src/components/3d/Hero3DScene.jsx's `<Environment files={...}>` usage).
+  Downsampled to cut transfer size (1.5MB -> ~390KB): this HDRI only drives
+  IBL reflections on the building's metal/glass materials (the visible sky
+  backdrop is a separate painted gradient, see GradientBackdrop in
+  Hero3DScene.jsx), so losing its own fine detail is imperceptible in the
+  final reflections. Downsample script: scratchpad hdr_tool.py (plain
+  RGBE/Radiance reader+writer, box-filtered in linear light space, no
+  external image libs beyond numpy) — not checked into the repo, regenerate
+  from potsdamer_platz_1k.hdr (Poly Haven, same URL) if a different size is
+  ever needed.
 
 Poly Haven license: CC0 1.0 Universal — https://polyhaven.com/license
