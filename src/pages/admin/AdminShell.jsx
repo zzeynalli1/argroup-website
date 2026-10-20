@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { LogOut } from 'lucide-react'
 import { useAuth } from '../../lib/auth/useAuth'
 import ProjectsAdminView from './projects/ProjectsAdminView'
@@ -56,9 +56,22 @@ const NAV_GROUPS = [
 
 const CONTENT_AREAS = NAV_GROUPS.flatMap((group) => group.items).filter((item) => item.key !== 'dashboard')
 
+// `/admin` itself is the dashboard; every other section lives at its own
+// `/admin/<key>` path — so the active section comes from the URL (via
+// react-router, matched against the `/admin/*` route in App.jsx) instead of
+// component state, which is what previously reset back to the dashboard on
+// every page refresh (plain component state doesn't survive a reload; the
+// URL does).
+function pathForKey(key) {
+  return key === 'dashboard' ? '/admin' : `/admin/${key}`
+}
+
 export default function AdminShell() {
   const { user, signOut } = useAuth()
-  const [activeKey, setActiveKey] = useState('dashboard')
+  const { pathname } = useLocation()
+
+  const segment = pathname.replace(/^\/admin\/?/, '').split('/')[0]
+  const activeKey = CONTENT_AREAS.some((item) => item.key === segment) ? segment : 'dashboard'
 
   const activeLabel = CONTENT_AREAS.find((item) => item.key === activeKey)?.label
 
@@ -85,9 +98,8 @@ export default function AdminShell() {
                   const isActive = activeKey === item.key
                   return (
                     <li key={item.key}>
-                      <button
-                        type="button"
-                        onClick={() => setActiveKey(item.key)}
+                      <Link
+                        to={pathForKey(item.key)}
                         className={`block w-full rounded-sm px-3 py-2 text-left text-sm transition-colors ${
                           isActive
                             ? 'bg-industrial-800 text-ember-600'
@@ -95,7 +107,7 @@ export default function AdminShell() {
                         }`}
                       >
                         {item.label}
-                      </button>
+                      </Link>
                     </li>
                   )
                 })}
@@ -122,7 +134,7 @@ export default function AdminShell() {
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-5xl px-10 py-10">
           {activeKey === 'dashboard' ? (
-            <DashboardView onSelect={setActiveKey} />
+            <DashboardView />
           ) : activeKey === 'projects' ? (
             <ProjectsAdminView />
           ) : activeKey === 'brands' ? (
@@ -150,7 +162,7 @@ export default function AdminShell() {
   )
 }
 
-function DashboardView({ onSelect }) {
+function DashboardView() {
   return (
     <div>
       <h1 className="font-heading text-2xl font-bold text-industrial-950">AR Group CMS</h1>
@@ -158,14 +170,13 @@ function DashboardView({ onSelect }) {
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {CONTENT_AREAS.map((item) => (
-          <button
+          <Link
             key={item.key}
-            type="button"
-            onClick={() => onSelect(item.key)}
+            to={pathForKey(item.key)}
             className="rounded-sm border border-industrial-950/10 bg-base-50 px-5 py-4 text-left transition-colors hover:border-ember-600"
           >
             <span className="text-sm font-semibold text-industrial-950">{item.label}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </div>

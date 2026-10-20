@@ -116,7 +116,7 @@ export default function App() {
             }
           />
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <Suspense fallback={<RouteFallback />}>
                 <ProtectedRoute>
