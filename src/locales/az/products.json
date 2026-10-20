@@ -52,10 +52,6 @@
       "name": "Fanlar",
       "description": "Bina və tunellər üçün tüstü çıxarma və hava dövranı fan sistemləri."
     },
-    "marineAnticorrosion": {
-      "name": "Dəniz və Antikorroziya Məhsulları",
-      "description": "Dəniz sənayesi və aqressiv mühitlər üçün qoruyucu örtük sistemləri."
-    },
     "additionalProducts": {
       "name": "Əlavə məhsullar",
       "description": "Əsas kateqoriyalara daxil olmayan digər AR Group məhsulları."

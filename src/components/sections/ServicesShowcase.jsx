@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import {
   Activity,
   Anchor,
-  ArrowRight,
   ArrowUpRight,
   Cable,
   Drill,
@@ -22,7 +20,6 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import { getCategoryByKey } from '../../data/servicesDetail'
-import ServiceIllustration from '../ui/ServiceIllustration'
 import ImagePlaceholder from '../ui/ImagePlaceholder'
 import ProcessStageShowcase from '../ui/ProcessStageShowcase'
 import TechnicalLines from '../ui/TechnicalLines'
@@ -463,116 +460,7 @@ function SectionConstruction({ t, activeKey, onSelect, onClose, panelRef }) {
   )
 }
 
-// ---- 04 — Industrial Solutions (light, panoramic) --------------------------
-// Currently unused — hidden from the page render below (see ServicesShowcase),
-// kept intact for a quick re-enable.
-// eslint-disable-next-line no-unused-vars
-function SectionIndustrial({ t }) {
-  const category = getCategoryByKey('industrial')
-
-  return (
-    <section className="relative overflow-hidden bg-base-100 py-16 md:py-24">
-      <div className="relative mx-auto max-w-7xl px-6">
-        <Reveal className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="flex items-baseline gap-3">
-            <span className="font-mono text-sm text-ember-600">{category.number}</span>
-            <h2 className="font-heading text-2xl font-bold text-industrial-950 md:text-3xl">
-              {t(`categories.${category.key}.title`)}
-            </h2>
-          </div>
-          <p className="max-w-md text-lg text-neutral-custom-600 md:text-right">{t(`categories.${category.key}.intro`)}</p>
-        </Reveal>
-
-        <Reveal delay={0.1} className="relative mt-10">
-          <ServiceIllustration
-            variant="industrial"
-            className="pointer-events-none absolute -right-6 -top-10 hidden h-28 w-28 text-neutral-custom-400/40 lg:block"
-          />
-          <ImagePlaceholder
-            label="Industrial engineering facility / plant"
-            aspect="aspect-[21/9]"
-            tone="light"
-            zoomOnHover
-            className="group"
-          />
-        </Reveal>
-
-        <Reveal delay={0.15} className="mt-8 flex flex-col items-end gap-2 text-right">
-          <p className="text-sm text-neutral-custom-600">{t('categoryShell.ctaText')}</p>
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-2 font-heading font-semibold text-industrial-950 transition-colors hover:text-ember-600"
-          >
-            {t('categoryShell.ctaButton')}
-            <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-// ---- 05 — Marine Solutions (dark, cinematic) -------------------------------
-
-function HotspotMarker({ style }) {
-  return (
-    <span aria-hidden="true" className="absolute flex h-3 w-3" style={style}>
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-ember-600/60 motion-reduce:animate-none" />
-      <span className="relative inline-flex h-3 w-3 rounded-full border border-ember-600 bg-ember-600/80" />
-    </span>
-  )
-}
-
-// Currently unused — hidden from the page render below (see ServicesShowcase),
-// kept intact for a quick re-enable.
-// eslint-disable-next-line no-unused-vars
-function SectionMarine({ t }) {
-  const category = getCategoryByKey('marine')
-
-  return (
-    <section className="relative overflow-hidden bg-industrial-900 py-16 md:py-24">
-      <TechnicalLines className="text-base-50" opacity="opacity-[0.04]" />
-      <div className="relative mx-auto max-w-7xl px-6">
-        <Reveal className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="flex items-baseline gap-3">
-            <span className="font-mono text-sm text-ember-600">{category.number}</span>
-            <h2 className="font-heading text-2xl font-bold text-base-50 md:text-3xl">{t(`categories.${category.key}.title`)}</h2>
-          </div>
-          <p className="max-w-md text-lg text-neutral-custom-400 md:text-right">{t(`categories.${category.key}.intro`)}</p>
-        </Reveal>
-
-        <Reveal delay={0.1} className="relative mt-10">
-          <ServiceIllustration
-            variant="marine"
-            className="pointer-events-none absolute -left-6 -bottom-10 hidden h-28 w-28 text-white/10 lg:block"
-          />
-          <ImagePlaceholder
-            label="Marine / ship engineering environment"
-            aspect="aspect-[21/9]"
-            tone="dark"
-            zoomOnHover
-            className="group"
-          />
-          <HotspotMarker style={{ top: '28%', left: '22%' }} />
-          <HotspotMarker style={{ top: '58%', left: '68%' }} />
-        </Reveal>
-
-        <Reveal delay={0.15} className="mt-8 flex flex-col items-end gap-2 text-right">
-          <p className="text-sm text-neutral-custom-400">{t('categoryShell.ctaText')}</p>
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-2 font-heading font-semibold text-base-50 transition-colors hover:text-ember-600"
-          >
-            {t('categoryShell.ctaButton')}
-            <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
-          </Link>
-        </Reveal>
-      </div>
-    </section>
-  )
-}
-
-// ---- 06 — Design Engineering (light, drawing-to-build transition) ---------
+// ---- 04 — Design Engineering (light, drawing-to-build transition) ---------
 
 function SectionDesignEngineering({ t }) {
   const category = getCategoryByKey('designEngineering')
@@ -643,9 +531,6 @@ export default function ServicesShowcase() {
       <SectionFirestop t={t} {...panelProps} />
       <SectionTesting t={t} {...panelProps} />
       <SectionConstruction t={t} {...panelProps} />
-      {/* Sənaye Həlləri (Industrial) and Marine Həlləri sections are temporarily
-          hidden from the page — components/data/translations kept as-is so
-          they can be re-enabled later. */}
       <SectionDesignEngineering t={t} />
     </>
   )
