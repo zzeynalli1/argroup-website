@@ -52,10 +52,6 @@
       "name": "Fanlar",
       "description": "Bina ve tüneller için duman tahliye ve hava sirkülasyon fan sistemleri."
     },
-    "marineAnticorrosion": {
-      "name": "Deniz ve Korozyon Önleyici Ürünler",
-      "description": "Deniz endüstrisi ve agresif ortamlar için koruyucu kaplama sistemleri."
-    },
     "additionalProducts": {
       "name": "Ek Ürünler",
       "description": "Ana kategori gruplarının dışında kalan diğer AR Group ürünleri."

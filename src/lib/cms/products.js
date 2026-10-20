@@ -34,7 +34,7 @@ const COLUMNS = [
 
 function toSafeError(action, error) {
   console.error(`[cms/products] ${action} failed:`, error)
-  if (error?.code === '23514') return new Error('Yalnız mövcud 10 kateqoriyadan biri seçilə bilər.')
+  if (error?.code === '23514') return new Error('Yalnız mövcud 9 kateqoriyadan biri seçilə bilər.')
   return new Error('Əməliyyat uğursuz oldu. Zəhmət olmasa yenidən cəhd edin.')
 }
 
@@ -45,7 +45,7 @@ function requireClient() {
 
 function assertValidCategory(category_key) {
   if (!FIXED_CATEGORY_KEYS.includes(category_key)) {
-    throw new Error('Yalnız mövcud 10 kateqoriyadan biri seçilə bilər.')
+    throw new Error('Yalnız mövcud 9 kateqoriyadan biri seçilə bilər.')
   }
 }
 

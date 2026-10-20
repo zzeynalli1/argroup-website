@@ -55,10 +55,6 @@
     "additionalProducts": {
       "name": "Additional Products",
       "description": "Other AR Group products that fall outside the primary category groups."
-    },
-    "marineAnticorrosion": {
-      "name": "Marine and Anti-Corrosion Products",
-      "description": "Protective coating systems for the marine industry and aggressive environments."
     }
   },
   "groups": {

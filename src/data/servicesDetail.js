@@ -1,14 +1,13 @@
 /**
- * Service taxonomy for the Services system: 6 primary categories, each with
+ * Service taxonomy for the Services system: 4 primary categories, each with
  * zero or more routable sub-services. Categories 01-03 have verified detail
  * content (docs/argroup-knowledge-base.md "Services" section) and get full
- * /services/:slug detail pages. Categories 04-06 (Industrial, Marine, Design
- * Engineering) have no body copy in the knowledge base — they render as
- * short shell blocks (title + verified-wording intro + CTA) with no
- * sub-services and no detail routes. Category 06 instead cross-links to the
- * three engineering-flavored sub-services already filed under category 03
- * (Support Design, Load Analysis, Vibration Solutions) rather than
- * duplicating them under its own routes.
+ * /services/:slug detail pages. Category 04 (Design Engineering) has no body
+ * copy in the knowledge base — it renders as a short shell block (title +
+ * verified-wording intro + CTA) with no sub-services and no detail routes,
+ * and cross-links to the three engineering-flavored sub-services already
+ * filed under category 03 (Support Design, Load Analysis, Vibration
+ * Solutions) rather than duplicating them under its own routes.
  *
  * Display copy for every category/sub-service/detail-page lives in
  * locales/<locale>/services.json — this file is structural data only,
@@ -218,20 +217,6 @@ const serviceCategories = [
   },
   {
     id: 4,
-    key: 'industrial',
-    number: '04',
-    icon: 'Factory',
-    subServices: [],
-  },
-  {
-    id: 5,
-    key: 'marine',
-    number: '05',
-    icon: 'Anchor',
-    subServices: [],
-  },
-  {
-    id: 6,
     key: 'designEngineering',
     number: '04',
     icon: 'PenTool',
