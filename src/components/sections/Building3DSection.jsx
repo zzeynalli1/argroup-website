@@ -42,8 +42,17 @@ function InfoPanel({ hotspot, t, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.25 }}
-      className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-industrial-950 px-6 py-6 md:absolute md:inset-x-auto md:top-6 md:right-6 md:max-h-[calc(100vh-3rem)] md:w-80 md:rounded-2xl md:border"
+      // Mobile (<md): true bottom sheet — capped at 60svh (not 80vh: the
+      // building above it needs to stay visible, not just a sliver), with
+      // bottom padding that clears Safari's own bottom chrome via
+      // `env(safe-area-inset-bottom)`. `md:` and up: unchanged, the
+      // existing right-side floating panel.
+      className="fixed inset-x-0 bottom-0 z-50 max-h-[60svh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-industrial-950 px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 md:absolute md:inset-x-auto md:top-6 md:right-6 md:max-h-[calc(100vh-3rem)] md:w-80 md:rounded-2xl md:border md:px-6 md:py-6"
     >
+      {/* Drag-handle bar — bottom-sheet-only affordance, hidden on the `md`+
+          floating panel. */}
+      <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/20 md:hidden" />
+
       <button
         type="button"
         onClick={onClose}
@@ -204,11 +213,46 @@ export default function Building3DSection() {
   return (
     <section
       ref={sectionRef}
-      className={`relative min-h-screen overflow-hidden transition-colors duration-700 ${
+      // Mobile (<lg): plain stacked flow (text block, then the 3D area,
+      // then the hint below it) sized to its own content — NOT
+      // `min-h-screen`, which used to force the whole viewport height on a
+      // layout that no longer needs it. `lg`+: unchanged, the original
+      // full-bleed absolute-overlay composition.
+      className={`relative flex flex-col overflow-hidden transition-colors duration-700 lg:block lg:min-h-screen ${
         sceneReady ? 'bg-industrial-950' : 'bg-base-50'
       }`}
     >
-      <div className="absolute inset-0">
+      {/* Mobile text block — normal document flow (not absolutely
+          overlaid), always the "ready" dark styling regardless of
+          `sceneReady` per the mobile spec (no light/dark swap down here;
+          the loading spinner behind it still shows against the section's
+          own `bg-base-50` while loading). `pt-[...]` clears the fixed
+          header (~112px unscrolled, see Header.jsx) + 24px + the device's
+          own safe-area inset, so the heading never starts under the header
+          OR a notch. Hidden entirely from `lg` up, where the original
+          absolute-overlay text block (below) takes over. */}
+      <div className="relative z-10 bg-industrial-950 px-6 pb-6 pt-[calc(136px+env(safe-area-inset-top))] lg:hidden">
+        <span className="block h-1 w-16 bg-ember-600" />
+        <h1 className="mt-6 font-heading text-3xl font-bold text-base-50">
+          {t('building3d.titleLine1')}
+          <br />
+          <span className="text-ember-600">{t('building3d.titleLine2')}</span>
+        </h1>
+        <p className="mt-4 text-neutral-custom-400">{t('building3d.subtitle')}</p>
+      </div>
+
+      {/* 3D area. Mobile: a fixed ~60svh band (not the full viewport) in
+          normal flow, so the text above and the hint below both get their
+          own real space instead of floating over the canvas. `lg`+:
+          unchanged, `absolute inset-0` filling the whole section as
+          before. */}
+      <div className="relative h-[60svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto lg:w-auto">
+        {/* Soft fade from the text block's own dark bg into the scene —
+            mobile only; `lg`+ has no text block directly above this area
+            (it's an absolute overlay instead), so there's nothing to blend
+            from. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-10 bg-gradient-to-b from-industrial-950 to-transparent lg:hidden" />
+
         {/* Loading layer: the section's own light background (see the
             `<section>` className above) plus a small textless spinner —
             shown until the real canvas has painted its first frame. No
@@ -263,23 +307,27 @@ export default function Building3DSection() {
         </div>
       </div>
 
-      {/* Text zone: default (mobile/tablet, below `lg`) keeps the original
-          full-width, top-anchored block so the asymmetric column below never
-          forces an unusably narrow text width on small screens (per the
-          brief's Fix 5). From `lg` up it becomes a left-anchored ~30-35%-wide
-          column, vertically centered, to leave the right side clear for the
-          building once `Hero3DScene`'s view-offset shifts it there (see
-          `CameraFrameShift` in Hero3DScene.jsx — this column width and that
-          shift were tuned together). `pt-32` clears the fixed header (its own
-          height is ~112px unscrolled) with roughly 16px to spare, so the
-          heading never starts underneath it on mobile/tablet — the upward
-          `-translate-y-[60%]` recentering only applies from `lg` up, where
-          this column is vertically centered instead of top-anchored and has
-          no header-clipping risk. Text color swaps from dark-on-light
-          (loading, matches the section's own `bg-base-50`) to light-on-dark
-          (ready, matches the real scene's dusk backdrop) in lockstep with
-          the section background above. */}
-      <div className="pointer-events-none absolute inset-0 z-10 flex items-start px-6 pt-32 lg:items-center lg:px-12 lg:pt-0 xl:px-16">
+      {/* Mobile hint — in normal flow, below the 3D area (not overlaid on
+          top of it), with bottom padding clearing Safari's own chrome via
+          `env(safe-area-inset-bottom)`. Hidden from `lg` up, where the
+          original overlaid pill (further below) takes over. */}
+      {sceneReady && !active && (
+        <p className="px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 text-center text-xs text-neutral-custom-400 lg:hidden">
+          {t('building3d.hint')}
+        </p>
+      )}
+
+      {/* Desktop (`lg`+) text zone — unchanged from before: a left-anchored
+          ~30-35%-wide column, vertically centered, absolutely overlaid over
+          the canvas, leaving the right side clear for the building once
+          `Hero3DScene`'s view-offset shifts it there (see `CameraFrameShift`
+          in Hero3DScene.jsx — this column width and that shift were tuned
+          together). Text color swaps from dark-on-light (loading, matches
+          the section's own `bg-base-50`) to light-on-dark (ready, matches
+          the real scene's dusk backdrop) in lockstep with the section
+          background above. Hidden below `lg`, where the stacked mobile text
+          block above takes over. */}
+      <div className="pointer-events-none absolute inset-0 z-10 hidden lg:flex lg:items-center lg:px-12 xl:px-16">
         <div className="max-w-xl lg:-translate-y-[60%] lg:w-[34%] lg:max-w-[460px] 2xl:max-w-[500px]">
           <span className="block h-1 w-16 bg-ember-600" />
           <h1
@@ -301,8 +349,11 @@ export default function Building3DSection() {
         </div>
       </div>
 
+      {/* Desktop (`lg`+) hint pill — unchanged from before, overlaid on the
+          canvas. Hidden below `lg`, where the stacked mobile hint above
+          takes over. */}
       {sceneReady && !active && (
-        <p className="pointer-events-none absolute bottom-6 left-1/2 z-10 -translate-x-1/2 rounded-full bg-industrial-950/80 px-4 py-2 text-xs text-neutral-custom-400 md:left-6 md:translate-x-0">
+        <p className="pointer-events-none absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 rounded-full bg-industrial-950/80 px-4 py-2 text-xs text-neutral-custom-400 lg:block lg:left-6 lg:translate-x-0">
           {t('building3d.hint')}
         </p>
       )}

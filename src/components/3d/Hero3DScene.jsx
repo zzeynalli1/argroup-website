@@ -68,6 +68,18 @@ function detectWideLayout() {
   return window.innerWidth >= 1024 && window.innerWidth / window.innerHeight >= 1.5
 }
 
+// Same one-time-at-mount pattern again, matching Tailwind's own `lg`
+// breakpoint (1024px) exactly — the boundary Building3DSection.jsx's own
+// mobile-vs-desktop layout split uses. Deliberately NOT the same thing as
+// `detectMobile` above (coarse pointer OR <768px): this scene needs a
+// width-only, Tailwind-aligned check for the touch-gesture/OrbitControls
+// restrictions below, which are about the STACKED MOBILE LAYOUT, not about
+// touch-vs-mouse input as such.
+function detectBelowLg() {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth < 1024
+}
+
 // Same one-time-at-mount pattern again: does the user's OS/browser have
 // "reduce motion" turned on? Gates only the hotspot markers' idle breathing
 // pulse below (see `Hotspot`'s `useFrame`) — rest/hover/active tier values
@@ -445,7 +457,14 @@ function createMarkerGlowTexture() {
 }
 const markerGlowTexture = createMarkerGlowTexture()
 
-function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, prefersReducedMotion }) {
+// Invisible raycast-target sphere radius (world units) — see the comment on
+// that mesh below. Bigger on touch devices (`isMobile`) so the real on-
+// screen tap area clears a comfortable finger-sized target; desktop keeps
+// the original, smaller value since a mouse pointer needs far less margin.
+const HOTSPOT_TOUCH_RADIUS = 0.28
+const HOTSPOT_TOUCH_RADIUS_MOBILE = 0.42
+
+function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, prefersReducedMotion, isMobile }) {
   const { t } = useTranslation('home')
   const emphasized = isActive || isHovered
   // A sibling hotspot is active — this marker dims, but hover still
@@ -608,7 +627,7 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
           onSelect(hotspot)
         }}
       >
-        <sphereGeometry args={[0.28, 16, 16]} />
+        <sphereGeometry args={[isMobile ? HOTSPOT_TOUCH_RADIUS_MOBILE : HOTSPOT_TOUCH_RADIUS, 16, 16]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 
@@ -1049,22 +1068,40 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
     invalidateRef.current = invalidate
   }, [invalidate, invalidateRef])
 
+  // OrbitControls unconditionally sets touch-action:none on its domElement
+  // EVERY TIME it (re)connects — which blocks native page scroll on touch
+  // devices entirely (independent of enableZoom/enablePan) — and it
+  // reconnects more often than once: drei/R3F recreates the underlying
+  // three-stdlib instance (dispose -> reconnect, resetting touchAction back
+  // to its own default each time) whenever certain props change identity,
+  // which happens here on nearly every re-render (e.g. the `touches` prop
+  // below is a fresh object literal each time). A ONE-TIME effect (empty/
+  // stable deps) only ever wins that race against the FIRST such
+  // reconnect — verified via a live reconnect trace that it silently loses
+  // against later ones, leaving touch-scroll broken for the rest of the
+  // session. No dependency array here on purpose, so this re-asserts
+  // `pan-y` after every single render/reconnect instead.
+  useEffect(() => {
+    const controls = orbitRef.current
+    if (!controls) return
+    controls.domElement.style.touchAction = 'pan-y'
+  })
+
+  // Same "every render, not once" reasoning as the touchAction effect above
+  // — if the underlying controls instance gets swapped, a one-time-mount
+  // version of this would silently stop stopping transitions on manual
+  // drag for the rest of the session (the new instance never gets this
+  // listener). Cheap to re-attach/detach every render.
   useEffect(() => {
     const controls = orbitRef.current
     if (!controls) return undefined
-
-    // OrbitControls unconditionally sets touch-action:none on its domElement
-    // when it connects, which blocks native page scroll on touch devices
-    // entirely (independent of enableZoom/enablePan). Override it so a
-    // one-finger vertical swipe still scrolls the page.
-    controls.domElement.style.touchAction = 'pan-y'
 
     const stopTransition = () => {
       transitioningRef.current = false
     }
     controls.addEventListener('start', stopTransition)
     return () => controls.removeEventListener('start', stopTransition)
-  }, [orbitRef, transitioningRef])
+  })
 
   useFrame((state, delta) => {
     if (!transitioningRef.current) {
@@ -1196,6 +1233,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   const [isMobile] = useState(detectMobile)
   const [isPortrait] = useState(detectPortraitAspect)
   const [isWideLayout] = useState(detectWideLayout)
+  const [isBelowLg] = useState(detectBelowLg)
   const [prefersReducedMotion] = useState(detectReducedMotion)
   // Weak-device scenes (see Building3DSection's lowPower gating) skip the
   // idle hotspot breathing pulse too — it's a purely decorative ambient
@@ -1208,6 +1246,16 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // derived/verified — this is the only place that picks between them.
   const defaultCameraPosition = isPortrait ? NARROW_CAMERA_POSITION : DEFAULT_CAMERA_POSITION
   const defaultCameraTarget = isPortrait ? NARROW_CAMERA_TARGET : DEFAULT_CAMERA_TARGET
+  // Vertical (polar) angle of the resting camera preset — used below to lock
+  // OrbitControls' polar range on the mobile stacked layout (`isBelowLg`) so
+  // a manual drag there can only orbit horizontally, never tilt the camera
+  // up/down. Deps are the two preset arrays themselves (module-level
+  // constants, referentially stable across renders), so this never
+  // recomputes after mount.
+  const initialPolarAngle = useMemo(() => {
+    const offset = new THREE.Vector3(...defaultCameraPosition).sub(new THREE.Vector3(...defaultCameraTarget))
+    return new THREE.Spherical().setFromVector3(offset).phi
+  }, [defaultCameraPosition, defaultCameraTarget])
   const desiredPosRef = useRef(new THREE.Vector3(...defaultCameraPosition))
   const desiredTargetRef = useRef(new THREE.Vector3(...defaultCameraTarget))
   const transitioningRef = useRef(false)
@@ -1548,6 +1596,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             onHover={setHoveredKey}
             onSelect={selectHotspot}
             prefersReducedMotion={disableBreathing}
+            isMobile={isMobile}
           />
         ))}
 
@@ -1568,8 +1617,27 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           // distance from its target (see hotspots3d.js) — not right at the
           // limit — or OrbitControls would clamp that resting shot inward.
           maxDistance={19.5}
-          maxPolarAngle={Math.PI / 2.05}
-          touches={{ ONE: undefined, TWO: undefined }}
+          // Polar range is locked to the resting shot's own angle on the
+          // mobile stacked layout (`isBelowLg`) WHILE AT REST (`!activeKey`)
+          // — a manual drag there can only orbit horizontally ("yalnız
+          // üfüqi fırlanma"), never tilt the camera. Unlocked back to the
+          // normal 0..~88deg range the instant a hotspot is selected (or on
+          // `lg`+, unchanged from before) so `CameraRig`'s own fly-to lerp —
+          // which also calls `controls.update()` every frame — isn't fought
+          // by this clamp while flying to/from a hotspot's own tuned
+          // elevation.
+          minPolarAngle={isBelowLg && !activeKey ? initialPolarAngle : 0}
+          maxPolarAngle={isBelowLg && !activeKey ? initialPolarAngle : Math.PI / 2.05}
+          // One-finger touch drag is ROTATE-only on the mobile stacked
+          // layout (azimuth free, polar locked above) so a horizontal swipe
+          // orbits the building while a vertical swipe still scrolls the
+          // page — `CameraRig`'s own effect sets this canvas's
+          // `touchAction: 'pan-y'`, which is what lets the browser claim
+          // predominantly-vertical touch moves for native scroll instead of
+          // this. Two-finger touch stays unmapped (`undefined`) everywhere —
+          // zoom/pan are already off via the props above, so there's nothing
+          // for a second finger to do.
+          touches={{ ONE: isBelowLg ? THREE.TOUCH.ROTATE : undefined, TWO: undefined }}
         />
         <CameraRig
           orbitRef={orbitRef}
@@ -1594,7 +1662,11 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         )}
       </Canvas>
 
-      <div className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col gap-2">
+      {/* Hidden on the mobile stacked layout (<lg) — zoom is pinch-gesture
+          territory there and this scene already disables pinch (enableZoom
+          false); keeping the buttons would just float unused controls over
+          a canvas that's already a fraction of the viewport. */}
+      <div className="pointer-events-none absolute bottom-6 right-6 z-20 hidden flex-col gap-2 lg:flex">
         <button
           type="button"
           onClick={() => zoomBy(ZOOM_STEP)}
