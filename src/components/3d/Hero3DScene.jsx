@@ -315,90 +315,33 @@ function GradientBackdrop() {
 // in place of this file and reliably read as grey/flat — a real
 // photographed HDRI's uneven, directional light pattern is what makes
 // metal/glass reflections look like a real environment instead of a
-// uniform studio dome, so that's worth the one real asset load.
+// uniform studio dome, so that's worth the one real asset load. Also
+// fetched eagerly, in parallel with this chunk itself, by App.jsx's
+// `HeroScenePrefetch` — same URL, so that fetch's bytes are already
+// HTTP-cache-warm by the time the `loadHDRTexture()` below requests them.
 const HDRI_URL = '/hdr/potsdamer_platz_512.hdr'
-// How long to wait for the HDRI before revealing the scene without it —
-// see `HDRIEnvironment` below for why this exists at all (no isolated
-// Suspense this scene can silently resolve behind).
+// How long to wait for the HDRI before compiling/revealing the scene
+// without it — see `SceneReady` below for why this exists at all (no
+// isolated Suspense this scene can silently resolve behind).
 const HDRI_TIMEOUT_MS = 4000
 const HDRI_ENV_INTENSITY = 1.15
 
-// Loads the HDRI manually (RGBELoader + PMREMGenerator) instead of drei's
-// `useEnvironment`/`<Environment files={...}>`, which is Suspense-based —
-// a Suspense boundary scoped to just this component would let the REST of
-// the scene (materials/lighting/hotspots) render and reveal with zero IBL
-// reflections, which then visibly snap on once the file finishes loading:
-// exactly the "dark/flat, then suddenly lit" pop this scene needs to avoid.
-// Instead, loading state is tracked in `envReadyRef` (owned by the parent
-// Hero3DScene, shared with `ReadySignal`) — the scene's first reveal
-// (`onReady`) waits for this to flip, same as it already waits for
-// `gl.compileAsync`, so the environment map is either genuinely already
-// applied by the time anything becomes visible, or `HDRI_TIMEOUT_MS` has
-// elapsed and the scene deliberately reveals without it rather than
-// blocking forever on a slow/unreachable asset. If the file DOES still
-// arrive after that timeout, it's applied anyway (just silently, a few
-// hundred ms of reflections "waking up" being a far smaller issue than a
-// scene that never reveals on a bad connection).
-function HDRIEnvironment({ envReadyRef }) {
-  const { gl, scene, invalidate } = useThree()
-
-  // `scene` (both its `.environment`/`.environmentIntensity` props here and
-  // `.background` in GradientBackdrop above) is the standard R3F imperative
-  // escape hatch — safe to mutate directly, including from these nested
-  // loader callbacks.
-  /* eslint-disable react-hooks/immutability */
-  useEffect(() => {
-    let unmounted = false
-    const loader = new RGBELoader()
-    const pmrem = new THREE.PMREMGenerator(gl)
-    pmrem.compileEquirectangularShader()
-
-    scene.environmentIntensity = HDRI_ENV_INTENSITY
-
-    function reveal(reason) {
-      if (envReadyRef.current) return
-      envReadyRef.current = true
-      diag3d(`3D HDRI gate resolved (${reason})`)
-      // `frameloop="demand"` needs an explicit nudge — this resolves outside
-      // R3F's own render loop (a loader callback / a plain setTimeout), same
-      // reasoning as `gl.compileAsync`'s own `.then()` in ReadySignal below.
-      invalidate()
-    }
-
-    loader.load(
-      HDRI_URL,
-      (hdrTexture) => {
-        if (unmounted) {
-          hdrTexture.dispose()
-          return
-        }
-        scene.environment = pmrem.fromEquirectangular(hdrTexture).texture
-        hdrTexture.dispose()
-        reveal('loaded')
-      },
-      undefined,
-      (err) => {
-        if (unmounted) return
-        diag3d('3D HDRI load failed (showing scene without env map)', err?.message)
-        reveal('error')
-      }
-    )
-
-    const timeoutId = window.setTimeout(() => reveal('4s timeout'), HDRI_TIMEOUT_MS)
-
-    return () => {
-      unmounted = true
-      window.clearTimeout(timeoutId)
-      pmrem.dispose()
-      if (scene.environment) {
-        scene.environment.dispose()
-        scene.environment = null
-      }
-    }
-  }, [gl, scene, invalidate, envReadyRef])
-  /* eslint-enable react-hooks/immutability */
-
-  return null
+// Module-scope cache (not component state): the decoded HDR
+// `THREE.DataTexture` behind `scene.environment` is identical across every
+// mount of this component (same file, same URL) — caching the RESOLVED
+// texture (not just relying on the browser's HTTP cache for the raw bytes)
+// means a second mount this session (e.g. navigating away from Home and
+// back) skips RGBE decoding entirely, not just the network fetch. Kept as a
+// shared in-flight promise too so two near-simultaneous mounts don't both
+// start their own RGBELoader.
+let cachedHDRTexturePromise = null
+function loadHDRTexture() {
+  if (!cachedHDRTexturePromise) {
+    cachedHDRTexturePromise = new Promise((resolve, reject) => {
+      new RGBELoader().load(HDRI_URL, resolve, undefined, reject)
+    })
+  }
+  return cachedHDRTexturePromise
 }
 
 function Ground() {
@@ -897,44 +840,103 @@ function StaticShadowMap() {
 // shift. Compiling everything together costs a longer wait behind the
 // poster instead of a shorter one followed by a visible pop — the explicit
 // trade this scene now makes.
-function ReadySignal({ onReady, envReadyRef }) {
+//
+// HDRI loading is handled HERE too, BEFORE `gl.compileAsync` is ever
+// called — not as a separate component racing it independently. Measured
+// root cause of a ~5s stall in production: every material's compiled
+// WebGLProgram is keyed in part on whether `scene.environment` is set
+// (envMap changes which shader variant a standard material needs), so
+// compiling first and setting `scene.environment` afterward meant EVERY
+// material's program had to be silently, SYNCHRONOUSLY relinked the
+// instant the HDRI arrived and changed that key — exactly the kind of
+// main-thread stall `compileAsync` was supposed to avoid in the first
+// place. Loading the HDRI first and only then starting `compileAsync`
+// means every program compiles ONCE, already in its final envMap-aware
+// form.
+function ReadySignal({ onReady }) {
   const { gl, scene, camera, invalidate } = useThree()
   const compileStartedRef = useRef(false)
   const compileDoneRef = useRef(false)
   const firstFrameLoggedRef = useRef(false)
 
+  // `scene` is the standard R3F imperative escape hatch (same convention as
+  // GradientBackdrop's `scene.background` above) — safe to mutate directly.
+  /* eslint-disable react-hooks/immutability */
   useEffect(() => {
-    if (compileStartedRef.current) return
-    compileStartedRef.current = true
-    diag3d('3D shader precompile (gl.compileAsync) starting')
-    gl.compileAsync(scene, camera).then(() => {
-      diag3d('3D shader precompile (gl.compileAsync) done')
-      compileDoneRef.current = true
-      // `frameloop="demand"` won't render the frame that notices
-      // `compileDoneRef` flipped on its own — this promise resolves outside
-      // R3F's render loop, so it has to explicitly ask for the next frame.
-      invalidate()
-    })
+    let unmounted = false
+    const pmrem = new THREE.PMREMGenerator(gl)
+    pmrem.compileEquirectangularShader()
+    scene.environmentIntensity = HDRI_ENV_INTENSITY
+
+    function startCompile(envReason) {
+      if (compileStartedRef.current) return
+      compileStartedRef.current = true
+      diag3d(`3D shader precompile (gl.compileAsync) starting — env: ${envReason}`)
+      gl.compileAsync(scene, camera).then(() => {
+        if (unmounted) return
+        diag3d('3D shader precompile (gl.compileAsync) done')
+        compileDoneRef.current = true
+        // `frameloop="demand"` won't render the frame that notices
+        // `compileDoneRef` flipped on its own — this promise resolves
+        // outside R3F's render loop, so it has to explicitly ask for the
+        // next frame.
+        invalidate()
+      })
+    }
+
+    // Safety valve: a slow/unreachable HDRI must never block the scene
+    // forever — compile and reveal without it once this fires. If the file
+    // DOES still arrive after that (rare — only on a genuinely slow/
+    // unreachable connection), it's still applied to `scene.environment`
+    // below for correctness, just without a second `compileAsync` pass (the
+    // one remaining case where a material may still relink synchronously on
+    // next use, same original issue, but now only on a connection already
+    // this degraded).
+    const timeoutId = window.setTimeout(() => {
+      diag3d('3D HDRI load timed out at 4s')
+      startCompile('timed out, no env map')
+    }, HDRI_TIMEOUT_MS)
+
+    loadHDRTexture().then(
+      (hdrTexture) => {
+        if (unmounted) return
+        window.clearTimeout(timeoutId)
+        scene.environment = pmrem.fromEquirectangular(hdrTexture).texture
+        diag3d('3D HDRI applied to scene.environment')
+        startCompile('loaded')
+      },
+      (err) => {
+        if (unmounted) return
+        window.clearTimeout(timeoutId)
+        diag3d('3D HDRI load failed', err?.message)
+        startCompile('load failed, no env map')
+      }
+    )
+
+    return () => {
+      unmounted = true
+      window.clearTimeout(timeoutId)
+      pmrem.dispose()
+      if (scene.environment) {
+        scene.environment.dispose()
+        scene.environment = null
+      }
+    }
   }, [gl, scene, camera, invalidate])
+  /* eslint-enable react-hooks/immutability */
 
   useFrame(() => {
-    // Wait for the async compile above to actually resolve before treating
-    // any rendered frame as "ready" — the compile's own `.then()` is what
-    // calls `invalidate()` to request the frame that will see this true,
-    // so no polling/re-invalidating is needed here while it's still false.
-    // The render that follows this same tick is also where EffectComposer's
-    // own passes (N8AO/Bloom/ToneMapping/etc., mounted unconditionally
-    // alongside the scene now, not gated behind a later flag) synchronously
-    // compile/link on their own first use — `onReady` firing here still
-    // means "nothing left to visibly pop in later", that compile just now
-    // happens to land inside the same blocking frame instead of a
-    // follow-up one.
+    // Wait for the compile above to actually resolve before treating any
+    // rendered frame as "ready" — the compile's own `.then()` is what calls
+    // `invalidate()` to request the frame that will see this true, so no
+    // polling/re-invalidating is needed here while it's still false. The
+    // render that follows this same tick is also where EffectComposer's own
+    // passes (N8AO/Bloom/ToneMapping/etc., mounted unconditionally alongside
+    // the scene now, not gated behind a later flag) synchronously compile/
+    // link on their own first use — `onReady` firing here still means
+    // "nothing left to visibly pop in later", that compile just now happens
+    // to land inside the same blocking frame instead of a follow-up one.
     if (!compileDoneRef.current) return
-    // See `HDRIEnvironment` — this flips once the HDRI has loaded (or
-    // failed, or timed out at 4s) so the scene's first reveal either
-    // already has real IBL reflections or has deliberately given up
-    // waiting, never a flash of flat/no-environment geometry in between.
-    if (!envReadyRef.current) return
     if (firstFrameLoggedRef.current) return
     firstFrameLoggedRef.current = true
     diag3d('3D first real frame rendered (building/lights/hotspots/post-fx on screen)')
@@ -1157,11 +1159,6 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // lowPower — see the JSX gate below, which already drops both passes
   // there regardless of this flag.
   const [heavyFxReady, setHeavyFxReady] = useState(false)
-  // Shared between `ReadySignal` and `HDRIEnvironment` (both Canvas
-  // children) — a plain ref, not state, since it only needs to gate a
-  // `useFrame` check inside `ReadySignal`, which `HDRIEnvironment` already
-  // wakes via `invalidate()` the moment it flips (see that component).
-  const envReadyRef = useRef(false)
   // Holds R3F's own `invalidate` once `CameraRig` (a Canvas child) captures
   // it — see that component's own comment on why this indirection exists:
   // under `frameloop="demand"`, the functions below (plain closures, called
@@ -1330,7 +1327,6 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         }}
       >
         <ReadySignal
-          envReadyRef={envReadyRef}
           onReady={() => {
             diag3d('3D scene onReady (first frame rendered, shaders compiled)')
             onReady?.()
@@ -1422,7 +1418,6 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             backlit-text texture entirely. This reads as a downlight grazing
             the sign from above instead. */}
         <pointLight position={[3.25, 2.35, -0.15]} intensity={0.28} distance={1.8} decay={2} color="#FFC98A" />
-        <HDRIEnvironment envReadyRef={envReadyRef} />
 
         <Ground />
         <Building activeGroup={activeGroup} hoveredGroup={hoveredGroup} />
