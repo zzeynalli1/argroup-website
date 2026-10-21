@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -7,7 +7,6 @@ import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
 import { useHeavyContentPreload } from './components/transitions/heavyContentGate'
-import { detectStrongDevice } from './lib/deviceCapability'
 import { diag3d } from './lib/diag3d'
 // Every page (including Home) is its own lazy chunk, so visiting any one
 // route never downloads JS for routes the user hasn't navigated to yet —
@@ -59,19 +58,16 @@ function RouteFallback() {
 // context at all. Scoped to the home route only — no other route pays for
 // any of this.
 //
-// Also gated on `detectStrongDevice()` (same check Building3DSection uses
-// to decide whether the scene auto-mounts at full quality) — a weak device
-// still eventually loads the scene itself (in lowPower mode, later and on
-// its own schedule, see Building3DSection), but shouldn't ALSO pay for this
-// earlier, purely speculative background fetch racing ahead of that
-// schedule on a device/connection this heuristic has already flagged as
-// constrained.
+// Unconditional across every device — Building3DSection now mounts the
+// scene immediately once the intro gate opens, on every device (full
+// quality vs the Canvas-internal `lowPower` prop only changes RENDER
+// quality, never whether/when it mounts), so there's no later "weak
+// device" schedule left for a device-gated prefetch to stay ahead of.
 function HeroScenePrefetch() {
   const { pathname } = useLocation()
   const canPreloadHeavyContent = useHeavyContentPreload()
-  const [isStrongDevice] = useState(detectStrongDevice)
   useEffect(() => {
-    if (pathname !== '/' || !canPreloadHeavyContent || !isStrongDevice) return
+    if (pathname !== '/' || !canPreloadHeavyContent) return
 
     diag3d('3D chunk prefetch requested')
     // Fire-and-forget: Building3DSection's own lazy()+Suspense+ErrorBoundary
@@ -83,7 +79,7 @@ function HeroScenePrefetch() {
     import('./components/3d/Hero3DScene')
       .then(() => diag3d('3D chunk prefetch resolved'))
       .catch((err) => diag3d('3D chunk prefetch failed (non-fatal, Building3DSection retries)', err?.message))
-  }, [pathname, canPreloadHeavyContent, isStrongDevice])
+  }, [pathname, canPreloadHeavyContent])
   return null
 }
 

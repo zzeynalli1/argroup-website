@@ -17,25 +17,6 @@
     />
     <title>AR Group Construction Services</title>
 
-    <!--
-      Poster-first 3D scene load: preloads the home page's hero poster photo
-      ahead of any JS running, so it's already decoded by the time
-      Building3DSection's <picture> needs it. Scoped via `media` to the same
-      "wide desktop" breakpoint Hero3DScene itself uses to pick this exact
-      framing (see Building3DSection.jsx's ScenePoster / Hero3DScene.jsx's
-      `detectWideLayout`) — the single most common case for this site's
-      desktop-heavy B2B traffic — so narrower/portrait viewports (which will
-      pick a different poster) never preload bytes they won't use.
-    -->
-    <link
-      rel="preload"
-      as="image"
-      href="/images/3d/hero-wide.webp"
-      media="(min-width: 1024px) and (min-aspect-ratio: 3/2)"
-      fetchpriority="high"
-      type="image/webp"
-    />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
