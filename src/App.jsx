@@ -1,5 +1,5 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './components/ScrollToTop'
@@ -38,6 +38,31 @@ function RouteFallback() {
   )
 }
 
+// Hero3DScene's own HDRI path — kept here, not imported, so importing it
+// doesn't pull the whole Three.js/R3F chunk into this eagerly-bundled file.
+const HERO_SCENE_HDRI_URL = '/hdr/potsdamer_platz_512.hdr'
+
+// Starts downloading Hero3DScene's chunk (~360KB gzip, the heaviest single
+// chunk on the site) AND its HDRI the instant the "/" route is requested —
+// unconditional, no gate/wait on the intro or anything else, just the
+// earliest possible start. This lives here (App.jsx, part of the main
+// eagerly-loaded bundle), not inside Building3DSection, specifically so it
+// fires IN PARALLEL with the Home route's own lazy chunk download instead
+// of after it: Building3DSection only exists once Home's chunk has already
+// loaded, so its own lazy()+Suspense import of Hero3DScene is one full
+// network round-trip later than this. Fire-and-forget — a real failure is
+// handled later by Building3DSection's own lazy()+Suspense+ErrorBoundary
+// when it imports the same chunk/asset for real.
+function HeroScenePrefetch() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    if (pathname !== '/') return
+    import('./components/3d/Hero3DScene').catch(() => {})
+    fetch(HERO_SCENE_HDRI_URL, { credentials: 'omit' }).catch(() => {})
+  }, [pathname])
+  return null
+}
+
 // Persistent Header/Footer around every public page — kept as its own
 // layout route so the admin routes below can render without them.
 function PublicLayout() {
@@ -64,6 +89,7 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <RouteTransitionProvider>
+        <HeroScenePrefetch />
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />
