@@ -22,7 +22,7 @@ export function useHeavyContentGate() {
 
 /**
  * True once it's safe to start DOWNLOADING heavy assets in the background
- * (Hero3DScene's JS chunk, its HDRI) — deliberately a separate, EARLIER
+ * (Hero3DScene's JS chunk) — deliberately a separate, EARLIER
  * signal than `useHeavyContentGate` above: opens the instant the intro
  * starts covering (not once it finishes), since a background network
  * fetch doesn't compete with the intro's main-thread budget the way

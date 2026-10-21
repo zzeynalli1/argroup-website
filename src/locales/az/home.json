@@ -32,7 +32,7 @@
     "titleLine2": "yaxından kəşf edin.",
     "subtitle": "Tikintidə tətbiq olunan mühəndislik həllərini interaktiv model üzərində araşdırın.",
     "loading": "Yüklənir...",
-    "loadingSlow": "Yüklənməsi gözləniləndən çox çəkir, bağlantınızı yoxlayın...",
+    "openModel": "3D modeli aç",
     "unavailable": "3D model hazırda əlçatan deyil.",
     "hint": "Sistemi araşdırmaq üçün qırmızı nöqtəyə klikləyin",
     "zoomIn": "Yaxınlaşdır",

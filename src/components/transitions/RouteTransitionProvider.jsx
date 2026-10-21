@@ -91,7 +91,7 @@ export default function RouteTransitionProvider({ children }) {
   // (phase -> idle), never by any other transition's reveal.
   const [heavyContentGateOpen, setHeavyContentGateOpen] = useState(introDefinitelySkipped)
   // Earlier, separate gate for starting background DOWNLOADS only (the
-  // Hero3DScene chunk + its HDRI) — opened the instant the intro starts
+  // Hero3DScene chunk) — opened the instant the intro starts
   // covering, not once it finishes, since a network fetch doesn't compete
   // for the main thread the way mounting does. See heavyContentGate.js's
   // `useHeavyContentPreload` for the full rationale.
