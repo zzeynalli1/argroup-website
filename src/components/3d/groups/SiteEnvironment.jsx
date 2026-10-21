@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { Instance, Instances, RoundedBox } from '@react-three/drei'
 import {
   plazaMaterial,
@@ -104,7 +104,7 @@ function Tree({ position, scale = 1, accent = false }) {
   )
 }
 
-export default function SiteEnvironment({ visible = true }) {
+function SiteEnvironment({ visible = true }) {
   const plazaY = 0.006 // just above the ground plane/ContactShadows, avoids z-fighting
 
   // Long rectangular planters running along the walkway toward the entrance
@@ -233,3 +233,5 @@ export default function SiteEnvironment({ visible = true }) {
     </group>
   )
 }
+
+export default memo(SiteEnvironment)

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { SYSTEM_GROUPS } from './groups'
 
 /**
@@ -15,7 +16,7 @@ import { SYSTEM_GROUPS } from './groups'
  * from its own `key` (e.g. two hotspots sharing one group) still highlights
  * correctly without touching this file.
  */
-export default function Building({ activeGroup = null, hoveredGroup = null }) {
+function Building({ activeGroup = null, hoveredGroup = null }) {
   return (
     <group>
       {SYSTEM_GROUPS.map(({ id, Component, defaultVisible }) => (
@@ -24,3 +25,5 @@ export default function Building({ activeGroup = null, hoveredGroup = null }) {
     </group>
   )
 }
+
+export default memo(Building)

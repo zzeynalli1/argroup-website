@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { RoundedBox } from '@react-three/drei'
 import { galvanizedMaterial, concreteDarkMaterial, panelCharcoalMaterial } from '../buildingMaterials'
 import { TechnicalRailing } from '../buildingParts'
@@ -132,7 +132,7 @@ function RooftopEquipmentEnclosure() {
  * built on the `TechnicalRailing` primitive runs around the
  * `vibrationSolutions` hotspot's own rooftop-unit platform.
  */
-export default function RooftopShell({ visible = true }) {
+function RooftopShell({ visible = true }) {
   const postPositions = useMemo(
     () => [
       [0.9, -0.1],
@@ -168,3 +168,5 @@ export default function RooftopShell({ visible = true }) {
     </group>
   )
 }
+
+export default memo(RooftopShell)

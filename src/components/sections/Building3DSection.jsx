@@ -128,9 +128,38 @@ export default function Building3DSection() {
   // see Hero3DScene below), lowPower or not.
   const [isLowPower] = useState(detectLowPower)
 
+  // Hotspot-click -> InfoPanel-open timing diagnostic (see Hero3DScene.jsx's
+  // own `diag3d('3D hotspot clicked', ...)`) — records the moment a click
+  // actually arrives here (synchronous with the click, not delayed by
+  // React's own state-update batching), then the effect below measures from
+  // it once this panel has actually painted.
+  const hotspotClickTimeRef = useRef(null)
+
+  function handleHotspotChange(hotspot) {
+    if (hotspot) hotspotClickTimeRef.current = performance.now()
+    setActive(hotspot)
+  }
+
   useEffect(() => {
     diag3d('Building3DSection mounted')
   }, [])
+
+  useEffect(() => {
+    if (!active || hotspotClickTimeRef.current == null) return undefined
+    const clickTime = hotspotClickTimeRef.current
+    let raf1 = 0
+    let raf2 = 0
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        diag3d('3D hotspot click -> InfoPanel open (ms)', Math.round(performance.now() - clickTime))
+        hotspotClickTimeRef.current = null
+      })
+    })
+    return () => {
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
+    }
+  }, [active])
 
   useEffect(() => {
     const el = sectionRef.current
@@ -221,7 +250,7 @@ export default function Building3DSection() {
             <Suspense fallback={null}>
               <Hero3DScene
                 ref={sceneRef}
-                onHotspotChange={setActive}
+                onHotspotChange={handleHotspotChange}
                 active={inView && tabVisible}
                 lowPower={isLowPower}
                 onReady={() => {

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, galvanizedMaterial, concreteDarkMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { SealantBead, InsulationLayer } from '../buildingParts'
@@ -14,7 +15,7 @@ const GROUP_ID = 'acousticInsulation'
  * batt -> board panel -> finished facing), so this reads as a real acoustic
  * wall assembly, not a single insulation slab.
  */
-export default function AcousticInsulation({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function AcousticInsulation({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const battMat = useSystemMaterial(
     { color: '#5B5F63', roughness: 0.95, metalness: 0.02, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -87,3 +88,5 @@ export default function AcousticInsulation({ activeGroup = null, hoveredGroup = 
     </group>
   )
 }
+
+export default memo(AcousticInsulation)

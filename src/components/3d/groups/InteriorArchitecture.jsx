@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { concreteMaterial, hardwareMaterial, galvanizedMaterial, firestopStaticMaterial } from '../buildingMaterials'
 import { DuctSegment, FirestopBoard } from '../buildingParts'
 
@@ -11,7 +12,7 @@ import { DuctSegment, FirestopBoard } from '../buildingParts'
  * properly concealed by default like the rest of the interior — intended,
  * not a regression; no hotspot targets this room, so it stays hidden.
  */
-export default function InteriorArchitecture({ visible = true }) {
+function InteriorArchitecture({ visible = true }) {
   return (
     <group visible={visible}>
       <mesh position={[1.8, 0.6, -1.25]} material={concreteMaterial} dispose={null} castShadow receiveShadow>
@@ -32,3 +33,5 @@ export default function InteriorArchitecture({ visible = true }) {
     </group>
   )
 }
+
+export default memo(InteriorArchitecture)

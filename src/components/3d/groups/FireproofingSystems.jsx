@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { RoundedBox } from '@react-three/drei'
 import { COLORS, hardwareMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
@@ -23,7 +24,7 @@ const COATING_TOP = COL_TOP_Y - 0.16
  * — steel -> coating -> protected member reads as three distinct layers/
  * materials, not a bigger box floating around a smaller one.
  */
-export default function FireproofingSystems({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function FireproofingSystems({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const coatingMat = useSystemMaterial(
     { color: COLORS.fireproofCoating, roughness: 0.9, metalness: 0.05, emissive: COLORS.amber500 },
     GROUP_ID,
@@ -101,3 +102,5 @@ export default function FireproofingSystems({ activeGroup = null, hoveredGroup =
     </group>
   )
 }
+
+export default memo(FireproofingSystems)

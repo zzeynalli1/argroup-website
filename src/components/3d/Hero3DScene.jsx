@@ -1,17 +1,7 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { forwardRef, lazy, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Billboard, ContactShadows, Html, OrbitControls } from '@react-three/drei'
 import { RGBELoader } from 'three-stdlib'
-import {
-  Bloom,
-  BrightnessContrast,
-  EffectComposer,
-  HueSaturation,
-  N8AO,
-  ToneMapping,
-  Vignette,
-} from '@react-three/postprocessing'
-import { ToneMappingMode } from 'postprocessing'
 import { Minus, Plus } from 'lucide-react'
 import * as THREE from 'three'
 import { useTranslation } from '../../lib/i18n/useTranslation'
@@ -25,6 +15,12 @@ import {
 import { COLORS, groundMaterial } from './buildingMaterials'
 import Building from './Building'
 import { diag3d } from '../../lib/diag3d'
+
+// Split into its own lazy chunk — see PostProcessingEffects.jsx's own
+// comment — so `lowPower` scenes, which never render it (see the JSX gate
+// below), never download `@react-three/postprocessing`/`postprocessing` at
+// all, shrinking the base 3D chunk those devices do pay for.
+const PostProcessingEffects = lazy(() => import('./PostProcessingEffects'))
 
 // Camera moves this much closer/farther per zoom-button click (see `zoomBy`).
 const ZOOM_STEP = 0.85
@@ -721,8 +717,16 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
 
       <Html distanceFactor={8} style={{ pointerEvents: 'none' }} zIndexRange={[10, 0]}>
         <div className="relative flex h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-          {emphasized && (
+          {/* `animate-ping` is a continuously-running CSS animation — skipped
+              on `lowPower`/reduced-motion devices (same `prefersReducedMotion`
+              flag this component already uses to flatten the 3D breathing
+              pulse), since it keeps compositing a DOM layer on top of the
+              WebGL canvas for as long as a marker is emphasized. */}
+          {emphasized && !prefersReducedMotion && (
             <span className="absolute inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-ember-600 opacity-60" />
+          )}
+          {emphasized && prefersReducedMotion && (
+            <span className="absolute inline-flex h-2.5 w-2.5 rounded-full bg-ember-600 opacity-60" />
           )}
           {isHovered && (
             <span className="absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap rounded border border-white/10 bg-industrial-950/90 px-2 py-1 text-xs text-base-50">
@@ -978,6 +982,50 @@ function ProgramCountLogger({ ready }) {
   return null
 }
 
+// Diagnostic for the hotspot-click freeze investigation: logs how many NEW
+// WebGL programs got compiled (target: 0) across a hotspot select/
+// deselect/switch — `useSystemMaterial`'s per-mesh materials used to
+// recreate themselves (and therefore their compiled shader variant) on
+// every one of these, which is exactly what froze the frame. Compared two
+// frames after `activeKey` changes (same rAF-settle pattern as
+// `ProgramCountLogger` above) so the real post-click program count is
+// counted, not a mid-render snapshot.
+function HotspotProgramDiag({ activeKey }) {
+  const { gl } = useThree()
+  const prevKeyRef = useRef(activeKey)
+  const baselineRef = useRef(null)
+  const rafsRef = useRef({ raf1: 0, raf2: 0 })
+
+  useEffect(() => {
+    if (baselineRef.current == null) {
+      baselineRef.current = gl.info.programs?.length ?? 0
+    }
+    if (activeKey === prevKeyRef.current) return undefined
+    prevKeyRef.current = activeKey
+    const before = baselineRef.current
+    rafsRef.current.raf1 = requestAnimationFrame(() => {
+      rafsRef.current.raf2 = requestAnimationFrame(() => {
+        const after = gl.info.programs?.length ?? 0
+        diag3d('3D hotspot click -> new WebGL programs (target 0)', after - before)
+        baselineRef.current = after
+      })
+    })
+    return () => {
+      cancelAnimationFrame(rafsRef.current.raf1)
+      cancelAnimationFrame(rafsRef.current.raf2)
+    }
+  }, [activeKey, gl])
+
+  return null
+}
+
+// Hard cap on the hotspot fly-to duration on mobile/lowPower — the desktop
+// exponential-decay lerp below has no such cap (time-to-settle scales with
+// the raw distance covered, which can run past a second for some hotspots),
+// which read as sluggish on phones. Bounded instead by a fixed-duration
+// eased tween (see `fastTransition` below) so it always lands by this many ms.
+const MOBILE_FLIGHT_MS = 400
+
 // Also doubles as this scene's one "give the outer, non-R3F component scope
 // access to `invalidate`" bridge (see `invalidateRef` below) — under
 // `frameloop="demand"`, nothing renders again on its own once the camera
@@ -986,8 +1034,16 @@ function ProgramCountLogger({ ready }) {
 // the only place `useThree` can be called) need a way to kick off the very
 // first render of a new camera transition. `invalidateRef.current` is set
 // here once R3F's own `invalidate` is available and read back there.
-function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef, invalidateRef }) {
+function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef, invalidateRef, fastTransition }) {
   const { invalidate } = useThree()
+  // Fixed-duration tween state (`fastTransition` only) — the start pose is
+  // captured the instant a transition begins (not just the target), so the
+  // tween always covers the REAL distance for THIS flight in exactly
+  // `MOBILE_FLIGHT_MS`, regardless of how far the camera already is.
+  const flightStartPosRef = useRef(new THREE.Vector3())
+  const flightStartTargetRef = useRef(new THREE.Vector3())
+  const flightStartTimeRef = useRef(0)
+  const wasTransitioningRef = useRef(false)
 
   useEffect(() => {
     invalidateRef.current = invalidate
@@ -1011,12 +1067,39 @@ function CameraRig({ orbitRef, desiredPosRef, desiredTargetRef, transitioningRef
   }, [orbitRef, transitioningRef])
 
   useFrame((state, delta) => {
-    if (!transitioningRef.current) return
+    if (!transitioningRef.current) {
+      wasTransitioningRef.current = false
+      return
+    }
+
+    const controls = orbitRef.current
+
+    if (fastTransition) {
+      if (!wasTransitioningRef.current) {
+        flightStartPosRef.current.copy(state.camera.position)
+        flightStartTargetRef.current.copy(controls ? controls.target : desiredTargetRef.current)
+        flightStartTimeRef.current = performance.now()
+        wasTransitioningRef.current = true
+      }
+      const elapsed = performance.now() - flightStartTimeRef.current
+      const t = Math.min(elapsed / MOBILE_FLIGHT_MS, 1)
+      const eased = 1 - (1 - t) ** 3 // ease-out cubic
+      state.camera.position.lerpVectors(flightStartPosRef.current, desiredPosRef.current, eased)
+      if (controls) {
+        controls.target.lerpVectors(flightStartTargetRef.current, desiredTargetRef.current, eased)
+        controls.update()
+      }
+      if (t >= 1) {
+        transitioningRef.current = false
+      } else {
+        state.invalidate()
+      }
+      return
+    }
 
     const t = 1 - Math.exp(-delta * 6)
     state.camera.position.lerp(desiredPosRef.current, t)
 
-    const controls = orbitRef.current
     if (controls) {
       controls.target.lerp(desiredTargetRef.current, t)
       controls.update()
@@ -1189,6 +1272,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   }
 
   function selectHotspot(hotspot) {
+    diag3d('3D hotspot clicked', hotspot.key)
     setActiveKey(hotspot.key)
     desiredPosRef.current.set(...hotspot.cameraPosition)
     desiredTargetRef.current.set(...hotspot.position)
@@ -1429,14 +1513,19 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             post-processing pipeline below, and now part of the SAME first
             blocking render `onReady` waits for, so there's nothing left to
             visibly pop in afterward. */}
-        {!lowPower && (
+        {/* Also skipped on `isMobile` now, not just `lowPower` — covers the
+            narrow-but-not-coarse-pointer desktop-window edge case that
+            `lowPower` alone doesn't catch; ContactShadows' blur pass is real
+            extra GPU work this scene doesn't need to spend on any phone-
+            class viewport. */}
+        {!lowPower && !isMobile && (
           <ContactShadows
             position={[0, -0.01, 0]}
             opacity={0.6}
             scale={14}
             blur={2.2}
             far={4.2}
-            resolution={isMobile ? 128 : 256}
+            resolution={256}
             // drei defaults this to Infinity — re-rendering the blur pass
             // every single frame forever. Nothing it captures ever moves
             // (the building is static geometry; hotspot dim/highlight only
@@ -1467,7 +1556,12 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           target={defaultCameraTarget}
           enablePan={false}
           enableZoom={false}
-          enableDamping
+          // Damping keeps rendering settle frames for a while after the user
+          // stops dragging — real cost under `frameloop="demand"`. Disabled
+          // entirely on `lowPower` so an orbit drag stops requesting new
+          // frames the instant the pointer lifts, instead of continuing to
+          // render its own inertia settle.
+          enableDamping={!lowPower}
           dampingFactor={0.05}
           minDistance={3}
           // Must stay comfortably above the NARROW camera preset's resting
@@ -1483,90 +1577,20 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           desiredTargetRef={desiredTargetRef}
           transitioningRef={transitioningRef}
           invalidateRef={invalidateRef}
+          fastTransition={isMobile || lowPower}
         />
         <CameraFrameShift active={isWideLayout} />
+        <HotspotProgramDiag activeKey={activeKey} />
 
-        {/* Post-processing pipeline. Order matters — each effect processes
-            the previous one's output:
-              1. N8AO   — screen-space ambient occlusion. Seats every small
-                          connection (bolts, brackets, base plates, slab/
-                          column junctions) into real contact shadow that the
-                          directional shadow map's resolution can't resolve,
-                          without needing per-mesh geometry changes.
-              2. Bloom  — luminance-gated, tight threshold: only true bright
-                          highlights (sun-hit specular on metal, the emissive
-                          hotspot markers) bloom, never a general glow.
-              3. ToneMapping (AGX) — replaces the old renderer-level
-                          ACESFilmic + fixed exposure (mounting this composer
-                          forces `renderer.toneMapping` to `NoToneMapping`
-                          for as long as it's mounted, so tone mapping has to
-                          live here now). AGX (Blender's own default view
-                          transform since 4.0) rolls off bright highlights
-                          much more gracefully than ACES/Reinhard, which is
-                          the direct fix for "washed out" — mid-tone contrast
-                          stays intact instead of everything clipping to white.
-              4. BrightnessContrast / HueSaturation — a very small, restrained
-                          grade (not a stylized LUT): a touch more contrast
-                          and a touch less saturation so it reads as a real
-                          render, not a color-corrected screenshot.
-              5. Vignette — subtle edge falloff only, to hold focus on the
-                          building rather than the frame edges.
-            `multisampling` is this composer's own antialiasing (see the
-            `gl={{antialias:false}}` note above) — was 4 on desktop/0 on
-            mobile, desktop now reduced to 2: the visible edge-aliasing delta
-            between 4x and 2x is subtle at this scene's camera distances, but
-            each sample multiplies the composer's own resolve cost. N8AO is
-            skipped entirely on mobile (same treatment as Bloom, already
-            mobile-skipped below) — AO is the single most expensive pass in
-            this pipeline, and `halfRes` alone wasn't enough headroom on
-            phone-class GPUs; ToneMapping/BrightnessContrast/HueSaturation/
-            Vignette stay mounted on mobile too, since those are what give
-            the AGX grade (replacing the renderer's own tone mapping — see
-            the mode comment above) and dropping the whole composer there
-            would make mobile visibly flatter/washed out relative to
-            desktop, not just less ambient-occluded. The composer itself now
-            mounts unconditionally (no staged flag) alongside the rest of
-            the scene — see ReadySignal's own comment: `onReady` already
-            means ToneMapping/BrightnessContrast/HueSaturation/Vignette are
-            compiled, so the scene's first visible frame is already this
-            graded look, never an un-graded one that pops in later. N8AO and
-            Bloom specifically stay gated on `heavyFxReady` (see that
-            state's own comment) — they're the two passes expensive enough
-            to turn "compile behind the poster" into a multi-second-plus
-            main-thread stall, and unlike the grade passes above, their
-            absence for a couple of extra frames reads as the render
-            settling in rather than a wrong-then-corrected image. */}
+        {/* Post-processing pipeline — see PostProcessingEffects.jsx for the
+            pass-by-pass breakdown (N8AO/Bloom/ToneMapping(AGX)/
+            BrightnessContrast/HueSaturation/Vignette) and why it's split
+            into its own lazy chunk. Never rendered (and therefore never
+            downloaded) on `lowPower`. */}
         {!lowPower && (
-          <EffectComposer multisampling={isMobile ? 0 : 2}>
-            {!isMobile && heavyFxReady ? (
-              <N8AO
-                aoRadius={0.45}
-                distanceFalloff={1}
-                intensity={3.2}
-                quality="medium"
-                // Half-resolution AO buffer on desktop too now (previously
-                // mobile-only) — screen-space AO is inherently a soft,
-                // low-frequency effect; rendering its own buffer at half
-                // the pixel count (so a quarter the shading cost) is not
-                // visually distinguishable from full-res at this effect's
-                // own blur radius, confirmed by comparing both before
-                // applying this.
-                halfRes
-                screenSpaceRadius
-              />
-            ) : (
-              <></>
-            )}
-            {!isMobile && heavyFxReady ? (
-              <Bloom luminanceThreshold={0.92} luminanceSmoothing={0.25} intensity={0.4} mipmapBlur />
-            ) : (
-              <></>
-            )}
-            <ToneMapping mode={ToneMappingMode.AGX} />
-            <BrightnessContrast brightness={0.015} contrast={0.06} />
-            <HueSaturation hue={0} saturation={-0.05} />
-            <Vignette offset={0.32} darkness={0.45} />
-          </EffectComposer>
+          <Suspense fallback={null}>
+            <PostProcessingEffects isMobile={isMobile} heavyFxReady={heavyFxReady} />
+          </Suspense>
         )}
       </Canvas>
 
@@ -1575,7 +1599,10 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           type="button"
           onClick={() => zoomBy(ZOOM_STEP)}
           aria-label={t('building3d.zoomIn')}
-          className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 backdrop-blur-sm transition-colors hover:border-ember-600 hover:text-ember-600"
+          // `backdrop-blur-sm` dropped on `lowPower` — compositing a CSS
+          // backdrop blur on a DOM element layered over the live WebGL
+          // canvas is real, avoidable cost on weak GPUs.
+          className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 transition-colors hover:border-ember-600 hover:text-ember-600 ${lowPower ? '' : 'backdrop-blur-sm'}`}
         >
           <Plus size={16} />
         </button>
@@ -1583,7 +1610,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           type="button"
           onClick={() => zoomBy(1 / ZOOM_STEP)}
           aria-label={t('building3d.zoomOut')}
-          className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 backdrop-blur-sm transition-colors hover:border-ember-600 hover:text-ember-600"
+          className={`pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-industrial-950/80 text-base-50 transition-colors hover:border-ember-600 hover:text-ember-600 ${lowPower ? '' : 'backdrop-blur-sm'}`}
         >
           <Minus size={16} />
         </button>

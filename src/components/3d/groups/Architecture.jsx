@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { memo, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import {
   COLORS,
@@ -73,7 +73,7 @@ const RIGHT_COLUMN_Z1 = BAY_Z_END
  * sill/flashing at the base, and small anchor clips tying the interior
  * mullions back to the floor slabs.
  */
-export default function Architecture({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function Architecture({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const isFacadeEmphasized = FACADE_HOTSPOT_GROUPS.has(activeGroup) || FACADE_HOTSPOT_GROUPS.has(hoveredGroup)
 
   // Base tint/opacity now comes from `curtainWallGlassMaterial` (see that
@@ -364,3 +364,5 @@ export default function Architecture({ activeGroup = null, hoveredGroup = null, 
     </group>
   )
 }
+
+export default memo(Architecture)

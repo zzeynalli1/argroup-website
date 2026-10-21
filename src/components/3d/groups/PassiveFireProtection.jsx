@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, steelMaterial, hardwareMaterial, concreteMaterial, concreteWeatheredMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { Pipe, PipeElbow, FirestopCollar, FirestopSeal, ConcreteSection, PipeSupport, Clamp } from '../buildingParts'
@@ -21,7 +22,7 @@ const GROUP_ID = 'passiveFireProtection'
  * the seal's own base color is the dark firestop red, only glowing brighter
  * when this hotspot is active/hovered.
  */
-export default function PassiveFireProtection({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function PassiveFireProtection({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const pipeMat = useSystemMaterial(
     { color: COLORS.steelDark, roughness: 0.35, metalness: 0.8, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -103,3 +104,5 @@ export default function PassiveFireProtection({ activeGroup = null, hoveredGroup
     </group>
   )
 }
+
+export default memo(PassiveFireProtection)

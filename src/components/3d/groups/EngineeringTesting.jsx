@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, hardwareMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { InstancedCylinders, Pipe } from '../buildingParts'
@@ -33,7 +34,7 @@ const ROD_BOTTOM_Y = GAUGE_Y + 0.045 // gauge housing's own top face (0.09 tall,
  * nearby — a wider horizontal rig was tried and rejected for exactly that
  * reason. The anchor bracket/bolt geometry itself is unchanged.
  */
-export default function EngineeringTesting({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function EngineeringTesting({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const anchorMat = useSystemMaterial(
     { color: COLORS.steelDark, roughness: 0.4, metalness: 0.75, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -95,3 +96,5 @@ export default function EngineeringTesting({ activeGroup = null, hoveredGroup = 
     </group>
   )
 }
+
+export default memo(EngineeringTesting)

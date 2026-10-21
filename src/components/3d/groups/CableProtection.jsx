@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { COLORS, hardwareMaterial, firestopStaticMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import {
@@ -20,7 +20,7 @@ const GROUP_ID = 'cableProtection'
  * penetration/board detail (static — was never dynamically highlighted, but
  * lives here since it's the same visual neighborhood).
  */
-export default function CableProtection({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function CableProtection({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const trayMat = useSystemMaterial(
     { color: '#2E3033', roughness: 0.5, metalness: 0.4, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -101,3 +101,5 @@ export default function CableProtection({ activeGroup = null, hoveredGroup = nul
     </group>
   )
 }
+
+export default memo(CableProtection)

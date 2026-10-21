@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { COLORS, hardwareMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { Isolator } from '../buildingParts'
@@ -29,7 +29,7 @@ const UNIT_SIZE = [0.8, 0.5, 0.6]
  * connected to the roof deck below and the equipment mass above, replacing
  * the previous bare rubber-puck cylinders.
  */
-export default function VibrationSolutions({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function VibrationSolutions({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const roofUnitMat = useSystemMaterial(
     { color: COLORS.metal, roughness: 0.4, metalness: 0.5, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -82,3 +82,5 @@ export default function VibrationSolutions({ activeGroup = null, hoveredGroup = 
     </group>
   )
 }
+
+export default memo(VibrationSolutions)

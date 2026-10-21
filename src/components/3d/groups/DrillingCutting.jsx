@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, hardwareMaterial, concreteMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { Pipe, FirestopCollar, PipeSupport, ConcreteSection } from '../buildingParts'
@@ -10,7 +11,7 @@ const GROUP_ID = 'drillingCutting'
  * pipe sleeve + firestop collar — all sharing the same `useSystemMaterial`
  * key so selecting this hotspot highlights/dims the whole assembly together.
  */
-export default function DrillingCutting({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function DrillingCutting({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const pvcMat = useSystemMaterial(
     { color: COLORS.amber500, roughness: 0.6, metalness: 0.05, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -52,3 +53,5 @@ export default function DrillingCutting({ activeGroup = null, hoveredGroup = nul
     </group>
   )
 }
+
+export default memo(DrillingCutting)

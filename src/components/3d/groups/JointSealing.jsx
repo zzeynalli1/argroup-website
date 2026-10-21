@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, hardwareMaterial, concreteMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { SealantBead } from '../buildingParts'
@@ -13,7 +14,7 @@ const HALF_D = 2
  * planes), a backer rod set into that gap, and the firestop sealant bead
  * tooled over it.
  */
-export default function JointSealing({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function JointSealing({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const jointMat = useSystemMaterial(
     { color: COLORS.firestopSealant, roughness: 0.65, metalness: 0.1, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -39,3 +40,5 @@ export default function JointSealing({ activeGroup = null, hoveredGroup = null, 
     </group>
   )
 }
+
+export default memo(JointSealing)

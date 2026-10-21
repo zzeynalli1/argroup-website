@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { RoundedBox } from '@react-three/drei'
 import { concreteMaterial, concreteDarkMaterial, concreteWeatheredMaterial, steelMaterial } from '../buildingMaterials'
 import { DetailedConcreteBeam, DetailedConcreteColumn } from '../buildingParts'
@@ -19,7 +20,7 @@ const CHAMFER_SMOOTHNESS = 2
  * it should stay that way — a future "structural layer" toggle can target
  * this group on its own without touching the envelope's open/close state.
  */
-export default function Structure({ visible = true }) {
+function Structure({ visible = true }) {
   return (
     <group visible={visible}>
       {FLOOR_Y.map((y) => (
@@ -73,3 +74,5 @@ export default function Structure({ visible = true }) {
     </group>
   )
 }
+
+export default memo(Structure)

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
@@ -1023,7 +1023,7 @@ function EntranceAssembly() {
  * opaque to open; `vibrationSolutions` needs nothing here either (roof,
  * already exterior-visible).
  */
-export default function ExteriorShell({ activeGroup = null, visible = true }) {
+function ExteriorShell({ activeGroup = null, visible = true }) {
   const panelRefs = useRef({})
   // Stable identity across renders — a plain function prop passed to each
   // Plug component's inline ref callback, rather than passing the mutable
@@ -1123,3 +1123,5 @@ export default function ExteriorShell({ activeGroup = null, visible = true }) {
     </group>
   )
 }
+
+export default memo(ExteriorShell)

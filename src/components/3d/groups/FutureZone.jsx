@@ -7,6 +7,10 @@
  * not adding new visible geometry. Swap this component for a real one in
  * groups/index.js when that discipline actually gets modeled.
  */
-export default function FutureZone() {
+import { memo } from 'react'
+
+function FutureZone() {
   return null
 }
+
+export default memo(FutureZone)

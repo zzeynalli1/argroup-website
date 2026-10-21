@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { COLORS, hardwareMaterial } from '../buildingMaterials'
 import { useSystemMaterial } from '../useSystemMaterial'
 import { DuctSegment, ThreadedRod, SupportChannel, Anchor } from '../buildingParts'
@@ -30,7 +31,7 @@ const CHANNEL_Y = DUCT_TOP + 0.021 // strut channel rests directly on the duct t
  * grille/register. AR Group does not offer HVAC as a service — see the
  * "IMPORTANT BUSINESS REQUIREMENT" note in .claude/agents/3d-modeling-agent.md.
  */
-export default function MechanicalSupport({ activeGroup = null, hoveredGroup = null, visible = true }) {
+function MechanicalSupport({ activeGroup = null, hoveredGroup = null, visible = true }) {
   const conduitMat = useSystemMaterial(
     { color: COLORS.galvanized, roughness: 0.38, metalness: 0.6, emissive: COLORS.ember600 },
     GROUP_ID,
@@ -98,3 +99,5 @@ export default function MechanicalSupport({ activeGroup = null, hoveredGroup = n
     </group>
   )
 }
+
+export default memo(MechanicalSupport)
