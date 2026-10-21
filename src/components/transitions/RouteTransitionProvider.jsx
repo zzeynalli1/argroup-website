@@ -161,12 +161,23 @@ export default function RouteTransitionProvider({ children }) {
       if (phaseRef.current !== 'idle') return // already transitioning — let the plain nav happen
 
       event.preventDefault()
+      // Navigating TO home: no overlay — the 3D scene mounts immediately on
+      // its own (Building3DSection) and the overlay was getting stuck
+      // "covering" the whole page for as long as that main-thread-heavy
+      // mount took (its own watchdog would eventually force it open, but
+      // not before visibly freezing the transition). A plain SPA navigate
+      // still avoids a full page reload. Navigating AWAY from home keeps
+      // the normal covered transition (handled below, unaffected).
+      if (targetPath === '/') {
+        navigate(`${targetPath}${url.search}${url.hash}`)
+        return
+      }
       startCover(`${targetPath}${url.search}${url.hash}`)
     }
 
     document.addEventListener('click', onClick, { capture: true })
     return () => document.removeEventListener('click', onClick, { capture: true })
-  }, [startCover])
+  }, [startCover, navigate])
 
   // Back/forward: the browser has already changed the URL by the time
   // popstate fires, so we can't cover-then-navigate like the click path.
@@ -176,6 +187,11 @@ export default function RouteTransitionProvider({ children }) {
   useEffect(() => {
     function onPopState() {
       if (phaseRef.current !== 'idle') return
+      // Landing on home via back/forward: no overlay — see the click
+      // handler's own comment. The browser has already changed the URL by
+      // this point; the route itself updates via BrowserRouter regardless
+      // of whether we show an overlay here.
+      if (window.location.pathname === '/') return
       minHoldMsRef.current = MIN_HOLD_MS.nav
       setInstant(true)
       setVariant('nav')
@@ -258,6 +274,12 @@ export default function RouteTransitionProvider({ children }) {
     // benefit. Deliberately doesn't write SESSION_INTRO_KEY here: a later
     // same-tab visit to a public route should still get the intro once.
     if (window.location.pathname.startsWith('/admin')) return undefined
+    // Home also skips it — see the click handler's own comment: the 3D
+    // scene's main-thread-heavy mount was getting the overlay stuck
+    // "covering" the whole page for as long as that took. Same
+    // doesn't-write-the-session-key reasoning as /admin above: a later
+    // same-tab hard reload on a non-home public route should still play it.
+    if (window.location.pathname === '/') return undefined
 
     let alreadyShown = false
     try {

@@ -124,8 +124,8 @@ export default function Building3DSection() {
   // whether Hero3DScene should render in its cheaper `lowPower` mode
   // (skips post-processing/shadows, pins dpr to 1x). Purely a render-
   // quality switch now — every device mounts the scene on the same
-  // schedule (immediately once the intro gate opens, see
-  // `canLoadHeavyContent` below), lowPower or not.
+  // schedule (immediately on mount, in parallel with the intro overlay —
+  // see Hero3DScene below), lowPower or not.
   const [isLowPower] = useState(detectLowPower)
 
   useEffect(() => {
@@ -184,9 +184,8 @@ export default function Building3DSection() {
             `<section>` className above) plus a small textless spinner —
             shown until the real canvas has painted its first frame. No
             placeholder image: unlike the previous poster-first approach,
-            this scene now always mounts immediately once the intro gate
-            opens (see `canLoadHeavyContent` below), so there's nothing to
-            bridge a long wait with. */}
+            this scene now always mounts immediately on mount, so there's
+            nothing to bridge a long wait with. */}
         {!sceneReady && <LoadingSpinner />}
 
         {/* Real scene layer: mounts immediately, in parallel with the
