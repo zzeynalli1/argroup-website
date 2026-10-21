@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import {
@@ -1032,12 +1032,26 @@ export default function ExteriorShell({ activeGroup = null, visible = true }) {
     panelRefs.current[id] = el
   }
 
+  const { gl } = useThree()
+
+  // The directional light's shadow map is baked once and frozen
+  // (Hero3DScene's `StaticShadowMap`, `gl.shadowMap.autoUpdate = false`) —
+  // these reveal panels are the one thing in the scene that actually moves
+  // real (shadow-casting) geometry, so this effect forces exactly one more
+  // shadow-map render (`gl` is the same imperative escape hatch used
+  // elsewhere, e.g. Hero3DScene's `StaticShadowMap`/`LowPowerToneMapping`)
+  // while any panel is still easing toward open/closed, so the shadow
+  // follows the panel instead of staying frozen at its pre-animation
+  // position. Stops firing itself the instant every panel settles (the lerp
+  // distance drops under the epsilon below).
+  /* eslint-disable react-hooks/immutability */
   useFrame((_, delta) => {
     // Hidden by default now (see groups/index.js) — skip the per-frame lerp
     // work entirely while dormant rather than animating invisible panels.
     if (!visible) return
 
     const t = 1 - Math.exp(-delta * EASE_RATE)
+    let stillMoving = false
     PANEL_DEFS.forEach((def) => {
       const obj = panelRefs.current[def.id]
       if (!obj) return
@@ -1045,17 +1059,23 @@ export default function ExteriorShell({ activeGroup = null, visible = true }) {
 
       if (def.kind === 'hinge') {
         const target = isOpen ? def.angle : 0
-        obj.rotation.y = THREE.MathUtils.lerp(obj.rotation.y, target, t)
+        const next = THREE.MathUtils.lerp(obj.rotation.y, target, t)
+        if (Math.abs(next - obj.rotation.y) > 1e-4) stillMoving = true
+        obj.rotation.y = next
         return
       }
 
       const target = isOpen ? def.distance : 0
-      const next = THREE.MathUtils.lerp(obj.userData.offset ?? 0, target, t)
+      const current = obj.userData.offset ?? 0
+      const next = THREE.MathUtils.lerp(current, target, t)
+      if (Math.abs(next - current) > 1e-4) stillMoving = true
       obj.userData.offset = next
       const [bx, by, bz] = obj.userData.base
       obj.position.set(bx + def.axis[0] * next, by + def.axis[1] * next, bz + def.axis[2] * next)
     })
+    if (stillMoving) gl.shadowMap.needsUpdate = true
   })
+  /* eslint-enable react-hooks/immutability */
 
   return (
     <group visible={visible}>

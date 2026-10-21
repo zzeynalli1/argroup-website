@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Billboard, ContactShadows, Environment, Html, Lightformer, OrbitControls } from '@react-three/drei'
+import { Billboard, ContactShadows, Html, OrbitControls } from '@react-three/drei'
+import { RGBELoader } from 'three-stdlib'
 import {
   Bloom,
   BrightnessContrast,
@@ -299,6 +300,103 @@ function GradientBackdrop() {
       cancelled = true
     }
   }, [texture])
+
+  return null
+}
+
+// Self-hosted (public/hdr/) rather than `preset="city"` — drei's preset
+// system fetches that exact file from a third-party CDN (raw.githack.com)
+// at runtime, which previously made the whole scene (and, with no error
+// boundary above it, the whole page) fail if that host was slow/
+// unreachable/blocked. Same HDRI drei's "city" preset used — reads as a
+// moody, window-lit night skyline (fits the dark industrial backdrop) and
+// gives metal/glass reflections actual shape/variation instead of a flat,
+// uniform dome. A flat procedural (Lightformer-rig) environment was tried
+// in place of this file and reliably read as grey/flat — a real
+// photographed HDRI's uneven, directional light pattern is what makes
+// metal/glass reflections look like a real environment instead of a
+// uniform studio dome, so that's worth the one real asset load.
+const HDRI_URL = '/hdr/potsdamer_platz_512.hdr'
+// How long to wait for the HDRI before revealing the scene without it —
+// see `HDRIEnvironment` below for why this exists at all (no isolated
+// Suspense this scene can silently resolve behind).
+const HDRI_TIMEOUT_MS = 4000
+const HDRI_ENV_INTENSITY = 1.15
+
+// Loads the HDRI manually (RGBELoader + PMREMGenerator) instead of drei's
+// `useEnvironment`/`<Environment files={...}>`, which is Suspense-based —
+// a Suspense boundary scoped to just this component would let the REST of
+// the scene (materials/lighting/hotspots) render and reveal with zero IBL
+// reflections, which then visibly snap on once the file finishes loading:
+// exactly the "dark/flat, then suddenly lit" pop this scene needs to avoid.
+// Instead, loading state is tracked in `envReadyRef` (owned by the parent
+// Hero3DScene, shared with `ReadySignal`) — the scene's first reveal
+// (`onReady`) waits for this to flip, same as it already waits for
+// `gl.compileAsync`, so the environment map is either genuinely already
+// applied by the time anything becomes visible, or `HDRI_TIMEOUT_MS` has
+// elapsed and the scene deliberately reveals without it rather than
+// blocking forever on a slow/unreachable asset. If the file DOES still
+// arrive after that timeout, it's applied anyway (just silently, a few
+// hundred ms of reflections "waking up" being a far smaller issue than a
+// scene that never reveals on a bad connection).
+function HDRIEnvironment({ envReadyRef }) {
+  const { gl, scene, invalidate } = useThree()
+
+  // `scene` (both its `.environment`/`.environmentIntensity` props here and
+  // `.background` in GradientBackdrop above) is the standard R3F imperative
+  // escape hatch — safe to mutate directly, including from these nested
+  // loader callbacks.
+  /* eslint-disable react-hooks/immutability */
+  useEffect(() => {
+    let unmounted = false
+    const loader = new RGBELoader()
+    const pmrem = new THREE.PMREMGenerator(gl)
+    pmrem.compileEquirectangularShader()
+
+    scene.environmentIntensity = HDRI_ENV_INTENSITY
+
+    function reveal(reason) {
+      if (envReadyRef.current) return
+      envReadyRef.current = true
+      diag3d(`3D HDRI gate resolved (${reason})`)
+      // `frameloop="demand"` needs an explicit nudge — this resolves outside
+      // R3F's own render loop (a loader callback / a plain setTimeout), same
+      // reasoning as `gl.compileAsync`'s own `.then()` in ReadySignal below.
+      invalidate()
+    }
+
+    loader.load(
+      HDRI_URL,
+      (hdrTexture) => {
+        if (unmounted) {
+          hdrTexture.dispose()
+          return
+        }
+        scene.environment = pmrem.fromEquirectangular(hdrTexture).texture
+        hdrTexture.dispose()
+        reveal('loaded')
+      },
+      undefined,
+      (err) => {
+        if (unmounted) return
+        diag3d('3D HDRI load failed (showing scene without env map)', err?.message)
+        reveal('error')
+      }
+    )
+
+    const timeoutId = window.setTimeout(() => reveal('4s timeout'), HDRI_TIMEOUT_MS)
+
+    return () => {
+      unmounted = true
+      window.clearTimeout(timeoutId)
+      pmrem.dispose()
+      if (scene.environment) {
+        scene.environment.dispose()
+        scene.environment = null
+      }
+    }
+  }, [gl, scene, invalidate, envReadyRef])
+  /* eslint-enable react-hooks/immutability */
 
   return null
 }
@@ -799,7 +897,7 @@ function StaticShadowMap() {
 // shift. Compiling everything together costs a longer wait behind the
 // poster instead of a shorter one followed by a visible pop — the explicit
 // trade this scene now makes.
-function ReadySignal({ onReady }) {
+function ReadySignal({ onReady, envReadyRef }) {
   const { gl, scene, camera, invalidate } = useThree()
   const compileStartedRef = useRef(false)
   const compileDoneRef = useRef(false)
@@ -832,6 +930,11 @@ function ReadySignal({ onReady }) {
     // happens to land inside the same blocking frame instead of a
     // follow-up one.
     if (!compileDoneRef.current) return
+    // See `HDRIEnvironment` — this flips once the HDRI has loaded (or
+    // failed, or timed out at 4s) so the scene's first reveal either
+    // already has real IBL reflections or has deliberately given up
+    // waiting, never a flash of flat/no-environment geometry in between.
+    if (!envReadyRef.current) return
     if (firstFrameLoggedRef.current) return
     firstFrameLoggedRef.current = true
     diag3d('3D first real frame rendered (building/lights/hotspots/post-fx on screen)')
@@ -1054,6 +1157,11 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // lowPower — see the JSX gate below, which already drops both passes
   // there regardless of this flag.
   const [heavyFxReady, setHeavyFxReady] = useState(false)
+  // Shared between `ReadySignal` and `HDRIEnvironment` (both Canvas
+  // children) — a plain ref, not state, since it only needs to gate a
+  // `useFrame` check inside `ReadySignal`, which `HDRIEnvironment` already
+  // wakes via `invalidate()` the moment it flips (see that component).
+  const envReadyRef = useRef(false)
   // Holds R3F's own `invalidate` once `CameraRig` (a Canvas child) captures
   // it — see that component's own comment on why this indirection exists:
   // under `frameloop="demand"`, the functions below (plain closures, called
@@ -1148,7 +1256,20 @@ const Hero3DScene = forwardRef(function Hero3DScene(
     <>
       <Canvas
         shadows={!lowPower}
-        camera={{ position: defaultCameraPosition, fov: 45 }}
+        // Explicit near/far instead of R3F's defaults (near 0.1, far 1000)
+        // — this scene's entire usable depth range is ~0.3-35 world units
+        // (OrbitControls minDistance 3 / maxDistance 19.5, fog fades out at
+        // 33), so a far plane of 1000 was wasting the vast majority of the
+        // depth buffer's precision on space nothing ever occupies, the
+        // classic cause of z-fighting on coplanar/near-coplanar surfaces
+        // (panel-on-panel cladding, wall-on-cladding, ground-on-paving).
+        // `near` raised to the largest safe value (0.3 — comfortably below
+        // the closest any real geometry/camera-zoom gets) rather than
+        // leaving it near-zero, since raising `near` is the single biggest
+        // lever on depth precision (it's logarithmic in `far/near`, not
+        // linear). Logged once below so this ratio can be re-verified if
+        // the camera's own distance range ever changes.
+        camera={{ position: defaultCameraPosition, fov: 45, near: 0.3, far: 40 }}
         // Desktop max capped at 1.25 (down from 1.5) — the visible sharpness
         // delta between 1.25x and 1.5x device pixel ratio on this scene's
         // detail level is marginal, but the pixel (and therefore fragment
@@ -1187,7 +1308,8 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         // the actual "real canvas has something on screen" signal for
         // Building3DSection's placeholder crossfade is `ReadySignal`'s
         // `onReady` below (first real frame, post-gl.compile).
-        onCreated={({ gl: createdGl }) => {
+        onCreated={({ gl: createdGl, camera: createdCamera }) => {
+          diag3d('3D camera near/far', `near=${createdCamera.near} far=${createdCamera.far}`)
           // Every `WebGLProgram`'s first real use (`getUniforms`/
           // `getAttributes`, called from `WebGLRenderer.setProgram` on the
           // program's first bind) runs a synchronous `gl.getProgramParameter`
@@ -1208,6 +1330,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         }}
       >
         <ReadySignal
+          envReadyRef={envReadyRef}
           onReady={() => {
             diag3d('3D scene onReady (first frame rendered, shaders compiled)')
             onReady?.()
@@ -1224,7 +1347,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             flat ambient would otherwise do, so a higher ambient here would
             wash the key/fill contrast back out and read flat instead of
             dusk. */}
-        <ambientLight intensity={0.3} />
+        <ambientLight intensity={0.37} />
         <directionalLight
           position={[6, 7, 5.5]}
           intensity={2.1}
@@ -1259,10 +1382,17 @@ const Hero3DScene = forwardRef(function Hero3DScene(
           shadow-camera-near={0.5}
           shadow-camera-far={20}
           // Prevents shadow acne now that resolution is effectively higher
-          // (tighter frustum + bigger map) — a small fixed depth bias offsets
-          // the comparison just enough to avoid self-shadowing artifacts on
-          // the concrete's own chamfered faces.
-          shadow-bias={-0.0015}
+          // (tighter frustum + bigger map). Split across two complementary
+          // biases rather than depth-bias alone: `shadow-bias` (constant
+          // depth offset) is kept small — too large a depth bias is its own
+          // artifact (visible "peter-panning", the shadow detaching from its
+          // caster) — while `shadow-normalBias` (offsets the sample point
+          // along the surface normal instead of raw depth) carries most of
+          // the acne-prevention work, since it scales naturally with the
+          // angle between the light and each surface instead of applying one
+          // flat depth offset everywhere.
+          shadow-bias={-0.0005}
+          shadow-normalBias={0.035}
         />
         {!lowPower && <StaticShadowMap />}
         {/* Warm rim/accent from the back-left, opposite the key — separates
@@ -1292,69 +1422,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             backlit-text texture entirely. This reads as a downlight grazing
             the sign from above instead. */}
         <pointLight position={[3.25, 2.35, -0.15]} intensity={0.28} distance={1.8} decay={2} color="#FFC98A" />
-        {/* Procedural IBL rig — replaces a self-hosted HDRI file entirely.
-            `<Environment>` with `<Lightformer>` children renders a small
-            offscreen scene into a cubemap (drei's standard "virtual studio"
-            pattern) instead of loading/decoding an image file, so there's
-            no network fetch AND no Suspense boundary that can resolve a
-            frame or more after everything else (an HDRI file previously
-            meant the scene's first visible frame had zero IBL reflections,
-            which then visibly snapped on once the file finished loading —
-            that pop is exactly what this replaces, alongside the composer
-            restructure above). Tuned to approximate the old HDRI's "moody
-            window-lit night skyline" contribution: a dim cool sky fill plus
-            a scattering of small warm/cool rects standing in for distant
-            lit windows, with one brighter warm rect roughly co-located with
-            the key light's azimuth (position [6,7,5.5]) so specular
-            highlights on glass/metal still read as coming from the same
-            direction as the real light. `resolution={32}` (well below
-            drei's own 256 default) — this is a soft ambient/reflection
-            contribution, not a sharp mirror, so the extra resolution bought
-            nothing visually distinguishable while making the one-time
-            cube-camera render (6 face passes, done synchronously on first
-            mount) needlessly expensive on weaker/software-rendered GPUs. */}
-        <Environment resolution={32} environmentIntensity={0.85}>
-          <Lightformer
-            form="rect"
-            color="#7C8FA6"
-            intensity={0.5}
-            scale={[14, 14, 1]}
-            position={[0, 9, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
-          />
-          <Lightformer
-            form="rect"
-            color="#FFC98A"
-            intensity={2.6}
-            scale={[2.5, 4, 1]}
-            position={[7, 4, 4]}
-            rotation={[0, -Math.PI / 4, 0]}
-          />
-          <Lightformer
-            form="rect"
-            color="#DCE8FF"
-            intensity={1.1}
-            scale={[1.4, 2.2, 1]}
-            position={[-6, 3, -5]}
-            rotation={[0, Math.PI / 3, 0]}
-          />
-          <Lightformer
-            form="rect"
-            color="#FFE3B8"
-            intensity={1.4}
-            scale={[1, 1.6, 1]}
-            position={[4, 2, -6]}
-            rotation={[0, Math.PI, 0]}
-          />
-          <Lightformer
-            form="rect"
-            color="#9FB4CC"
-            intensity={0.9}
-            scale={[1, 1.4, 1]}
-            position={[-7, 1.5, 3]}
-            rotation={[0, Math.PI / 2, 0]}
-          />
-        </Environment>
+        <HDRIEnvironment envReadyRef={envReadyRef} />
 
         <Ground />
         <Building activeGroup={activeGroup} hoveredGroup={hoveredGroup} />
@@ -1500,7 +1568,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
               <></>
             )}
             <ToneMapping mode={ToneMappingMode.AGX} />
-            <BrightnessContrast brightness={-0.03} contrast={0.1} />
+            <BrightnessContrast brightness={0.015} contrast={0.06} />
             <HueSaturation hue={0} saturation={-0.05} />
             <Vignette offset={0.32} darkness={0.45} />
           </EffectComposer>

@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useTranslation } from '../../lib/i18n/useTranslation'
 import ErrorBoundary from '../ui/ErrorBoundary'
-import { useHeavyContentGate } from '../transitions/heavyContentGate'
 import { detectLowPower } from '../../lib/deviceCapability'
 import { diag3d } from '../../lib/diag3d'
 
@@ -129,15 +128,6 @@ export default function Building3DSection() {
   // `canLoadHeavyContent` below), lowPower or not.
   const [isLowPower] = useState(detectLowPower)
 
-  // False only for the exact window where the first-load intro overlay is
-  // about to play or is actively playing (see heavyContentGate.js /
-  // RouteTransitionProvider's `heavyContentGateOpen`) — true immediately
-  // for every other case (reduced motion, admin routes, intro already
-  // shown this session, or any later nav back to Home). The lazy
-  // `<Hero3DScene>` subtree below mounts the instant this flips true — no
-  // further idle/timeout scheduling on top.
-  const canLoadHeavyContent = useHeavyContentGate()
-
   useEffect(() => {
     diag3d('Building3DSection mounted')
   }, [])
@@ -199,53 +189,50 @@ export default function Building3DSection() {
             bridge a long wait with. */}
         {!sceneReady && <LoadingSpinner />}
 
-        {/* Real scene layer: mounts the instant the intro gate opens — no
-            idle-callback/timeout scheduling on top (see
-            `canLoadHeavyContent`'s own comment). Fades in once Hero3DScene's
-            canvas has actually painted (`sceneReady`, set via the `onReady`
-            callback below). ErrorBoundary is a separate layer from Suspense
-            on purpose: Suspense only catches a thrown PROMISE (the loading
-            state); a WebGL/Three.js runtime failure or a rejected asset load
-            (e.g. a loader re-throwing a failed fetch as a render-time error)
-            is a thrown ERROR, which only an error boundary catches — without
-            one, that error would unmount this whole page, not just the 3D
-            scene. */}
-        {canLoadHeavyContent && (
-          <div
-            className="absolute inset-0 transition-opacity duration-700 ease-out"
-            style={{ opacity: sceneReady ? 1 : 0 }}
+        {/* Real scene layer: mounts immediately, in parallel with the
+            first-load intro overlay (no longer waits for it) — fades in
+            once Hero3DScene's canvas has actually painted (`sceneReady`,
+            set via the `onReady` callback below). ErrorBoundary is a
+            separate layer from Suspense on purpose: Suspense only catches a
+            thrown PROMISE (the loading state); a WebGL/Three.js runtime
+            failure or a rejected asset load (e.g. a loader re-throwing a
+            failed fetch as a render-time error) is a thrown ERROR, which
+            only an error boundary catches — without one, that error would
+            unmount this whole page, not just the 3D scene. */}
+        <div
+          className="absolute inset-0 transition-opacity duration-700 ease-out"
+          style={{ opacity: sceneReady ? 1 : 0 }}
+        >
+          <ErrorBoundary
+            // Treated the same as "ready" for crossfade/theme-swap purposes
+            // below — without this, `sceneReady` would never flip (its only
+            // other trigger is Hero3DScene's own `onReady`, which never
+            // fires if it crashed before mounting), leaving the spinner
+            // spinning forever instead of actually showing "unavailable".
+            onError={(err) => {
+              diag3d('3D scene ErrorBoundary caught (showing unavailable fallback)', err?.message)
+              setSceneReady(true)
+            }}
+            fallback={
+              <div className="absolute inset-0 flex items-center justify-center bg-base-50">
+                <span className="text-sm text-industrial-950">{t('building3d.unavailable')}</span>
+              </div>
+            }
           >
-            <ErrorBoundary
-              // Treated the same as "ready" for crossfade/theme-swap purposes
-              // below — without this, `sceneReady` would never flip (its only
-              // other trigger is Hero3DScene's own `onReady`, which never
-              // fires if it crashed before mounting), leaving the spinner
-              // spinning forever instead of actually showing "unavailable".
-              onError={(err) => {
-                diag3d('3D scene ErrorBoundary caught (showing unavailable fallback)', err?.message)
-                setSceneReady(true)
-              }}
-              fallback={
-                <div className="absolute inset-0 flex items-center justify-center bg-base-50">
-                  <span className="text-sm text-industrial-950">{t('building3d.unavailable')}</span>
-                </div>
-              }
-            >
-              <Suspense fallback={null}>
-                <Hero3DScene
-                  ref={sceneRef}
-                  onHotspotChange={setActive}
-                  active={inView && tabVisible}
-                  lowPower={isLowPower}
-                  onReady={() => {
-                    diag3d('3D scene onReady (first frame rendered, shaders compiled)')
-                    setSceneReady(true)
-                  }}
-                />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-        )}
+            <Suspense fallback={null}>
+              <Hero3DScene
+                ref={sceneRef}
+                onHotspotChange={setActive}
+                active={inView && tabVisible}
+                lowPower={isLowPower}
+                onReady={() => {
+                  diag3d('3D scene onReady (first frame rendered, shaders compiled)')
+                  setSceneReady(true)
+                }}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </div>
 
       {/* Text zone: default (mobile/tablet, below `lg`) keeps the original

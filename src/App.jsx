@@ -1,13 +1,11 @@
-import { lazy, Suspense, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
-import { useHeavyContentPreload } from './components/transitions/heavyContentGate'
-import { diag3d } from './lib/diag3d'
 // Every page (including Home) is its own lazy chunk, so visiting any one
 // route never downloads JS for routes the user hasn't navigated to yet —
 // this keeps non-public routes like /admin/login from paying for Home's
@@ -40,49 +38,6 @@ function RouteFallback() {
   )
 }
 
-// Starts downloading Hero3DScene's chunk (1.26MB raw / ~375KB gzip, by far
-// the heaviest single chunk on the site) the instant the "/" route is
-// requested AND the heavy-content PRELOAD gate is open (see
-// heavyContentGate.js's `useHeavyContentPreload` — deliberately the earlier
-// of its two gates: opens the moment the intro STARTS covering, not once it
-// finishes, since a background network fetch doesn't compete for the main
-// thread the way Building3DSection's actual Canvas/WebGL MOUNT does — that
-// one still waits for the later `useHeavyContentGate` signal). On every
-// other case (reduced motion, admin routes, intro already shown this
-// session) this gate is already open at mount, so the fetch fires
-// immediately, same as before this split existed. Still ahead of
-// Building3DSection's own lazy()+Suspense, which otherwise only fires once
-// Home has loaded AND mounted AND rendered down to that point, a fully
-// sequential waterfall. Needs to be a child of RouteTransitionProvider (not
-// a sibling, which is where this used to sit) to read either gate from
-// context at all. Scoped to the home route only — no other route pays for
-// any of this.
-//
-// Unconditional across every device — Building3DSection now mounts the
-// scene immediately once the intro gate opens, on every device (full
-// quality vs the Canvas-internal `lowPower` prop only changes RENDER
-// quality, never whether/when it mounts), so there's no later "weak
-// device" schedule left for a device-gated prefetch to stay ahead of.
-function HeroScenePrefetch() {
-  const { pathname } = useLocation()
-  const canPreloadHeavyContent = useHeavyContentPreload()
-  useEffect(() => {
-    if (pathname !== '/' || !canPreloadHeavyContent) return
-
-    diag3d('3D chunk prefetch requested')
-    // Fire-and-forget: Building3DSection's own lazy()+Suspense+ErrorBoundary
-    // is what actually handles a real failure (shows the "unavailable"
-    // placeholder) once it imports the same specifier later. This call just
-    // needs to not produce an unhandled promise rejection if the network
-    // request itself fails before that — it was doing exactly that before
-    // this .catch was added.
-    import('./components/3d/Hero3DScene')
-      .then(() => diag3d('3D chunk prefetch resolved'))
-      .catch((err) => diag3d('3D chunk prefetch failed (non-fatal, Building3DSection retries)', err?.message))
-  }, [pathname, canPreloadHeavyContent])
-  return null
-}
-
 // Persistent Header/Footer around every public page — kept as its own
 // layout route so the admin routes below can render without them.
 function PublicLayout() {
@@ -109,7 +64,6 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <RouteTransitionProvider>
-        <HeroScenePrefetch />
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Home />} />

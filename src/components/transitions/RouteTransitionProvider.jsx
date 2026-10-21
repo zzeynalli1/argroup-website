@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useReducedMotion } from 'framer-motion'
 import RouteTransitionOverlay from './RouteTransitionOverlay'
 import { LoadingSignalContext } from './routeLoadingSignal'
-import { HeavyContentGateContext, HeavyContentPreloadContext } from './heavyContentGate'
 import { diag3d } from '../../lib/diag3d'
 
 // Minimum time to stay in the "holding" phase (planes at rest) before a
@@ -66,42 +65,7 @@ export default function RouteTransitionProvider({ children }) {
   const [instant, setInstant] = useState(false)
   const [variant, setVariant] = useState('nav')
 
-  // Shared "does the intro definitely not need to play" check, used as the
-  // initial value for BOTH gates below — reduced motion, admin routes, or a
-  // repeat visit this session that already played the intro once. When
-  // none of those apply, both gates start closed and are opened explicitly
-  // later (preload earlier than mount — see each one's own comment).
-  function introDefinitelySkipped() {
-    if (reducedMotion) return true
-    if (typeof window === 'undefined') return true
-    if (window.location.pathname.startsWith('/admin')) return true
-    try {
-      return sessionStorage.getItem(SESSION_INTRO_KEY) === '1'
-    } catch {
-      return false
-    }
-  }
-
-  // Gates when it's safe to start MOUNTING heavy same-viewport content
-  // (today: just Building3DSection's Hero3DScene Canvas/WebGL) — see
-  // heavyContentGate.js's own comment for the full rationale. The ONLY case
-  // this starts closed is the genuine first-ever paint this session, where
-  // the intro effect below is about to actually play it. Opened by
-  // `handleOpenAnimationComplete` the moment that intro's reveal finishes
-  // (phase -> idle), never by any other transition's reveal.
-  const [heavyContentGateOpen, setHeavyContentGateOpen] = useState(introDefinitelySkipped)
-  // Earlier, separate gate for starting background DOWNLOADS only (the
-  // Hero3DScene chunk) — opened the instant the intro starts
-  // covering, not once it finishes, since a network fetch doesn't compete
-  // for the main thread the way mounting does. See heavyContentGate.js's
-  // `useHeavyContentPreload` for the full rationale.
-  const [heavyContentPreloadOpen, setHeavyContentPreloadOpen] = useState(introDefinitelySkipped)
-
   const phaseRef = useRef(phase)
-  const variantRef = useRef(variant)
-  useEffect(() => {
-    variantRef.current = variant
-  }, [variant])
   useEffect(() => {
     phaseRef.current = phase
     diag3d('transition phase ->', phase)
@@ -247,16 +211,6 @@ export default function RouteTransitionProvider({ children }) {
     if (phaseRef.current !== 'revealing') return
     diag3d('overlay unmount (revealing -> idle)')
     setPhase('idle')
-    // Only the intro's own reveal opens the heavy-content gate — a plain
-    // 'nav' transition's reveal finishing has no bearing on it (see
-    // `heavyContentGateOpen`'s own comment: it's only ever closed for the
-    // genuine first-paint intro case to begin with, so this is a no-op via
-    // setState-to-same-value for every other transition anyway, but the
-    // variant check keeps the intent explicit rather than relying on that).
-    if (variantRef.current === 'intro') {
-      diag3d('intro revealed — opening heavy-content gate')
-      setHeavyContentGateOpen(true)
-    }
   }, [])
 
   // Watchdogs for the two animation-callback-dependent phases — see
@@ -323,11 +277,6 @@ export default function RouteTransitionProvider({ children }) {
       setInstant(false)
       setVariant('intro')
       setPhase('covering')
-      // The intro is now definitely playing — safe to start background
-      // downloads (not mounts) immediately, well before its reveal
-      // finishes. See heavyContentPreloadOpen's own comment.
-      diag3d('intro starting — opening heavy-content preload gate')
-      setHeavyContentPreloadOpen(true)
     })
     return () => cancelAnimationFrame(raf)
   }, [])
@@ -337,11 +286,7 @@ export default function RouteTransitionProvider({ children }) {
 
   return (
     <LoadingSignalContext.Provider value={loadingSignal}>
-      <HeavyContentPreloadContext.Provider value={heavyContentPreloadOpen}>
-        <HeavyContentGateContext.Provider value={heavyContentGateOpen}>
-          {children}
-        </HeavyContentGateContext.Provider>
-      </HeavyContentPreloadContext.Provider>
+      {children}
       {active && (
         <RouteTransitionOverlay
           covered={covered}
