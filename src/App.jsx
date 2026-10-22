@@ -6,7 +6,6 @@ import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
-import { detectLowPower } from './lib/deviceCapability'
 import { prefetchHeroHdri } from './lib/heroHdri'
 // Every page (including Home) is its own lazy chunk, so visiting any one
 // route never downloads JS for routes the user hasn't navigated to yet —
@@ -53,16 +52,14 @@ function RouteFallback() {
 // lazy()+Suspense import of Hero3DScene is one full network round-trip
 // later than this. Fire-and-forget — a real failure is handled later by
 // Building3DSection's own lazy()+Suspense+ErrorBoundary when it imports the
-// same chunk/asset for real. HDRI fetch itself is skipped on mobile/weak
-// hardware (`detectLowPower`) — see main.jsx's own comment on why.
+// same chunk/asset for real. HDRI fetch is unconditional, even on mobile/
+// lowPower — see main.jsx's own comment on why.
 function HeroScenePrefetch() {
   const { pathname } = useLocation()
   useEffect(() => {
     if (pathname !== '/') return
     import('./components/3d/Hero3DScene').catch(() => {})
-    if (!detectLowPower()) {
-      prefetchHeroHdri().catch(() => {})
-    }
+    prefetchHeroHdri().catch(() => {})
   }, [pathname])
   return null
 }

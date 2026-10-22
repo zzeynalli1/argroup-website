@@ -919,7 +919,7 @@ function StaticShadowMap() {
 // the composer in later used to shave the FIRST frame's compile cost by
 // deferring its ~6 extra shader programs a couple of frames past the base
 // scene's own first paint — but that meant the poster faded out to reveal
-// an un-graded frame (no AGX tone mapping, no Bloom/N8AO) for a beat before
+// an un-graded frame (no AGX tone mapping, no Bloom) for a beat before
 // the graded look popped in a frame or two later, a visible double color
 // shift. Compiling everything together costs a longer wait behind the
 // poster instead of a shorter one followed by a visible pop — the explicit
@@ -937,7 +937,7 @@ function StaticShadowMap() {
 // place. Loading the HDRI first and only then starting `compileAsync`
 // means every program compiles ONCE, already in its final envMap-aware
 // form.
-function ReadySignal({ onReady, lowPower }) {
+function ReadySignal({ onReady }) {
   const { gl, scene, camera, invalidate } = useThree()
   const compileStartedRef = useRef(false)
   const compileDoneRef = useRef(false)
@@ -968,24 +968,11 @@ function ReadySignal({ onReady, lowPower }) {
       })
     }
 
-    // Mobile/weak-hardware scenes never request the HDRI at all (see
-    // main.jsx/App.jsx's own `detectLowPower`-gated prefetch skip) — asking
-    // for it here anyway would just start the fetch late, on the one class
-    // of device least able to afford it. Compiles/reveals immediately with
-    // no env map, same as the timeout path below.
-    if (lowPower) {
-      diag3d('3D HDRI load skipped — lowPower')
-      startCompile('lowPower, no env map')
-      return () => {
-        unmounted = true
-        pmrem.dispose()
-        if (scene.environment) {
-          scene.environment.dispose()
-          scene.environment = null
-        }
-      }
-    }
-
+    // Loaded on EVERY device, including `lowPower`/mobile — the file is
+    // small and fetched at most once (see lib/heroHdri.js's shared cache),
+    // and without it `lowPower` scenes render with a flat/grey env map-less
+    // look. `lowPower` only skips the EXPENSIVE stuff: post-processing,
+    // shadows, ContactShadows (see the lowPower-gated JSX below).
     // Safety valve: a slow/unreachable HDRI must never block the scene
     // forever — compile and reveal without it once this fires. If the file
     // DOES still arrive after that (rare — only on a genuinely slow/
@@ -1024,7 +1011,7 @@ function ReadySignal({ onReady, lowPower }) {
         scene.environment = null
       }
     }
-  }, [gl, scene, camera, invalidate, lowPower])
+  }, [gl, scene, camera, invalidate])
   /* eslint-enable react-hooks/immutability */
 
   useFrame(() => {
@@ -1033,7 +1020,7 @@ function ReadySignal({ onReady, lowPower }) {
     // `invalidate()` to request the frame that will see this true, so no
     // polling/re-invalidating is needed here while it's still false. The
     // render that follows this same tick is also where EffectComposer's own
-    // passes (N8AO/Bloom/ToneMapping/etc., mounted unconditionally alongside
+    // passes (Bloom/ToneMapping/etc., mounted unconditionally alongside
     // the scene now, not gated behind a later flag) synchronously compile/
     // link on their own first use — `onReady` firing here still means
     // "nothing left to visibly pop in later", that compile just now happens
@@ -1351,29 +1338,10 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // to key off. <EffectComposer>/<ContactShadows> mount unconditionally
   // alongside everything else now (no separate staged flag) — see
   // ReadySignal's own comment on why: `onReady`/`sceneReady` firing already
-  // means the composer's own TONE-MAPPING/grade passes are compiled too,
-  // since they're part of the same first blocking render. N8AO/Bloom are a
-  // separate, later-staged concern — see `heavyFxReady` below.
+  // means the WHOLE composer (Bloom/ToneMapping/grade passes — N8AO was
+  // removed, see PostProcessingEffects.jsx) is compiled too, since it's all
+  // part of the same first blocking render. No later-staged second mount.
   const [sceneReady, setSceneReady] = useState(false)
-  // N8AO + Bloom specifically (not the rest of the composer, see
-  // `heavyFxReady`'s own gate on the JSX below) stay staged behind a short
-  // delay past `sceneReady`, same 2-rAF pattern this scene used to apply to
-  // the ENTIRE composer. Measured cause: under software-rendered WebGL
-  // (confirmed via this scene's own CPU profiling — no real GPU driver,
-  // `KHR_parallel_shader_compile` unsupported), N8AO's SSAO shader alone
-  // turned a sub-4s first frame into a 30s+ one; Bloom adds a smaller but
-  // real amount on top. Neither pass changes the image's base color/tone
-  // the way ToneMapping/BrightnessContrast/HueSaturation do (see the bug
-  // this whole restructure fixes: a visible double color-pop from THOSE
-  // specific passes popping in late) — AO/bloom are localized refinements
-  // (contact shadow in tight corners, a soft highlight bloom on already-
-  // bright specular hits), not a tone/color-space change, so popping in a
-  // couple of frames after the poster has already faded out reads as the
-  // render settling in, not as a wrong-then-corrected image the way the
-  // original bug did. Skipped entirely (stays false forever) on mobile and
-  // lowPower — see the JSX gate below, which already drops both passes
-  // there regardless of this flag.
-  const [heavyFxReady, setHeavyFxReady] = useState(false)
   // Holds R3F's own `invalidate` once `CameraRig` (a Canvas child) captures
   // it — see that component's own comment on why this indirection exists:
   // under `frameloop="demand"`, the functions below (plain closures, called
@@ -1432,31 +1400,6 @@ const Hero3DScene = forwardRef(function Hero3DScene(
 
   useImperativeHandle(ref, () => ({ resetCamera, selectHotspot: selectHotspotByKey }))
 
-  // Stages N8AO/Bloom in 2 rAFs after the rest of the scene (including the
-  // composer's own tone-mapping/grade passes) is already on screen — see
-  // `heavyFxReady`'s own comment above for why only these two passes stay
-  // deferred. Plain `window.requestAnimationFrame`, not R3F's `useFrame`:
-  // this runs outside the Canvas/R3F tree (same reasoning as `zoomBy`/
-  // `selectHotspot` above needing `invalidateRef`), and R3F auto-invalidates
-  // `frameloop="demand"` on its own whenever a committed prop/children
-  // change touches the scene graph, so no manual `invalidate()` call is
-  // needed here once `heavyFxReady` flips and N8AO/Bloom mount below.
-  useEffect(() => {
-    if (!sceneReady || isMobile || lowPower) return undefined
-    let raf1 = 0
-    let raf2 = 0
-    raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => {
-        diag3d('3D N8AO/Bloom mounting (deferred, heavier shader compile starts now)')
-        setHeavyFxReady(true)
-      })
-    })
-    return () => {
-      cancelAnimationFrame(raf1)
-      cancelAnimationFrame(raf2)
-    }
-  }, [sceneReady, isMobile, lowPower])
-
   // Groups (components/3d/groups) are what actually highlight/dim — resolved
   // here from the hotspot's own `group` field rather than passed straight
   // through as the raw hotspot key, so a future hotspot whose `group`
@@ -1512,9 +1455,9 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         // — see its own comment) all explicitly call `invalidate()` only
         // while/as often as they actually need a new frame, so an idle,
         // non-interacting scene renders nothing further once everything
-        // settles, instead of burning a full GPU frame (scene + N8AO +
-        // Bloom + shadow/contact-shadow passes) 60 times a second for no
-        // visible change.
+        // settles, instead of burning a full GPU frame (scene + Bloom +
+        // shadow/contact-shadow passes) 60 times a second for no visible
+        // change.
         frameloop={active ? 'demand' : 'never'}
         // `antialias` off deliberately: once `<EffectComposer>` is mounted,
         // the 3D scene is rendered into the composer's own render target,
@@ -1552,7 +1495,6 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         }}
       >
         <ReadySignal
-          lowPower={lowPower}
           onReady={() => {
             diag3d('3D scene onReady (first frame rendered, shaders compiled)')
             onReady?.()
@@ -1663,7 +1605,11 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         {!lowPower && !isMobile && (
           <ContactShadows
             position={[0, -0.01, 0]}
-            opacity={0.6}
+            // Bumped from 0.6 — a cheap, same-cost compensation for the
+            // removed N8AO pass's small-connection contact shadowing (see
+            // PostProcessingEffects.jsx), not a new effect: same single-bake
+            // blur pass, just a touch darker.
+            opacity={0.72}
             scale={14}
             blur={2.2}
             far={4.2}
@@ -1745,13 +1691,13 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         <HotspotProgramDiag activeKey={activeKey} />
 
         {/* Post-processing pipeline — see PostProcessingEffects.jsx for the
-            pass-by-pass breakdown (N8AO/Bloom/ToneMapping(AGX)/
+            pass-by-pass breakdown (Bloom/ToneMapping(AGX)/
             BrightnessContrast/HueSaturation/Vignette) and why it's split
             into its own lazy chunk. Never rendered (and therefore never
             downloaded) on `lowPower`. */}
         {!lowPower && (
           <Suspense fallback={null}>
-            <PostProcessingEffects isMobile={isMobile} heavyFxReady={heavyFxReady} />
+            <PostProcessingEffects isMobile={isMobile} />
           </Suspense>
         )}
       </Canvas>
