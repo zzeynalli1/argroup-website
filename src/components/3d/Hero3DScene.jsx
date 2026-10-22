@@ -1,4 +1,14 @@
-import { forwardRef, lazy, Suspense, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Billboard, ContactShadows, Html, OrbitControls } from '@react-three/drei'
 import { RGBELoader } from 'three-stdlib'
@@ -332,6 +342,16 @@ function GradientBackdrop() {
 // isolated Suspense this scene can silently resolve behind).
 const HDRI_TIMEOUT_MS = 4000
 const HDRI_ENV_INTENSITY = 1.15
+// How many full real R3F frames to render, hidden (canvas still opacity 0),
+// before calling `onReady` — see `ReadySignal`'s own comment on why this
+// exists: `gl.compileAsync` only compiles the base SCENE materials.
+// EffectComposer's passes, the shadow-depth materials, and ContactShadows'
+// own blur materials all compile synchronously on their own first real use,
+// which otherwise happened on the very frame the canvas was revealed. 2
+// warm-up frames (not 1) gives ContactShadows' one-shot bake (`frames={1}`)
+// and the shadow map's own first depth pass room to fully settle before
+// anything is shown.
+const WARMUP_FRAME_COUNT = 2
 
 // Module-scope cache (not component state): the decoded HDR
 // `THREE.DataTexture` behind `scene.environment` is identical across every
@@ -914,16 +934,11 @@ function StaticShadowMap() {
 // Post-processing (EffectComposer/ContactShadows below) is no longer staged
 // behind a later `postFxReady` flip — it mounts together with everything
 // else in this Canvas from the very first render, so there is only ever ONE
-// visible look: `onReady` (and therefore Building3DSection's poster
-// crossfade) waits for this same first-real-frame tick regardless. Staging
-// the composer in later used to shave the FIRST frame's compile cost by
-// deferring its ~6 extra shader programs a couple of frames past the base
-// scene's own first paint — but that meant the poster faded out to reveal
-// an un-graded frame (no AGX tone mapping, no Bloom) for a beat before
-// the graded look popped in a frame or two later, a visible double color
-// shift. Compiling everything together costs a longer wait behind the
-// poster instead of a shorter one followed by a visible pop — the explicit
-// trade this scene now makes.
+// visible look, never a later color-grade pop-in. It's still not compiled by
+// `gl.compileAsync` itself (that call only covers the base scene's own
+// materials) — see `ReadySignal`'s own `useFrame`/`WARMUP_FRAME_COUNT` below
+// for how its first-use compile is forced to happen BEFORE `onReady` fires,
+// while the canvas is still hidden, instead of on the reveal frame itself.
 //
 // HDRI loading is handled HERE too, BEFORE `gl.compileAsync` is ever
 // called — not as a separate component racing it independently. Measured
@@ -937,11 +952,12 @@ function StaticShadowMap() {
 // place. Loading the HDRI first and only then starting `compileAsync`
 // means every program compiles ONCE, already in its final envMap-aware
 // form.
-function ReadySignal({ onReady }) {
+function ReadySignal({ onReady, composerReady }) {
   const { gl, scene, camera, invalidate } = useThree()
   const compileStartedRef = useRef(false)
   const compileDoneRef = useRef(false)
   const firstFrameLoggedRef = useRef(false)
+  const warmupFramesRef = useRef(0)
 
   // `scene` is the standard R3F imperative escape hatch (same convention as
   // GradientBackdrop's `scene.background` above) — safe to mutate directly.
@@ -1018,17 +1034,42 @@ function ReadySignal({ onReady }) {
     // Wait for the compile above to actually resolve before treating any
     // rendered frame as "ready" — the compile's own `.then()` is what calls
     // `invalidate()` to request the frame that will see this true, so no
-    // polling/re-invalidating is needed here while it's still false. The
-    // render that follows this same tick is also where EffectComposer's own
-    // passes (Bloom/ToneMapping/etc., mounted unconditionally alongside
-    // the scene now, not gated behind a later flag) synchronously compile/
-    // link on their own first use — `onReady` firing here still means
-    // "nothing left to visibly pop in later", that compile just now happens
-    // to land inside the same blocking frame instead of a follow-up one.
+    // polling/re-invalidating is needed here while it's still false.
     if (!compileDoneRef.current) return
     if (firstFrameLoggedRef.current) return
+    // Composer chunk/mount may still be in flight (see PostProcessingEffects
+    // own comment on `onMount`) — a later commit that mounts it auto-
+    // invalidates this frameloop on its own, so nothing to schedule here;
+    // just wait.
+    if (!composerReady) return
+
+    // `gl.compileAsync` above only compiles the base SCENE's materials.
+    // EffectComposer's own passes (Bloom/ToneMapping/etc.), the shadow-depth
+    // materials, and ContactShadows' blur materials all still compile
+    // SYNCHRONOUSLY on their own first real use — which happens later in
+    // THIS SAME tick (this callback runs at default priority, before
+    // EffectComposer's own higher-priority render callback actually draws
+    // the frame). Rather than let that first-time compile land on the frame
+    // that reveals the canvas (the original freeze this fixes), render
+    // `WARMUP_FRAME_COUNT` full real frames first, HIDDEN (canvas is still
+    // opacity 0 — Building3DSection only flips it once `onReady` fires
+    // below), and only call `onReady` once they're done.
+    warmupFramesRef.current += 1
+    const framesRemaining = WARMUP_FRAME_COUNT - warmupFramesRef.current
+    if (framesRemaining > 0) {
+      diag3d(`3D warm-up frame ${warmupFramesRef.current}/${WARMUP_FRAME_COUNT} rendering (hidden — composer/shadows/ContactShadows compiling)`)
+      // Plain `requestAnimationFrame`, not `invalidate()` directly: this
+      // tick's own render (including the heavy compile work below this
+      // callback) has to actually finish executing — a synchronous JS task —
+      // before the next one starts, so the next warm-up frame has to be
+      // requested from a LATER browser animation-frame callback, not from
+      // later in this same one.
+      window.requestAnimationFrame(() => invalidate())
+      return
+    }
+
     firstFrameLoggedRef.current = true
-    diag3d('3D first real frame rendered (building/lights/hotspots/post-fx on screen)')
+    diag3d('3D warm-up complete — revealing (first visible frame should be cheap)')
     onReady?.()
   })
 
@@ -1342,6 +1383,22 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // removed, see PostProcessingEffects.jsx) is compiled too, since it's all
   // part of the same first blocking render. No later-staged second mount.
   const [sceneReady, setSceneReady] = useState(false)
+  // Whether the (lazy-loaded, see PostProcessingEffects.jsx) composer has
+  // actually mounted into the scene graph yet — `ReadySignal`'s warm-up
+  // frames (below) wait on this too, not just `gl.compileAsync`, since that
+  // chunk's own `import()` can still be in flight when compileAsync
+  // resolves. Always already "ready" on `lowPower`, which never mounts a
+  // composer at all.
+  const [composerMounted, setComposerMounted] = useState(false)
+  // Stable reference (empty deps) — PostProcessingEffects' own effect that
+  // calls this depends on it; an inline arrow recreated every render would
+  // have a NEW identity each time Hero3DScene re-renders for ANY reason
+  // (e.g. the very `setComposerMounted` call below), re-firing that effect
+  // and calling this again on a loop instead of exactly once on real mount.
+  const handleComposerMount = useCallback(() => {
+    diag3d('3D composer (PostProcessingEffects) mounted')
+    setComposerMounted(true)
+  }, [])
   // Holds R3F's own `invalidate` once `CameraRig` (a Canvas child) captures
   // it — see that component's own comment on why this indirection exists:
   // under `frameloop="demand"`, the functions below (plain closures, called
@@ -1495,6 +1552,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         }}
       >
         <ReadySignal
+          composerReady={lowPower || composerMounted}
           onReady={() => {
             diag3d('3D scene onReady (first frame rendered, shaders compiled)')
             onReady?.()
@@ -1697,7 +1755,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
             downloaded) on `lowPower`. */}
         {!lowPower && (
           <Suspense fallback={null}>
-            <PostProcessingEffects isMobile={isMobile} />
+            <PostProcessingEffects isMobile={isMobile} onMount={handleComposerMount} />
           </Suspense>
         )}
       </Canvas>

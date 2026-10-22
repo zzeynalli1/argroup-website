@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   Bloom,
   BrightnessContrast,
@@ -44,7 +45,19 @@ import { ToneMappingMode } from 'postprocessing'
  * the canvas's own framebuffer once this is mounted) — 2 on desktop, 0 on
  * mobile.
  */
-export default function PostProcessingEffects({ isMobile }) {
+export default function PostProcessingEffects({ isMobile, onMount }) {
+  // This whole component is itself behind `lazy()`+`Suspense` (see the file
+  // comment above) — its chunk can still be in flight when
+  // `gl.compileAsync` resolves, so Hero3DScene's `ReadySignal` needs an
+  // explicit signal for "the composer object now actually exists in the
+  // scene graph" rather than assuming it's already there once compileAsync
+  // is done. Without this, the hidden warm-up frames ReadySignal renders
+  // could all happen BEFORE this chunk resolves, missing the composer's own
+  // first-use compile entirely and pushing it onto the reveal frame anyway.
+  useEffect(() => {
+    onMount?.()
+  }, [onMount])
+
   return (
     <EffectComposer multisampling={isMobile ? 0 : 2}>
       {!isMobile ? (
