@@ -43,25 +43,18 @@ function InfoPanel({ hotspot, t, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.25 }}
-      // Mobile (<md): true bottom sheet — capped at 38svh (was 60svh, which
-      // on the stacked mobile layout's own 45svh 3D area meant the sheet's
-      // TOP edge sat above the 3D area's own top, fully hiding the
-      // building the user just tapped a hotspot on — see
-      // Building3DSection's own 3D-area height above). 38svh instead leaves
-      // roughly the top half of the building visible above the sheet.
-      // Translucent + blurred (vs. the md+ panel's solid bg) so even the
-      // covered lower portion still reads as "the building is behind this,"
-      // not "the building is gone" — reset back to solid/unblurred at `md`+
-      // where the panel floats beside the full-bleed scene instead of
-      // overlaying it. Bottom padding clears Safari's own bottom chrome via
-      // `env(safe-area-inset-bottom)`. `md:` and up: unchanged, the
-      // existing right-side floating panel.
-      className="fixed inset-x-0 bottom-0 z-50 max-h-[38svh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-industrial-950/92 backdrop-blur-md px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 md:absolute md:inset-x-auto md:top-6 md:right-6 md:max-h-[calc(100vh-3rem)] md:w-80 md:rounded-2xl md:border md:bg-industrial-950 md:px-6 md:py-6 md:backdrop-blur-none"
+      // Below `md`: a normal, in-flow content block directly below the 3D
+      // area (not a fixed overlay/bottom-sheet) — a fixed sheet here used to
+      // sit on TOP of the building (its own height easily exceeded the 3D
+      // area's ~45svh), fully hiding the model the user just tapped a
+      // hotspot on. In-flow instead, the model stays completely unobstructed
+      // above; Building3DSection scrolls this panel into view once it mounts
+      // (see that component's own effect) rather than covering the model to
+      // bring the text to it. Bottom padding clears Safari's own bottom
+      // chrome via `env(safe-area-inset-bottom)`. `md:` and up: unchanged,
+      // the original right-side floating overlay panel.
+      className="relative z-10 border-t border-white/10 bg-industrial-950 px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6 md:absolute md:inset-x-auto md:top-6 md:right-6 md:z-50 md:max-h-[calc(100vh-3rem)] md:w-80 md:overflow-y-auto md:rounded-2xl md:border md:px-6 md:py-6"
     >
-      {/* Drag-handle bar — bottom-sheet-only affordance, hidden on the `md`+
-          floating panel. */}
-      <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-white/20 md:hidden" />
-
       <button
         type="button"
         onClick={onClose}
@@ -97,6 +90,7 @@ export default function Building3DSection() {
   const { t } = useTranslation('home')
   const sceneRef = useRef(null)
   const sectionRef = useRef(null)
+  const threeDAreaRef = useRef(null)
   const [active, setActive] = useState(null)
   // Real measured <header> height (see hooks/useHeaderHeight.js) — null
   // until the first measurement lands, in which case the mobile text
@@ -204,9 +198,38 @@ export default function Building3DSection() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [])
 
+  // Below `md` (the same breakpoint InfoPanel's own in-flow-vs-floating
+  // styles switch on), the panel now renders directly below the 3D area
+  // instead of overlaying it (see InfoPanel's own comment on why) — so
+  // selecting a hotspot there needs an explicit scroll to actually bring the
+  // panel on screen, since nothing moves the viewport on its own once new
+  // content appears further down the page. Scrolls the 3D AREA (not the
+  // panel) to the top of the viewport — deliberately, not
+  // `panelRef.current.scrollIntoView`: that aligned the PANEL's own top to
+  // the viewport top, which (since the panel sits below the 3D area) pushed
+  // the entire ~45svh-tall model off-screen above the fold — the opposite of
+  // the goal. The 3D area is always shorter than the viewport, so scrolling
+  // IT to the top keeps the whole model on screen while leaving whatever
+  // viewport height remains below it to reveal the panel (fully or
+  // partially, depending on description length — scrollable either way).
+  // `md`+ keeps the original floating overlay (no scroll needed, nothing to
+  // bring into view). A plain `window.innerWidth` check rather than a
+  // resize-aware hook: this only needs to be right at the moment a hotspot
+  // is tapped, not kept in sync continuously.
+  useEffect(() => {
+    if (!active || typeof window === 'undefined' || window.innerWidth >= 768) return
+    const id = window.setTimeout(() => {
+      threeDAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
+    return () => window.clearTimeout(id)
+  }, [active])
+
   function handleClose() {
     sceneRef.current?.resetCamera()
     setActive(null)
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      threeDAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   useEffect(() => {
@@ -279,6 +302,7 @@ export default function Building3DSection() {
           unchanged, `absolute inset-0` filling the whole section as
           before. */}
       <div
+        ref={threeDAreaRef}
         className="relative h-[45svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto lg:w-auto"
         style={{ touchAction: 'pan-y' }}
       >
@@ -360,6 +384,15 @@ export default function Building3DSection() {
         )}
       </div>
 
+      {/* Mobile/tablet (<md) in-flow info panel — rendered here, directly
+          below the 3D area, so an open hotspot's text never covers the
+          model (see InfoPanel's own comment). `md`+ renders nothing extra
+          here visually (InfoPanel switches to its own `md:absolute`
+          floating position at that breakpoint, so its DOM position stops
+          mattering) — kept as a single shared instance rather than two
+          separate renders so there's only ever one InfoPanel mounted. */}
+      <AnimatePresence>{active && <InfoPanel key={active.key} hotspot={active} t={t} onClose={handleClose} />}</AnimatePresence>
+
       {/* Desktop (`lg`+) text zone — unchanged from before: a left-anchored
           ~30-35%-wide column, vertically centered, absolutely overlaid over
           the canvas, leaving the right side clear for the building once
@@ -401,6 +434,10 @@ export default function Building3DSection() {
         </p>
       )}
 
+      {/* Dims the page behind the floating panel — `md`+ only. Below `md`
+          the panel is a normal in-flow block beside the (fully visible,
+          unobstructed) model, not a modal overlay, so there is nothing here
+          that needs dimming/click-outside-to-close. */}
       <AnimatePresence>
         {active && (
           <motion.div
@@ -409,15 +446,9 @@ export default function Building3DSection() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-industrial-950/60"
+            className="fixed inset-0 z-40 hidden bg-industrial-950/60 md:block"
             onClick={handleClose}
           />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {active && (
-          <InfoPanel key={active.key} hotspot={active} t={t} onClose={handleClose} />
         )}
       </AnimatePresence>
     </section>
