@@ -74,6 +74,40 @@ body {
   }
 }
 
+/* Hero3DScene's mobile hotspot marker — a continuous "tappable" cue (the
+   ember ring expands and fades, 2s, infinite) implemented as pure CSS
+   (transform: scale + opacity only) so it runs on the compositor thread
+   instead of costing a WebGL redraw every frame — see Hero3DScene.jsx's
+   `Hotspot` component, which gates this behind `isMobile` and skips it
+   entirely once a hotspot is selected (a static, brighter ring takes over
+   there instead) or `prefers-reduced-motion` is set. */
+@keyframes hotspot-ring-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .animate-hotspot-ring {
+    animation: hotspot-ring-pulse 2s ease-out infinite;
+  }
+}
+
+/* Belt-and-suspenders alongside the JS `prefersReducedMotion` gate above —
+   this component is already skipped from the JSX in that case, but a plain
+   CSS-level override keeps the guarantee even if that prop/render path ever
+   changes without this media query being revisited. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-hotspot-ring {
+    animation: none;
+  }
+}
+
 /* Process's horizontal scroller — native scrollbar hidden since the row
    already has its own visible connector-line/dot affordance. */
 @layer utilities {

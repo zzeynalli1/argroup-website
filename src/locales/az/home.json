@@ -33,6 +33,7 @@
     "subtitle": "Tikintidə tətbiq olunan mühəndislik həllərini interaktiv model üzərində araşdırın.",
     "unavailable": "3D model hazırda əlçatan deyil.",
     "hint": "Sistemi araşdırmaq üçün qırmızı nöqtəyə klikləyin",
+    "hintTouch": "Sistemi araşdırmaq üçün qırmızı nöqtəyə toxunun",
     "zoomIn": "Yaxınlaşdır",
     "zoomOut": "Uzaqlaşdır",
     "panel": {

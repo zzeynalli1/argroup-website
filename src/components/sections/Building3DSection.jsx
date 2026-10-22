@@ -6,6 +6,7 @@ import { useTranslation } from '../../lib/i18n/useTranslation'
 import ErrorBoundary from '../ui/ErrorBoundary'
 import { detectLowPower } from '../../lib/deviceCapability'
 import { diag3d } from '../../lib/diag3d'
+import { useHeaderHeight } from '../../hooks/useHeaderHeight'
 
 // Three.js only loads once this section is actually rendered, keeping it out
 // of the initial bundle (see CLAUDE.md perf note on the earlier 1.37MB hero).
@@ -89,6 +90,10 @@ export default function Building3DSection() {
   const sceneRef = useRef(null)
   const sectionRef = useRef(null)
   const [active, setActive] = useState(null)
+  // Real measured <header> height (see hooks/useHeaderHeight.js) — null
+  // until the first measurement lands, in which case the mobile text
+  // block's fallback Tailwind class (below) covers that one frame.
+  const headerHeight = useHeaderHeight()
   // Starts `true` so the very first mount (before the observer's first
   // callback has had a chance to fire) never freezes the scene — the Home
   // hero section is at/near the top of the page anyway, so this is correct
@@ -231,22 +236,44 @@ export default function Building3DSection() {
           own safe-area inset, so the heading never starts under the header
           OR a notch. Hidden entirely from `lg` up, where the original
           absolute-overlay text block (below) takes over. */}
-      <div className="relative z-10 bg-industrial-950 px-6 pb-6 pt-[calc(136px+env(safe-area-inset-top))] lg:hidden">
+      <div
+        className="relative z-10 bg-industrial-950 px-6 pb-3 pt-[calc(136px+env(safe-area-inset-top))] lg:hidden"
+        // Overrides the Tailwind fallback above once the real header height
+        // is measured (see useHeaderHeight) — inline style always wins over
+        // a class selector regardless of specificity, so this is safe to
+        // set unconditionally once non-null without fighting the class.
+        style={
+          headerHeight != null
+            ? { paddingTop: `calc(${headerHeight}px + 32px + env(safe-area-inset-top))` }
+            : undefined
+        }
+      >
         <span className="block h-1 w-16 bg-ember-600" />
-        <h1 className="mt-6 font-heading text-3xl font-bold text-base-50">
+        {/* Tighter than the lg+ overlay heading below (text-2xl/mt-4 here
+            vs text-3xl+/mt-6 there) — this stacked mobile layout has to fit
+            header-clearance + this block + the 3D area within a single
+            Safari "small viewport" screen (no scroll) on real phones, see
+            the hint below; the lg+ column has no such budget constraint. */}
+        <h1 className="mt-3 font-heading text-xl font-bold text-base-50">
           {t('building3d.titleLine1')}
           <br />
           <span className="text-ember-600">{t('building3d.titleLine2')}</span>
         </h1>
-        <p className="mt-4 text-neutral-custom-400">{t('building3d.subtitle')}</p>
+        <p className="mt-1 text-xs text-neutral-custom-400">{t('building3d.subtitle')}</p>
       </div>
 
-      {/* 3D area. Mobile: a fixed ~60svh band (not the full viewport) in
+      {/* 3D area. Mobile: a fixed ~50svh band (not the full viewport) in
           normal flow, so the text above and the hint below both get their
-          own real space instead of floating over the canvas. `lg`+:
+          own real space instead of floating over the canvas — sized so
+          header-clearance + the tightened text block above + this band fit
+          within a single Safari "small viewport" screen (no scroll needed)
+          on both iPhone SE and iPhone 13, verified via Playwright. `lg`+:
           unchanged, `absolute inset-0` filling the whole section as
           before. */}
-      <div className="relative h-[60svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto lg:w-auto">
+      <div
+        className="relative h-[45svh] w-full shrink-0 lg:absolute lg:inset-0 lg:h-auto lg:w-auto"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Soft fade from the text block's own dark bg into the scene —
             mobile only; `lg`+ has no text block directly above this area
             (it's an absolute overlay instead), so there's nothing to blend
@@ -273,7 +300,7 @@ export default function Building3DSection() {
             unmount this whole page, not just the 3D scene. */}
         <div
           className="absolute inset-0 transition-opacity duration-700 ease-out"
-          style={{ opacity: sceneReady ? 1 : 0 }}
+          style={{ opacity: sceneReady ? 1 : 0, touchAction: 'pan-y' }}
         >
           <ErrorBoundary
             // Treated the same as "ready" for crossfade/theme-swap purposes
@@ -305,17 +332,25 @@ export default function Building3DSection() {
             </Suspense>
           </ErrorBoundary>
         </div>
-      </div>
 
-      {/* Mobile hint — in normal flow, below the 3D area (not overlaid on
-          top of it), with bottom padding clearing Safari's own chrome via
-          `env(safe-area-inset-bottom)`. Hidden from `lg` up, where the
-          original overlaid pill (further below) takes over. */}
-      {sceneReady && !active && (
-        <p className="px-6 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 text-center text-xs text-neutral-custom-400 lg:hidden">
-          {t('building3d.hint')}
-        </p>
-      )}
+        {/* Mobile hint — absolutely positioned INSIDE the 3D area itself
+            (not below it in normal flow, where it previously landed below
+            the fold behind Safari's own bottom chrome before that chrome
+            collapses on scroll) and anchored off the real bottom safe-area
+            inset rather than fixed padding, so it stays clear of Safari's
+            bottom bar on iPhones with a home indicator. `pointer-events-none`
+            since it overlays the canvas — must never swallow a touch meant
+            for the scene/hotspots underneath. Hidden from `lg` up, where the
+            original overlaid pill (further below) takes over. */}
+        {sceneReady && !active && (
+          <p
+            className="pointer-events-none absolute inset-x-0 z-20 px-6 text-center text-xs text-neutral-custom-400 lg:hidden"
+            style={{ bottom: 'calc(16px + env(safe-area-inset-bottom))' }}
+          >
+            {t('building3d.hintTouch')}
+          </p>
+        )}
+      </div>
 
       {/* Desktop (`lg`+) text zone — unchanged from before: a left-anchored
           ~30-35%-wide column, vertically centered, absolutely overlaid over

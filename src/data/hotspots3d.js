@@ -142,5 +142,15 @@ export const hotspots = [
 // the NARROW preset's distance from its target.
 export const DEFAULT_CAMERA_POSITION = [4.95, 3.45, 9.62]
 export const DEFAULT_CAMERA_TARGET = [-1.4, 1.65, 0.2]
-export const NARROW_CAMERA_POSITION = [8.54, 4.32, 14.94]
+// Pulled 20% closer to NARROW_CAMERA_TARGET than the originally-solved
+// bounding-box fit (was [8.54, 4.32, 14.94]) — a deliberate closer-than-
+// "technically fits" framing for mobile/tablet (the only layout that uses
+// this preset, isPortraitAspect < 1.15), so the building reads larger
+// (~60-70% of the canvas width instead of ~50-55%) on those smaller screens
+// instead of floating in the middle of extra margin. Pure scale-toward-
+// target along the same ray, so the building stays exactly as vertically
+// centered as before and nothing new clips (still comfortably inside the
+// original bounding-box-fit frame, just magnified) — new resting distance
+// ≈14.4, still well under OrbitControls' maxDistance (19.5 below).
+export const NARROW_CAMERA_POSITION = [6.55, 3.76, 11.99]
 export const NARROW_CAMERA_TARGET = [-1.4, 1.5, 0.2]

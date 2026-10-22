@@ -33,6 +33,7 @@
     "subtitle": "İnşaatta uygulanan mühendislik çözümlerini interaktif model üzerinde inceleyin.",
     "unavailable": "3D model şu anda kullanılamıyor.",
     "hint": "Sistemi incelemek için kırmızı noktaya tıklayın",
+    "hintTouch": "Sistemi incelemek için kırmızı noktaya dokunun",
     "zoomIn": "Yakınlaştır",
     "zoomOut": "Uzaklaştır",
     "panel": {

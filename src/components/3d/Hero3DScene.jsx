@@ -734,18 +734,57 @@ function Hotspot({ hotspot, isActive, isHovered, anyActive, onHover, onSelect, p
         </mesh>
       </group>
 
+      {isMobile && (
+        // Separate Html layer, deliberately WITHOUT `distanceFactor` (unlike
+        // the one below) — `distanceFactor` scales its content to simulate
+        // perspective shrink-with-distance, which is what made an earlier
+        // version of this mobile dot measure ~9px on screen instead of its
+        // intended ~14px (it was nested inside the `distanceFactor={8}` Html
+        // below, whose scale varies per hotspot's own distance from the
+        // resting camera). Omitting it here makes this a flat screen-space
+        // overlay at a literal, constant CSS size regardless of distance —
+        // the "görünən nöqtə ~14px" touch target the design calls for.
+        <Html style={{ pointerEvents: 'none' }} zIndexRange={[10, 0]}>
+          <div className="relative flex h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+            {/* Always-visible solid dot — white border + shadow keeps it
+                legible against both light concrete and dark glazing. */}
+            <span className="absolute inline-block h-3.5 w-3.5 rounded-full border-2 border-white bg-ember-600 shadow-[0_1px_4px_rgba(0,0,0,0.55)]" />
+            {isActive ? (
+              // Selected: a stable, brighter ring — no animation, reads as a
+              // deliberate "this one's open" state rather than still pulsing
+              // underneath the open info panel.
+              <span className="absolute inline-block h-6 w-6 rounded-full border-2 border-ember-600 opacity-90" />
+            ) : (
+              !prefersReducedMotion && (
+                // Continuous "tappable" cue — pure CSS (transform/opacity
+                // only, see index.css's `.animate-hotspot-ring`), runs on the
+                // compositor so it never touches the WebGL frame budget.
+                // Paused entirely once this marker is selected (branch
+                // above) or reduced-motion is on.
+                <span className="absolute inline-block h-3.5 w-3.5 rounded-full border-2 border-ember-600 animate-hotspot-ring" />
+              )
+            )}
+          </div>
+        </Html>
+      )}
+
       <Html distanceFactor={8} style={{ pointerEvents: 'none' }} zIndexRange={[10, 0]}>
         <div className="relative flex h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-          {/* `animate-ping` is a continuously-running CSS animation — skipped
-              on `lowPower`/reduced-motion devices (same `prefersReducedMotion`
-              flag this component already uses to flatten the 3D breathing
-              pulse), since it keeps compositing a DOM layer on top of the
-              WebGL canvas for as long as a marker is emphasized. */}
-          {emphasized && !prefersReducedMotion && (
-            <span className="absolute inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-ember-600 opacity-60" />
-          )}
-          {emphasized && prefersReducedMotion && (
-            <span className="absolute inline-flex h-2.5 w-2.5 rounded-full bg-ember-600 opacity-60" />
+          {!isMobile && (
+            <>
+              {/* `animate-ping` is a continuously-running CSS animation —
+                  skipped on `lowPower`/reduced-motion devices (same
+                  `prefersReducedMotion` flag this component already uses to
+                  flatten the 3D breathing pulse), since it keeps compositing
+                  a DOM layer on top of the WebGL canvas for as long as a
+                  marker is emphasized. */}
+              {emphasized && !prefersReducedMotion && (
+                <span className="absolute inline-flex h-2.5 w-2.5 animate-ping rounded-full bg-ember-600 opacity-60" />
+              )}
+              {emphasized && prefersReducedMotion && (
+                <span className="absolute inline-flex h-2.5 w-2.5 rounded-full bg-ember-600 opacity-60" />
+              )}
+            </>
           )}
           {isHovered && (
             <span className="absolute left-4 top-1/2 -translate-y-1/2 whitespace-nowrap rounded border border-white/10 bg-industrial-950/90 px-2 py-1 text-xs text-base-50">
@@ -1240,8 +1279,13 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   // cue, not core interaction, and `BreathingPulseDriver`'s periodic
   // `invalidate()` + the per-marker useFrame math are both work a
   // low-power device shouldn't pay for just to animate something nobody
-  // asked to see move.
-  const disableBreathing = prefersReducedMotion || lowPower
+  // asked to see move. Also off on `isMobile` regardless of `lowPower`: the
+  // mobile marker now gets its own always-on "tappable" cue as a pure-CSS
+  // ring in the Html block below (see `.animate-hotspot-ring` in index.css)
+  // — animating BOTH that and this WebGL breathing pulse on the same mesh
+  // would be redundant GPU/CPU work for a cue the CSS ring already carries
+  // on phones.
+  const disableBreathing = prefersReducedMotion || lowPower || isMobile
   // See data/hotspots3d.js for why there are two presets and how each was
   // derived/verified — this is the only place that picks between them.
   const defaultCameraPosition = isPortrait ? NARROW_CAMERA_POSITION : DEFAULT_CAMERA_POSITION
@@ -1384,6 +1428,15 @@ const Hero3DScene = forwardRef(function Hero3DScene(
   return (
     <>
       <Canvas
+        // Defense-in-depth alongside `CameraRig`'s own per-render
+        // `controls.domElement.style.touchAction = 'pan-y'` reassertion
+        // above (which targets the inner <canvas> element OrbitControls
+        // actually attaches to): this `style` prop is forwarded by R3F to
+        // the Canvas's own OUTER wrapper div, so a vertical swipe starting
+        // anywhere in that wrapper (not just exactly on the canvas's own
+        // hit-tested pixels) is still eligible for native page scroll
+        // rather than being swallowed as a no-op gesture.
+        style={{ touchAction: 'pan-y' }}
         shadows={!lowPower}
         // Explicit near/far instead of R3F's defaults (near 0.1, far 1000)
         // — this scene's entire usable depth range is ~0.3-35 world units
