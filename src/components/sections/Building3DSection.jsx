@@ -43,12 +43,20 @@ function InfoPanel({ hotspot, t, onClose }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 24 }}
       transition={{ duration: 0.25 }}
-      // Mobile (<md): true bottom sheet — capped at 60svh (not 80vh: the
-      // building above it needs to stay visible, not just a sliver), with
-      // bottom padding that clears Safari's own bottom chrome via
+      // Mobile (<md): true bottom sheet — capped at 38svh (was 60svh, which
+      // on the stacked mobile layout's own 45svh 3D area meant the sheet's
+      // TOP edge sat above the 3D area's own top, fully hiding the
+      // building the user just tapped a hotspot on — see
+      // Building3DSection's own 3D-area height above). 38svh instead leaves
+      // roughly the top half of the building visible above the sheet.
+      // Translucent + blurred (vs. the md+ panel's solid bg) so even the
+      // covered lower portion still reads as "the building is behind this,"
+      // not "the building is gone" — reset back to solid/unblurred at `md`+
+      // where the panel floats beside the full-bleed scene instead of
+      // overlaying it. Bottom padding clears Safari's own bottom chrome via
       // `env(safe-area-inset-bottom)`. `md:` and up: unchanged, the
       // existing right-side floating panel.
-      className="fixed inset-x-0 bottom-0 z-50 max-h-[60svh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-industrial-950 px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 md:absolute md:inset-x-auto md:top-6 md:right-6 md:max-h-[calc(100vh-3rem)] md:w-80 md:rounded-2xl md:border md:px-6 md:py-6"
+      className="fixed inset-x-0 bottom-0 z-50 max-h-[38svh] overflow-y-auto rounded-t-2xl border-t border-white/10 bg-industrial-950/92 backdrop-blur-md px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-3 md:absolute md:inset-x-auto md:top-6 md:right-6 md:max-h-[calc(100vh-3rem)] md:w-80 md:rounded-2xl md:border md:bg-industrial-950 md:px-6 md:py-6 md:backdrop-blur-none"
     >
       {/* Drag-handle bar — bottom-sheet-only affordance, hidden on the `md`+
           floating panel. */}
