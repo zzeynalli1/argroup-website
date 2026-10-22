@@ -15,6 +15,7 @@ import {
 import { COLORS, groundMaterial } from './buildingMaterials'
 import Building from './Building'
 import { diag3d } from '../../lib/diag3d'
+import { prefetchHeroHdri } from '../../lib/heroHdri'
 
 // Split into its own lazy chunk — see PostProcessingEffects.jsx's own
 // comment — so `lowPower` scenes, which never render it (see the JSX gate
@@ -323,11 +324,9 @@ function GradientBackdrop() {
 // in place of this file and reliably read as grey/flat — a real
 // photographed HDRI's uneven, directional light pattern is what makes
 // metal/glass reflections look like a real environment instead of a
-// uniform studio dome, so that's worth the one real asset load. Also
-// fetched eagerly, in parallel with this chunk itself, by App.jsx's
-// `HeroScenePrefetch` — same URL, so that fetch's bytes are already
-// HTTP-cache-warm by the time the `loadHDRTexture()` below requests them.
-const HDRI_URL = '/hdr/potsdamer_platz_512.hdr'
+// uniform studio dome, so that's worth the one real asset load. The actual
+// URL/fetch now lives in lib/heroHdri.js, shared with main.jsx's and
+// App.jsx's own prefetches — see `loadHDRTexture` below.
 // How long to wait for the HDRI before compiling/revealing the scene
 // without it — see `SceneReady` below for why this exists at all (no
 // isolated Suspense this scene can silently resolve behind).
@@ -341,12 +340,35 @@ const HDRI_ENV_INTENSITY = 1.15
 // means a second mount this session (e.g. navigating away from Home and
 // back) skips RGBE decoding entirely, not just the network fetch. Kept as a
 // shared in-flight promise too so two near-simultaneous mounts don't both
-// start their own RGBELoader.
+// start their own decode.
+//
+// Decodes the SAME ArrayBuffer `prefetchHeroHdri()` fetched (deduped at
+// module scope there too — main.jsx/App.jsx's own prefetches and this call
+// all resolve the one shared promise, so the network tab shows exactly one
+// request for this file) via `RGBELoader.createDataTexture`, which parses
+// already-in-memory bytes into a DataTexture without re-fetching — the
+// RGBELoader instance's own `.load()` method is never called here, since
+// that method does its own internal fetch. The colorSpace/filter/flipY
+// adjustments below are copied from `RGBELoader.load()`'s own
+// `onLoadCallback` (three-stdlib/loaders/RGBELoader.js), which
+// `createDataTexture()` does NOT apply on its own — they're required for a
+// HalfFloat/Float RGBE texture to look correct as an equirect env map.
 let cachedHDRTexturePromise = null
 function loadHDRTexture() {
   if (!cachedHDRTexturePromise) {
-    cachedHDRTexturePromise = new Promise((resolve, reject) => {
-      new RGBELoader().load(HDRI_URL, resolve, undefined, reject)
+    cachedHDRTexturePromise = prefetchHeroHdri().then((buffer) => {
+      const texture = new RGBELoader().createDataTexture(buffer)
+      switch (texture.type) {
+        case THREE.FloatType:
+        case THREE.HalfFloatType:
+          texture.colorSpace = THREE.LinearSRGBColorSpace
+          texture.minFilter = THREE.LinearFilter
+          texture.magFilter = THREE.LinearFilter
+          texture.generateMipmaps = false
+          texture.flipY = true
+          break
+      }
+      return texture
     })
   }
   return cachedHDRTexturePromise
@@ -915,7 +937,7 @@ function StaticShadowMap() {
 // place. Loading the HDRI first and only then starting `compileAsync`
 // means every program compiles ONCE, already in its final envMap-aware
 // form.
-function ReadySignal({ onReady }) {
+function ReadySignal({ onReady, lowPower }) {
   const { gl, scene, camera, invalidate } = useThree()
   const compileStartedRef = useRef(false)
   const compileDoneRef = useRef(false)
@@ -944,6 +966,24 @@ function ReadySignal({ onReady }) {
         // next frame.
         invalidate()
       })
+    }
+
+    // Mobile/weak-hardware scenes never request the HDRI at all (see
+    // main.jsx/App.jsx's own `detectLowPower`-gated prefetch skip) — asking
+    // for it here anyway would just start the fetch late, on the one class
+    // of device least able to afford it. Compiles/reveals immediately with
+    // no env map, same as the timeout path below.
+    if (lowPower) {
+      diag3d('3D HDRI load skipped — lowPower')
+      startCompile('lowPower, no env map')
+      return () => {
+        unmounted = true
+        pmrem.dispose()
+        if (scene.environment) {
+          scene.environment.dispose()
+          scene.environment = null
+        }
+      }
     }
 
     // Safety valve: a slow/unreachable HDRI must never block the scene
@@ -984,7 +1024,7 @@ function ReadySignal({ onReady }) {
         scene.environment = null
       }
     }
-  }, [gl, scene, camera, invalidate])
+  }, [gl, scene, camera, invalidate, lowPower])
   /* eslint-enable react-hooks/immutability */
 
   useFrame(() => {
@@ -1512,6 +1552,7 @@ const Hero3DScene = forwardRef(function Hero3DScene(
         }}
       >
         <ReadySignal
+          lowPower={lowPower}
           onReady={() => {
             diag3d('3D scene onReady (first frame rendered, shaders compiled)')
             onReady?.()

@@ -6,6 +6,8 @@ import ScrollToTop from './components/ScrollToTop'
 import ProtectedRoute from './components/admin/ProtectedRoute'
 import RouteTransitionProvider from './components/transitions/RouteTransitionProvider'
 import { useRegisterRouteLoading } from './components/transitions/routeLoadingSignal'
+import { detectLowPower } from './lib/deviceCapability'
+import { prefetchHeroHdri } from './lib/heroHdri'
 // Every page (including Home) is its own lazy chunk, so visiting any one
 // route never downloads JS for routes the user hasn't navigated to yet —
 // this keeps non-public routes like /admin/login from paying for Home's
@@ -38,27 +40,29 @@ function RouteFallback() {
   )
 }
 
-// Hero3DScene's own HDRI path — kept here, not imported, so importing it
-// doesn't pull the whole Three.js/R3F chunk into this eagerly-bundled file.
-const HERO_SCENE_HDRI_URL = '/hdr/potsdamer_platz_512.hdr'
-
 // Starts downloading Hero3DScene's chunk (~360KB gzip, the heaviest single
-// chunk on the site) AND its HDRI the instant the "/" route is requested —
-// unconditional, no gate/wait on the intro or anything else, just the
-// earliest possible start. This lives here (App.jsx, part of the main
-// eagerly-loaded bundle), not inside Building3DSection, specifically so it
-// fires IN PARALLEL with the Home route's own lazy chunk download instead
-// of after it: Building3DSection only exists once Home's chunk has already
-// loaded, so its own lazy()+Suspense import of Hero3DScene is one full
-// network round-trip later than this. Fire-and-forget — a real failure is
-// handled later by Building3DSection's own lazy()+Suspense+ErrorBoundary
-// when it imports the same chunk/asset for real.
+// chunk on the site) AND its HDRI (see lib/heroHdri.js — same shared
+// cached-promise module main.jsx's own earlier prefetch and Hero3DScene's
+// own decode step use, so this is a dedupe, never a second request) the
+// instant the "/" route is requested — unconditional, no gate/wait on the
+// intro or anything else, just the earliest possible start. This lives here
+// (App.jsx, part of the main eagerly-loaded bundle), not inside
+// Building3DSection, specifically so it fires IN PARALLEL with the Home
+// route's own lazy chunk download instead of after it: Building3DSection
+// only exists once Home's chunk has already loaded, so its own
+// lazy()+Suspense import of Hero3DScene is one full network round-trip
+// later than this. Fire-and-forget — a real failure is handled later by
+// Building3DSection's own lazy()+Suspense+ErrorBoundary when it imports the
+// same chunk/asset for real. HDRI fetch itself is skipped on mobile/weak
+// hardware (`detectLowPower`) — see main.jsx's own comment on why.
 function HeroScenePrefetch() {
   const { pathname } = useLocation()
   useEffect(() => {
     if (pathname !== '/') return
     import('./components/3d/Hero3DScene').catch(() => {})
-    fetch(HERO_SCENE_HDRI_URL, { credentials: 'omit' }).catch(() => {})
+    if (!detectLowPower()) {
+      prefetchHeroHdri().catch(() => {})
+    }
   }, [pathname])
   return null
 }
